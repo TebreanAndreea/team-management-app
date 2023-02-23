@@ -17,6 +17,7 @@ Worked for me too I think - Andrei
 | ![](https://secure.gravatar.com/avatar/c5c04fddc42c7f22b447c91953fae25d?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Andrei Stefan | A.Stefan-1@student.tudelft.nl |
 | ![](https://secure.gravatar.com/avatar/3a83cd892f1433ec65466fa6b4b7e293?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Cristian Toadere | c.f.toadere@student.tudelft.nl |
 | ![](https://secure.gravatar.com/avatar/80563c8b75551f77dfdbb3dae6d648b0?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Marin Perković | M.Perkovic@student.tudelft.nl |
+| ![](https://secure.gravatar.com/avatar/18df772a35e9d50a4c281b668c69c2b5?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Alexandra Nicola | A.M.Nicola@student.tudelft.nl |
 
 <!-- Instructions (remove once assignment has been completed -->
 <!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
