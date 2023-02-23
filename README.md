@@ -7,14 +7,14 @@ Add your own name (do not add the names for others!) to the section below.
 ## Description of project
 Testing whatever
 It worked for me - Cristian
-
+Worked for me too I think - Andrei 
 ## Group members
 
 | Profile Picture | Name | Email |
 |---|---|---|
 |-!-|Vasko|v.v.guenov@student.tudelft.nl|
 | ![](https://eu.ui-avatars.com/api/?name=OOPP&length=4&size=50&color=DDD&background=777&font-size=0.325) | Your Name Here | Y.NameHere@student.tudelft.nl |
-
+| ![](https://secure.gravatar.com/avatar/c5c04fddc42c7f22b447c91953fae25d?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Andrei Stefan | A.Stefan-1@student.tudelft.nl |
 <!-- Instructions (remove once assignment has been completed -->
 <!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
 <!-- - Mention your *student* email address -->
