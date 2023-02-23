@@ -15,6 +15,7 @@ Worked for me too I think - Andrei
 |-!-|Vasko|v.v.guenov@student.tudelft.nl|
 | ![](https://eu.ui-avatars.com/api/?name=OOPP&length=4&size=50&color=DDD&background=777&font-size=0.325) | Your Name Here | Y.NameHere@student.tudelft.nl |
 | ![](https://secure.gravatar.com/avatar/c5c04fddc42c7f22b447c91953fae25d?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Andrei Stefan | A.Stefan-1@student.tudelft.nl |
+| ![](https://gitlab.ewi.tudelft.nl/uploads/-/system/user/avatar/6110/avatar.png?width=400&length=4&size=50&color=DDD&background=777&font-size=0.325) | Cristian Toadere | c.f.toadere@student.tudelft.nl |
 <!-- Instructions (remove once assignment has been completed -->
 <!-- - Add (only!) your own name to the table above (use Markdown formatting) -->
 <!-- - Mention your *student* email address -->
