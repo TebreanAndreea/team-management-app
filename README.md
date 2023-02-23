@@ -12,7 +12,7 @@ Worked for me too I think - Andrei
 
 | Profile Picture | Name | Email |
 |![](https://secure.gravatar.com/avatar/300c41aa17c0604bc04d2794dd74c8eb?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325)|Tebrean Andreea||A.aebrean@student.tudelft.nl|
-| ![](https://secure.gravatar.com/avatar/6ced06964ac9fdd7c1eea6eaf1b66f3f?s=800&d=identicon)|Vasko|v.v.guenov@student.tudelft.nl|
+| ![](https://secure.gravatar.com/avatar/6ced06964ac9fdd7c1eea6eaf1b66f3f?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325)|Vasko|v.v.guenov@student.tudelft.nl|
 | ![](https://eu.ui-avatars.com/api/?name=OOPP&length=4&size=50&color=DDD&background=777&font-size=0.325) | Your Name Here | Y.NameHere@student.tudelft.nl |
 | ![](https://secure.gravatar.com/avatar/c5c04fddc42c7f22b447c91953fae25d?s=800&d=identicon&length=4&size=50&color=DDD&background=777&font-size=0.325) | Andrei Stefan | A.Stefan-1@student.tudelft.nl |
 | ![](https://gitlab.ewi.tudelft.nl/uploads/-/system/user/avatar/6110/avatar.png?&length=4&size=50&color=DDD&background=777&font-size=0.325) | Cristian Toadere | c.f.toadere@student.tudelft.nl |
