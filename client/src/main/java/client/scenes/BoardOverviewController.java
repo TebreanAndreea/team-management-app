@@ -5,6 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.awt.event.ActionEvent;
@@ -14,6 +18,8 @@ public class BoardOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
+    public HBox hBox;
+    public TitledPane TODO;
 
 
     /**
@@ -28,5 +34,17 @@ public class BoardOverviewController {
         overview = new Scene(root);
         primaryStage.setScene(overview);
         primaryStage.show();
+    }
+
+    //TODO make button inside titled pane top-center aligned
+    public void addList() {
+        Button tempButton = new Button("+");
+        TitledPane titledPane = new TitledPane("new list", tempButton);
+        titledPane.setPrefHeight(TODO.getPrefHeight());
+        titledPane.setMinWidth(TODO.getMinWidth());
+        titledPane.setAnimated(false);
+        titledPane.setContentDisplay(ContentDisplay.TOP);
+        titledPane.getContent().setStyle("-fx-alignment: top-center;");
+        hBox.getChildren().add(titledPane);
     }
 }

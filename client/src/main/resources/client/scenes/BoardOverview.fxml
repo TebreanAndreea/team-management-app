@@ -1,37 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="427.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
+<AnchorPane prefHeight="427.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
-        <TitledPane animated="false" layoutX="20.0" layoutY="83.0" prefHeight="235.0" prefWidth="154.0" text="To Do">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="213.0" prefWidth="660.0">
-                    <children>
-                        <Button layoutX="8.0" layoutY="22.0" mnemonicParsing="false" onAction="#switchToCardScene" prefHeight="26.0" prefWidth="136.0" text="Task1" />
-                        <Button layoutX="9.0" layoutY="66.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="134.0" text="Task2" />
-                    </children></AnchorPane>
-            </content>
-        </TitledPane>
-        <TitledPane animated="false" layoutX="202.0" layoutY="83.0" prefHeight="235.0" prefWidth="154.0" text="Doing">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-        </TitledPane>
-        <TitledPane animated="false" layoutX="383.0" layoutY="83.0" prefHeight="235.0" prefWidth="154.0" text="Done">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="204.0" prefWidth="152.0" />
-            </content>
-        </TitledPane>
-        <Button layoutX="561.0" layoutY="169.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="50.0" text="+Add" />
+        <Button layoutX="546.0" layoutY="17.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="50.0" onAction="#addList" text="+Add" />
         <Label layoutX="20.0" layoutY="23.0" prefHeight="39.0" prefWidth="154.0" text="Board Name">
             <font>
                 <Font name="System Bold" size="19.0" />
             </font>
         </Label>
+        <ScrollPane layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0" vbarPolicy="NEVER">
+            <content>
+                <HBox fx:id="hBox" alignment="CENTER_LEFT" layoutX="1.0" layoutY="103.0" prefHeight="250.0" prefWidth="635.0" spacing="20.0" style="-fx-background-color: rgba(199, 215, 242)">
+                    <children>
+                        <TitledPane fx:id="TODO" animated="false" prefHeight="235.0" prefWidth="154.0" minWidth="154.0" text="To Do">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="213.0" prefWidth="660.0">
+                                    <children>
+                                        <Button layoutX="8.0" layoutY="22.0" mnemonicParsing="false"  onAction="#switchToCardScene" prefHeight="26.0" prefWidth="136.0" text="Task1" />
+                                        <Button layoutX="9.0" layoutY="66.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="134.0" text="Task2" />
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                        <TitledPane animated="false" prefHeight="235.0" prefWidth="154.0" minWidth="154.0" text="Doing">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                            </content>
+                        </TitledPane>
+                        <TitledPane animated="false" prefHeight="235.0" prefWidth="154.0" minWidth="154.0" text="Done">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="204.0" prefWidth="152.0" />
+                            </content>
+                        </TitledPane>
+                    </children>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </HBox>
+            </content>
+        </ScrollPane>
     </children>
 </AnchorPane>
