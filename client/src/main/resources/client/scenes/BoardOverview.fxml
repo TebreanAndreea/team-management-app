@@ -12,7 +12,7 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="213.0" prefWidth="660.0">
                     <children>
-                        <Button layoutX="8.0" layoutY="22.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="136.0" text="Task1" />
+                        <Button layoutX="8.0" layoutY="22.0" mnemonicParsing="false" onAction="#switchToCardScene" prefHeight="26.0" prefWidth="136.0" text="Task1" />
                         <Button layoutX="9.0" layoutY="66.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="134.0" text="Task2" />
                     </children></AnchorPane>
             </content>

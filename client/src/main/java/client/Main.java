@@ -38,7 +38,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
 
-        var overview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+         var overview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
 
         var mainController = INJECTOR.getInstance(MainController.class);
