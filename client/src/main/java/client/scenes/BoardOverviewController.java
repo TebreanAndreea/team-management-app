@@ -1,6 +1,6 @@
 package client.scenes;
 
-import javafx.fxml.FXML;
+//import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -10,8 +10,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
-import java.awt.event.ActionEvent;
+//import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 public class BoardOverviewController {
@@ -23,7 +22,7 @@ public class BoardOverviewController {
 
 
     /**
-     * Function that goes to add a card
+     * Function that goes to add a card.
      *
      * @param actionEvent the action event on the button
      * @throws IOException the exception which might be caused

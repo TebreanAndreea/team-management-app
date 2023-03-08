@@ -14,7 +14,7 @@ public class CardOverviewController {
 
 
     /**
-     * Function that goes from the card details back to the board
+     * Function that goes from the card details back to the board.
      *
      * @param actionEvent the action event on the button
      * @throws IOException the exception which might be caused

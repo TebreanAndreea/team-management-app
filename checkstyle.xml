@@ -6,6 +6,41 @@
 <module name = "Checker">
     <module name="TreeWalker">
         <module name="UnusedImports" />
+        <module name="UnusedImports" />
+        <module name="JavadocMethod"/>
+        <module name="JavadocStyle"/>
+        <module name="Indentation"/>
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z][_a-zA-Z0-9]+$"/>
+            <property name="allowOneCharVarInForLoop" value="true"/>
+        </module>
+        <module name="AvoidNestedBlocks">
+            <property name="allowInSwitchCase" value="true"/>
+        </module>
+        <module name="EmptyBlock"/>
+        <module name="NestedIfDepth">
+            <property name="max" value="2"/>
+        </module>
+        <module name="NestedForDepth">
+            <property name="max" value="2"/>
+        </module>
+        <module name="EmptyStatement"/>
+        <module name="EqualsAvoidNull"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="EqualsHashCode"/>
+        <module name="RedundantImport"/>
+        <module name="CyclomaticComplexity">
+            <property name="max" value="6"/>
+            <property name="tokens" value="LITERAL_WHILE, LITERAL_DO"/>
+        </module>
+        <module name="MethodName"/>
+        <module name="MethodLength">
+            <property name="tokens" value="METHOD_DEF"/>
+            <property name="max" value="50"/>
+        </module>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+
     </module>
 
     <!-- TODO: decide in your team with other checkers to add! -->
