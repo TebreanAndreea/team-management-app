@@ -22,35 +22,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 public class PersonTest {
+    @Test
+    public void checkConstructor() {
+        var pp = new Person("f", "l");
+        assertEquals("f", pp.firstName);
+        assertEquals("l", pp.lastName);
+    }
 
-	@Test
-	public void checkConstructor() {
-		var p = new Person("f", "l");
-		assertEquals("f", p.firstName);
-		assertEquals("l", p.lastName);
-	}
+    @Test
+    public void equalsHashCode() {
+        var aa = new Person("a", "b");
+        var bb = new Person("a", "b");
+        assertEquals(aa, bb);
+        assertEquals(aa.hashCode(), bb.hashCode());
+    }
 
-	@Test
-	public void equalsHashCode() {
-		var a = new Person("a", "b");
-		var b = new Person("a", "b");
-		assertEquals(a, b);
-		assertEquals(a.hashCode(), b.hashCode());
-	}
+    @Test
+    public void notEqualsHashCode() {
+        var aa = new Person("a", "b");
+        var bb = new Person("a", "c");
+        assertNotEquals(aa, bb);
+        assertNotEquals(aa.hashCode(), bb.hashCode());
+    }
 
-	@Test
-	public void notEqualsHashCode() {
-		var a = new Person("a", "b");
-		var b = new Person("a", "c");
-		assertNotEquals(a, b);
-		assertNotEquals(a.hashCode(), b.hashCode());
-	}
-
-	@Test
+    @Test
 	public void hasToString() {
-		var actual = new Person("a", "b").toString();
-		assertTrue(actual.contains(Person.class.getSimpleName()));
-		assertTrue(actual.contains("\n"));
-		assertTrue(actual.contains("firstName"));
-	}
+        var actual = new Person("a", "b").toString();
+        assertTrue(actual.contains(Person.class.getSimpleName()));
+        assertTrue(actual.contains("\n"));
+        assertTrue(actual.contains("firstName"));
+    }
 }

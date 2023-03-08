@@ -70,9 +70,9 @@ public class AddQuoteCtrl {
     }
 
     private Quote getQuote() {
-        var p = new Person(firstName.getText(), lastName.getText());
-        var q = quote.getText();
-        return new Quote(p, q);
+        var person = new Person(firstName.getText(), lastName.getText());
+        var quoteText = quote.getText();
+        return new Quote(person, quoteText);
     }
 
     private void clearFields() {
@@ -83,14 +83,14 @@ public class AddQuoteCtrl {
 
     public void keyPressed(KeyEvent e) {
         switch (e.getCode()) {
-        case ENTER:
-            ok();
-            break;
-        case ESCAPE:
-            cancel();
-            break;
-        default:
-            break;
+            case ENTER:
+                ok();
+                break;
+            case ESCAPE:
+                cancel();
+                break;
+            default:
+                break;
         }
     }
 }
