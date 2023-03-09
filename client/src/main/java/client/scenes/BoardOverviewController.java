@@ -48,7 +48,7 @@ public class BoardOverviewController {
     }
 
     /**
-     * Function that enable you to go back to HomePage
+     * Function that enable you to go back to HomePage.
      *
      * @param actionEvent the event used
      * @throws IOException the exemption it might be caused
