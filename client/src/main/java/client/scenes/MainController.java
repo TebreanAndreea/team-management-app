@@ -13,7 +13,7 @@ import javafx.util.Pair;
 public class MainController {
 
     private Stage primaryStage;
-    private BoardOverviewController overviewController;
+    private HomePageOverviewController overviewController;
     private Scene overview;
 
     /**
@@ -21,7 +21,7 @@ public class MainController {
      * @param primaryStage
      * @param overview
      */
-    public void initialize(Stage primaryStage, Pair<BoardOverviewController, Parent> overview){
+    public void initialize(Stage primaryStage, Pair<HomePageOverviewController, Parent> overview){
         this.primaryStage = primaryStage;
         this.overviewController = overview.getKey();
         this.overview = new Scene(overview.getValue());

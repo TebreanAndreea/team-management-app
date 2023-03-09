@@ -118,4 +118,19 @@ public class BoardOverviewController {
         HBox mainhbox = (HBox) titledPane.getParent();
         mainhbox.getChildren().remove(titledPane);
     }
+
+    /**
+     * Function that enable you to go back to HomePage.
+     *
+     * @param actionEvent the event used
+     * @throws IOException the exemption it might be caused
+     */
+    public void switchToHomePageScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("HomePageOverview.fxml"));
+        primaryStage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(root);
+        primaryStage.setScene(overview);
+        primaryStage.show();
+    }
+
 }
