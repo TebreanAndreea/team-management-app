@@ -7,34 +7,46 @@ import java.util.Date;
 import java.util.Objects;
 //import java.util.Set;
 
+@Entity
 public class Card {
 
-
+    @Id
+    @GeneratedValue
     private long cardId;
     private String description;
     private String name;
     private Date dueDate;
+    @ManyToMany
+    private ArrayList<Tags> tags;
     @OneToMany
-    private ArrayList<String> tags;
-    private ArrayList<SubTasks> miniTasks;
+    private ArrayList<SubTasks> subTasks;
     private boolean complete;
+    @ManyToOne
+    private List list;
 
     /**
+     *
      * Constructor for the card class.
      * @param description - description of the card
      * @param name - Name of the card
      * @param dueDate - The due date of the card
      * @param tags - List with tags which will make searching for the card easier
-     * @param miniTasks - List of smaller simple subtasks of the global goal
+     * @param subTasks - List of smaller simple subtasks of the global goal
+     * @param list - the list in which the card is
      */
-    public Card(String description, String name, Date dueDate, ArrayList<String> tags, ArrayList<SubTasks> miniTasks) {
+    public Card(String description, String name, Date dueDate, ArrayList<Tags> tags, ArrayList<SubTasks> subTasks, List list) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
         this.tags = tags;
-        this.miniTasks = miniTasks;
+        this.subTasks = subTasks;
+        this.complete = false;
+        this.list = list;
     }
 
+    /**
+     * Default constructor.
+     */
     public Card() {
 
     }
@@ -99,7 +111,7 @@ public class Card {
      * Getter for the tags.
      * @return the tags of the card
      */
-    public ArrayList<String> getTags() {
+    public ArrayList<Tags> getTags() {
         return tags;
     }
 
@@ -107,7 +119,7 @@ public class Card {
      * Alters the tags list with a new one.
      * @param tags the new tags list
      */
-    public void setTags(ArrayList<String> tags) {
+    public void setTags(ArrayList<Tags> tags) {
         this.tags = tags;
     }
 
@@ -116,7 +128,7 @@ public class Card {
      * @return the mini tasks of the card
      */
     public ArrayList<SubTasks> getMiniTasks() {
-        return miniTasks;
+        return subTasks;
     }
 
     /**
@@ -124,7 +136,7 @@ public class Card {
      * @param miniTasks - the new array list
      */
     public void setMiniTasks(ArrayList<SubTasks> miniTasks) {
-        this.miniTasks = miniTasks;
+        this.subTasks = miniTasks;
     }
 
     /**
@@ -153,7 +165,7 @@ public class Card {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
-        return cardId == card.cardId && complete == card.complete && Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags) && Objects.equals(miniTasks, card.miniTasks);
+        return cardId == card.cardId && complete == card.complete && Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags) && Objects.equals(subTasks, card.subTasks) && Objects.equals(list, card.list);
     }
 
     /**
@@ -162,6 +174,6 @@ public class Card {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(cardId, description, name, dueDate, tags, miniTasks, complete);
+        return Objects.hash(cardId, description, name, dueDate, tags, subTasks, complete, list);
     }
 }
