@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 @Entity
@@ -17,8 +19,11 @@ public class List {
     private long listId;
 
     private String title;
-    
-    private ArrayList<Long> cards;
+    @OneToMany
+    private ArrayList<Card> cards;
+
+    @ManyToOne
+    private Board board;
 
     /**
      * Constructs empty tables at database initialisation.
@@ -31,10 +36,11 @@ public class List {
     /**
      * Creates a new list.
      * @param title the title of the list.
+     * @param board the board containing the list.
      */
-    public List(String title) {
+    public List(String title, Board board) {
         this.title = title;
-        this.title = title;
+        this.board = board;
         this.cards = new ArrayList<>();
     }
 
@@ -67,8 +73,16 @@ public class List {
      * Getter for the ArrayList of cards.
      * @return the ArrayList of cards.
      */
-    public ArrayList<Long> getCards() {
+    public ArrayList<Card> getCards() {
         return this.cards;
+    }
+
+    /**
+     * Getter for the board.
+     * @return the board containing the list.
+     */
+    public Board getBoard() {
+        return this.board;
     }
 
     /**
@@ -83,7 +97,7 @@ public class List {
             return false;
         }
         List list = (List) o;
-        return listId == list.listId && Objects.equals(title, list.title) && Objects.equals(cards, list.cards);
+        return listId == list.listId && Objects.equals(title, list.title) && Objects.equals(cards, list.cards) && Objects.equals(board, list.board);
     }
 
     /**
@@ -91,7 +105,7 @@ public class List {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(listId, title, cards);
+        return Objects.hash(listId, title, cards, board);
     }
     
 
