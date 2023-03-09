@@ -37,7 +37,7 @@ public class BoardOverviewController {
     }
 
     /**
-     * <h3>Adds a new list with no contents, beside the 'add' button</h3>
+     * <h3>Adds a new list with no contents, beside the 'add' button.</h3>
      */
     public void addList() {
         Button tempButton = new Button("+");
@@ -57,9 +57,9 @@ public class BoardOverviewController {
     }
 
     /**
-     * <h3>Adds a (placeholder, as of now) card to its assigned list</h3>
-     * <p>The method gets the button causing the action, and generates another button to place above it</p>
-     * @param actionEvent the action event that caused this method to be called
+     * <h3>Adds a (placeholder, as of now) card to its assigned list.</h3>
+     * <p>The method gets the button causing the action, and generates another button to place above it.</p>
+     * @param actionEvent the action event that caused this method to be called.
      */
     public void addCard(javafx.event.ActionEvent actionEvent) {
         Button clickedButton = (Button) actionEvent.getSource();
@@ -76,7 +76,7 @@ public class BoardOverviewController {
     }
 
     /**
-     * <h3>Deletes the card on which the button is clicked</h3>
+     * <h3>Deletes the card on which the button is clicked.</h3>
      * @param actionEvent the action  event that caused this method to be called
      */
     public void deleteCard(javafx.event.ActionEvent actionEvent) {
