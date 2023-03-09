@@ -1,15 +1,23 @@
 package commons;
 
 //import java.lang.reflect.Array;
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
+//import java.util.Set;
 
 public class Card {
+
+
+    private long cardId;
     private String description;
     private String name;
-    private String dueDate;
+    private Date dueDate;
+    @OneToMany
     private ArrayList<String> tags;
-    private ArrayList<String> miniTasks;
+    private ArrayList<SubTasks> miniTasks;
+    private boolean complete;
 
     /**
      * Constructor for the card class.
@@ -19,12 +27,24 @@ public class Card {
      * @param tags - List with tags which will make searching for the card easier
      * @param miniTasks - List of smaller simple subtasks of the global goal
      */
-    public Card(String description, String name, String dueDate, ArrayList<String> tags, ArrayList<String> miniTasks) {
+    public Card(String description, String name, Date dueDate, ArrayList<String> tags, ArrayList<SubTasks> miniTasks) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
         this.tags = tags;
         this.miniTasks = miniTasks;
+    }
+
+    public Card() {
+
+    }
+
+    /**
+     * Getter for the id.
+     * @return the id of the card
+     */
+    public long getCardId() {
+        return cardId;
     }
 
     /**
@@ -63,7 +83,7 @@ public class Card {
      * Getter for the due date.
      * @return the due date of the card
      */
-    public String getDueDate() {
+    public Date getDueDate() {
         return dueDate;
     }
 
@@ -71,7 +91,7 @@ public class Card {
      * Setter for the due date.
      * @param dueDate - the new due date
      */
-    public void setDueDate(String dueDate) {
+    public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -95,7 +115,7 @@ public class Card {
      * Getter for the mini tasks.
      * @return the mini tasks of the card
      */
-    public ArrayList<String> getMiniTasks() {
+    public ArrayList<SubTasks> getMiniTasks() {
         return miniTasks;
     }
 
@@ -103,8 +123,24 @@ public class Card {
      * Alters the mini tasks list with a new one.
      * @param miniTasks - the new array list
      */
-    public void setMiniTasks(ArrayList<String> miniTasks) {
+    public void setMiniTasks(ArrayList<SubTasks> miniTasks) {
         this.miniTasks = miniTasks;
+    }
+
+    /**
+     * Getter for the completion.
+     * @return whether the task is complete
+     */
+    public boolean isComplete() {
+        return complete;
+    }
+
+    /**
+     * Alters the status of the task.
+     * @param complete - the new status
+     */
+    public void setComplete(boolean complete) {
+        this.complete = complete;
     }
 
     /**
@@ -117,7 +153,7 @@ public class Card {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
-        return Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags);
+        return cardId == card.cardId && complete == card.complete && Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags) && Objects.equals(miniTasks, card.miniTasks);
     }
 
     /**
@@ -126,6 +162,6 @@ public class Card {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(description, name, dueDate, tags);
+        return Objects.hash(cardId, description, name, dueDate, tags, miniTasks, complete);
     }
 }
