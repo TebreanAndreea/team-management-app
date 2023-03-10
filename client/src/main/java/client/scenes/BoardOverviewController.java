@@ -5,9 +5,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -34,10 +36,14 @@ public class BoardOverviewController {
         primaryStage.show();
     }
 
+    //TODO make button inside titled pane top-center aligned
+
     /**
-     * <h3>Adds a new list with no contents, beside the 'add' button.</h3>
+     * Adds a new list with no contents, beside the 'add' button with a title.
+     *
+     * @param title the title for the new list
      */
-    public void addList() {
+    public void addList(String title) {
         Button addCardButton = new Button("+");
         addCardButton.setOnAction(this::addCard);
 
@@ -61,13 +67,36 @@ public class BoardOverviewController {
         vBox.getChildren().add(deleteListButtonRow);
 
         // set up the list itself
-        TitledPane titledPane = new TitledPane("new list", vBox);
+        TitledPane titledPane = new TitledPane(title, vBox);
         titledPane.setPrefHeight(TODO.getPrefHeight());
         titledPane.setMinWidth(TODO.getMinWidth());
         titledPane.setAnimated(false);
         hBox.getChildren().add(titledPane);
     }
 
+    /**
+     * Method to create an area to add a title for a new created list.
+     *
+     */
+    public void addTitleForList() {
+        TextArea textArea = new TextArea();
+        textArea.setPromptText("Enter title");
+        Button createButton = new Button("Create");
+        VBox vbox = new VBox(textArea, createButton);
+        hBox.getChildren().add(vbox);
+        vbox.setMinWidth(70);
+        vbox.setPrefHeight(100);
+        textArea.setPrefHeight(5);
+        textArea.setMinWidth(1);
+        vbox.setAlignment(Pos.CENTER);
+        createButton.setOnAction(event -> {
+            String titleText = textArea.getText().trim();
+            Pane parent = (Pane) vbox.getParent();
+            parent.getChildren().remove(vbox);
+            addList(titleText);
+        });
+
+    }
     /**
      * <h3>Adds a (placeholder, as of now) card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>

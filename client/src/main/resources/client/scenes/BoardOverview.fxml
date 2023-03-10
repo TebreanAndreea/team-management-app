@@ -7,7 +7,7 @@
 
 <AnchorPane prefHeight="427.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
-        <Button layoutX="546.0" layoutY="17.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
+        <Button layoutX="546.0" layoutY="17.0" mnemonicParsing="false" onAction="#addTitleForList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
         <Label layoutX="20.0" layoutY="23.0" prefHeight="39.0" prefWidth="154.0" text="Board Name">
             <font>
                 <Font name="System Bold" size="19.0" />
