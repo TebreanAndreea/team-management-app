@@ -1,6 +1,5 @@
 package client.scenes;
 
-//import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,7 +10,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-//import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 public class BoardOverviewController {
@@ -40,15 +38,29 @@ public class BoardOverviewController {
      * <h3>Adds a new list with no contents, beside the 'add' button.</h3>
      */
     public void addList() {
-        Button tempButton = new Button("+");
-        tempButton.setOnAction(this::addCard);
+        Button addCardButton = new Button("+");
+        addCardButton.setOnAction(this::addCard);
+
+        Button deleteListButton = new Button("delete list");
+        deleteListButton.setOnAction(this::deleteList);
+
         VBox vBox = new VBox();
         vBox.setSpacing(20);
         vBox.setAlignment(Pos.TOP_CENTER);
-        HBox buttonRow = new HBox();
-        buttonRow.setAlignment(Pos.CENTER);
-        buttonRow.getChildren().add(tempButton);
-        vBox.getChildren().add(buttonRow);
+
+        // add the "Add card" button below the cards
+        HBox addCardButtonRow = new HBox();
+        addCardButtonRow.setAlignment(Pos.CENTER);
+        addCardButtonRow.getChildren().add(addCardButton);
+        vBox.getChildren().add(addCardButtonRow);
+
+        // add the "Delete list button at the bottom of this list
+        HBox deleteListButtonRow = new HBox();
+        deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
+        deleteListButtonRow.getChildren().add(deleteListButton);
+        vBox.getChildren().add(deleteListButtonRow);
+
+        // set up the list itself
         TitledPane titledPane = new TitledPane("new list", vBox);
         titledPane.setPrefHeight(TODO.getPrefHeight());
         titledPane.setMinWidth(TODO.getMinWidth());
@@ -64,15 +76,22 @@ public class BoardOverviewController {
     public void addCard(javafx.event.ActionEvent actionEvent) {
         Button clickedButton = (Button) actionEvent.getSource();
         VBox vBox = (VBox) clickedButton.getParent().getParent();
+
         Button newCard = new Button("New Card");
         Button edit = new Button("Edit");
         Button delete = new Button("x");
         delete.setOnAction(this::deleteCard);
+
         HBox buttonList = new HBox();
         buttonList.getChildren().addAll(newCard,edit,delete);
+
+        HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
         HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
+
+
         vBox.getChildren().add(buttonList);
         vBox.getChildren().add(plusBox);
+        vBox.getChildren().add(deleteListBox);
     }
 
     /**
@@ -83,6 +102,21 @@ public class BoardOverviewController {
         HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
         VBox vBox = (VBox) clicked.getParent();
         vBox.getChildren().remove(clicked);
+    }
+
+
+    /**
+     * Deletes a list when the "delete button" is clicked.
+     * @param actionEvent the action event that caused this method to be called
+     */
+    public void deleteList(javafx.event.ActionEvent actionEvent){
+        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
+        VBox vbox = (VBox)clicked.getParent();
+
+        TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
+
+        HBox mainhbox = (HBox) titledPane.getParent();
+        mainhbox.getChildren().remove(titledPane);
     }
 
     /**
