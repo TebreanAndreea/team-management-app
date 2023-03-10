@@ -18,8 +18,8 @@ package commons;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+//import javax.persistence.GeneratedValue;
+//import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class Person {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
     public String firstName;
