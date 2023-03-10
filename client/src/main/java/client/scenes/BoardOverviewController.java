@@ -60,7 +60,7 @@ public class BoardOverviewController {
         addCardButtonRow.getChildren().add(addCardButton);
         vBox.getChildren().add(addCardButtonRow);
 
-        // add the "Delete list button at the bottom of this list
+        // add the "Delete list" button at the bottom of this list
         HBox deleteListButtonRow = new HBox();
         deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
         deleteListButtonRow.getChildren().add(deleteListButton);
@@ -86,8 +86,11 @@ public class BoardOverviewController {
         hBox.getChildren().add(vbox);
         vbox.setMinWidth(70);
         vbox.setPrefHeight(100);
+
         textArea.setPrefHeight(5);
+        textArea.setPrefWidth(vbox.getPrefWidth());
         textArea.setMinWidth(1);
+
         vbox.setAlignment(Pos.CENTER);
         createButton.setOnAction(event -> {
             String titleText = textArea.getText().trim();
@@ -97,6 +100,7 @@ public class BoardOverviewController {
         });
 
     }
+
     /**
      * <h3>Adds a (placeholder, as of now) card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>
@@ -106,22 +110,50 @@ public class BoardOverviewController {
         Button clickedButton = (Button) actionEvent.getSource();
         VBox vBox = (VBox) clickedButton.getParent().getParent();
 
-        Button newCard = new Button("New Card");
-        Button edit = new Button("Edit");
-        Button delete = new Button("x");
-        delete.setOnAction(this::deleteCard);
+        // when the plus button is clicked, a text area will appear, and we can get the title
+        TextArea textArea = new TextArea();
+        textArea.setPromptText("Enter title");
+        textArea.setPrefHeight(5);
+        textArea.setPrefWidth(vBox.getPrefWidth());
+        textArea.setMinWidth(1);
 
-        HBox buttonList = new HBox();
-        buttonList.getChildren().addAll(newCard,edit,delete);
+        Button createButton = new Button("Create");
 
-        HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
-        HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
+        HBox textAreaBox = new HBox(textArea);
+        HBox createButtonBox = new HBox(createButton);
+
+        // add these boxes to the vBox to the vbox
+        vBox.getChildren().add(textAreaBox);
+        vBox.getChildren().add(createButtonBox);
 
 
-        vBox.getChildren().add(buttonList);
-        vBox.getChildren().add(plusBox);
-        vBox.getChildren().add(deleteListBox);
+        createButton.setOnAction(event -> {
+            String cardTitle = textArea.getText().trim(); // getting the card name from the user
+
+            // once we retrieve the title, we can delete this text area and the button
+            vBox.getChildren().remove(vBox.getChildren().size()-1);
+            vBox.getChildren().remove(vBox.getChildren().size()-1);
+
+            Button newCard = new Button(cardTitle);
+            Button edit = new Button("Edit");
+            Button delete = new Button("x");
+            delete.setOnAction(this::deleteCard);
+
+            // when we add a new card, we first need to delete the "plus" and "delete" button, add the card
+            // and then add the buttons back
+
+            HBox buttonList = new HBox();
+            buttonList.getChildren().addAll(newCard,edit,delete);
+
+            HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
+            HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
+
+            vBox.getChildren().add(buttonList);
+            vBox.getChildren().add(plusBox);
+            vBox.getChildren().add(deleteListBox);
+        });
     }
+
 
     /**
      * <h3>Deletes the card on which the button is clicked.</h3>
@@ -144,8 +176,8 @@ public class BoardOverviewController {
 
         TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
 
-        HBox mainhbox = (HBox) titledPane.getParent();
-        mainhbox.getChildren().remove(titledPane);
+        HBox mainHBox = (HBox) titledPane.getParent();
+        mainHBox.getChildren().remove(titledPane);
     }
 
     /**
