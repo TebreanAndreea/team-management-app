@@ -39,7 +39,9 @@ public class BoardOverviewController {
     //TODO make button inside titled pane top-center aligned
 
     /**
-     * <h3>Adds a new list with no contents, beside the 'add' button.</h3>
+     * Adds a new list with no contents, beside the 'add' button with a title.
+     *
+     * @param title the title for the new list
      */
     public void addList(String title) {
         Button addCardButton = new Button("+");
@@ -71,6 +73,11 @@ public class BoardOverviewController {
         titledPane.setAnimated(false);
         hBox.getChildren().add(titledPane);
     }
+
+    /**
+     * Method to create an area to add a title for a new created list.
+     *
+     */
     public void addTitleForList() {
         TextArea textArea = new TextArea();
         textArea.setPromptText("Enter title");
@@ -86,7 +93,6 @@ public class BoardOverviewController {
             String titleText = textArea.getText().trim();
             Pane parent = (Pane) vbox.getParent();
             parent.getChildren().remove(vbox);
-            vbox.getChildren().removeAll(textArea, createButton);
             addList(titleText);
         });
 
