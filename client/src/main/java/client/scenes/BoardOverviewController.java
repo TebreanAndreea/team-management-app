@@ -2,13 +2,14 @@ package client.scenes;
 
 //import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 //import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -36,9 +37,9 @@ public class BoardOverviewController {
     }
 
     //TODO make button inside titled pane top-center aligned
-    public void addList() {
+    public void addList(String title) {
         Button tempButton = new Button("+");
-        TitledPane titledPane = new TitledPane("new list", tempButton);
+        TitledPane titledPane = new TitledPane(title, tempButton);
         titledPane.setPrefHeight(TODO.getPrefHeight());
         titledPane.setMinWidth(TODO.getMinWidth());
         titledPane.setAnimated(false);
@@ -46,7 +47,26 @@ public class BoardOverviewController {
         titledPane.getContent().setStyle("-fx-alignment: top-center;");
         hBox.getChildren().add(titledPane);
     }
+    public void addTitleForList() {
+        TextArea textArea = new TextArea();
+        textArea.setPromptText("Enter title");
+        Button createButton = new Button("Create");
+        VBox vbox = new VBox(textArea, createButton);
+        hBox.getChildren().add(vbox);
+        vbox.setMinWidth(70);
+        vbox.setPrefHeight(100);
+        textArea.setPrefHeight(5);
+        textArea.setMinWidth(1);
+        vbox.setAlignment(Pos.CENTER);
+        createButton.setOnAction(event -> {
+            String titleText = textArea.getText().trim();
+            Pane parent = (Pane) vbox.getParent();
+            parent.getChildren().remove(vbox);
+            vbox.getChildren().removeAll(textArea, createButton);
+            addList(titleText);
+        });
 
+    }
     /**
      * Function that enable you to go back to HomePage.
      *
