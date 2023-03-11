@@ -15,13 +15,13 @@ public class Card {
     private String name;
     private Date dueDate;
     @ManyToMany(mappedBy = "cards")
-    private List<Tags> tags;
+    private List<Tag> tags;
     @OneToMany(
         mappedBy = "card",
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private List<SubTasks> subTasks;
+    private List<SubTask> subTasks;
     private boolean complete;
     @ManyToOne
     @JoinColumn(name = "list_id")
@@ -37,7 +37,7 @@ public class Card {
      * @param subTasks - List of smaller simple subtasks of this card (can be empty)
      * @param list - the list in which the card is
      */
-    public Card(String description, String name, Date dueDate, List<Tags> tags, List<SubTasks> subTasks, Listing list) {
+    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
@@ -115,7 +115,7 @@ public class Card {
      * Getter for the tags.
      * @return the tags of the card
      */
-    public List<Tags> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
@@ -123,7 +123,7 @@ public class Card {
      * Alters the tags list with a new one.
      * @param tags - the new tags list
      */
-    public void setTags(List<Tags> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 
@@ -131,7 +131,7 @@ public class Card {
      * Getter for the mini tasks.
      * @return the mini tasks of the card
      */
-    public List<SubTasks> getSubTasks() {
+    public List<SubTask> getSubTasks() {
         return subTasks;
     }
 
@@ -139,7 +139,7 @@ public class Card {
      * Alters the mini tasks list with a new one.
      * @param subTasks - the new array list
      */
-    public void setSubTasks(List<SubTasks> subTasks) {
+    public void setSubTasks(List<SubTask> subTasks) {
         this.subTasks = subTasks;
     }
 

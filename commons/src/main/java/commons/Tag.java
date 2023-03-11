@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class Tags {
+public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long tagId;
@@ -23,7 +23,7 @@ public class Tags {
      * Constructor for the Tags class.
      * @param title - the title to the class
      */
-    public Tags(String title) {
+    public Tag(String title) {
         this.title = title;
         this.cards = new ArrayList<>();
     }
@@ -32,7 +32,7 @@ public class Tags {
      * Default constructor.
      */
     @SuppressWarnings("unused")
-    public Tags() {
+    public Tag() {
 
     }
 
@@ -82,8 +82,8 @@ public class Tags {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Tags)) return false;
-        Tags tags = (Tags) o;
+        if (!(o instanceof Tag)) return false;
+        Tag tags = (Tag) o;
         return tagId == tags.tagId && title.equals(tags.title) && cards.equals(tags.cards);
     }
 

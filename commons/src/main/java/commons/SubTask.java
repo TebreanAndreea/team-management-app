@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class SubTasks {
+public class SubTask {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long stId;
@@ -19,7 +19,7 @@ public class SubTasks {
      * @param title - title of the subtask
      * @param card - card this subtask is assigned to
      */
-    public SubTasks(String title, Card card) {
+    public SubTask(String title, Card card) {
         this.title = title;
         this.card = card;
         this.done = false;
@@ -29,7 +29,7 @@ public class SubTasks {
      * Default constructor for a SubTask object.
      */
     @SuppressWarnings("unused")
-    public SubTasks(){
+    public SubTask(){
 
     }
 
@@ -97,9 +97,9 @@ public class SubTasks {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SubTasks)) return false;
-        SubTasks subTasks = (SubTasks) o;
-        return stId == subTasks.stId && done == subTasks.done && title.equals(subTasks.title) && card.equals(subTasks.card);
+        if (!(o instanceof SubTask)) return false;
+        SubTask subTask = (SubTask) o;
+        return stId == subTask.stId && done == subTask.done && title.equals(subTask.title) && Objects.equals(card, subTask.card);
     }
 
     /**
