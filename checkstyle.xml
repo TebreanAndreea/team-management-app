@@ -6,7 +6,6 @@
 <module name = "Checker">
     <module name="TreeWalker">
         <module name="UnusedImports" />
-        <module name="UnusedImports" />
         <module name="JavadocMethod"/>
         <module name="JavadocStyle"/>
         <module name="Indentation"/>

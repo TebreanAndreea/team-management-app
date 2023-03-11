@@ -1,28 +1,31 @@
 package commons;
 
-//import java.lang.reflect.Array;
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 import java.util.Objects;
-//import java.util.Set;
 
 @Entity
 public class Card {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long cardId;
     private String description;
     private String name;
     private Date dueDate;
-    @ManyToMany
-    private ArrayList<Tags> tags;
-    @OneToMany
-    private ArrayList<SubTasks> subTasks;
+    @ManyToMany(mappedBy = "cards")
+    private List<Tag> tags;
+    @OneToMany(
+        mappedBy = "card",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<SubTask> subTasks;
     private boolean complete;
     @ManyToOne
-    private List list;
+    @JoinColumn(name = "list_id")
+    private Listing list;
 
     /**
      *
@@ -30,11 +33,11 @@ public class Card {
      * @param description - description of the card
      * @param name - Name of the card
      * @param dueDate - The due date of the card
-     * @param tags - List with tags which will make searching for the card easier
-     * @param subTasks - List of smaller simple subtasks of the global goal
+     * @param tags - List with tags assigned to card (can be empty)
+     * @param subTasks - List of smaller simple subtasks of this card (can be empty)
      * @param list - the list in which the card is
      */
-    public Card(String description, String name, Date dueDate, ArrayList<Tags> tags, ArrayList<SubTasks> subTasks, List list) {
+    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
@@ -47,6 +50,7 @@ public class Card {
     /**
      * Default constructor.
      */
+    @SuppressWarnings("unused")
     public Card() {
 
     }
@@ -111,15 +115,15 @@ public class Card {
      * Getter for the tags.
      * @return the tags of the card
      */
-    public ArrayList<Tags> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
     /**
      * Alters the tags list with a new one.
-     * @param tags the new tags list
+     * @param tags - the new tags list
      */
-    public void setTags(ArrayList<Tags> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 
@@ -127,16 +131,16 @@ public class Card {
      * Getter for the mini tasks.
      * @return the mini tasks of the card
      */
-    public ArrayList<SubTasks> getMiniTasks() {
+    public List<SubTask> getSubTasks() {
         return subTasks;
     }
 
     /**
      * Alters the mini tasks list with a new one.
-     * @param miniTasks - the new array list
+     * @param subTasks - the new array list
      */
-    public void setMiniTasks(ArrayList<SubTasks> miniTasks) {
-        this.subTasks = miniTasks;
+    public void setSubTasks(List<SubTask> subTasks) {
+        this.subTasks = subTasks;
     }
 
     /**
@@ -163,9 +167,9 @@ public class Card {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Card)) return false;
         Card card = (Card) o;
-        return cardId == card.cardId && complete == card.complete && Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags) && Objects.equals(subTasks, card.subTasks) && Objects.equals(list, card.list);
+        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && Objects.equals(dueDate, card.dueDate) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list);
     }
 
     /**

@@ -1,35 +1,31 @@
 package commons;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 
 @Entity
-public class List {
-
+public class Listing {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long listId;
-
     private String title;
-    @OneToMany
-    private ArrayList<Card> cards;
-
+    @OneToMany(
+        mappedBy = "list",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Card> cards;
     @ManyToOne
+    @JoinColumn(name = "board_id")
     private Board board;
 
     /**
      * Constructs empty tables at database initialisation.
      */
     @SuppressWarnings("unused")
-    private List() {
+    public Listing() {
         // for object mapper
     }
 
@@ -38,7 +34,7 @@ public class List {
      * @param title the title of the list.
      * @param board the board containing the list.
      */
-    public List(String title, Board board) {
+    public Listing(String title, Board board) {
         this.title = title;
         this.board = board;
         this.cards = new ArrayList<>();
@@ -70,10 +66,10 @@ public class List {
     }
 
     /**
-     * Getter for the ArrayList of cards.
-     * @return the ArrayList of cards.
+     * Getter for the Set of cards.
+     * @return the Set of cards.
      */
-    public ArrayList<Card> getCards() {
+    public List<Card> getCards() {
         return this.cards;
     }
 
@@ -91,13 +87,10 @@ public class List {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof List)) {
-            return false;
-        }
-        List list = (List) o;
-        return listId == list.listId && Objects.equals(title, list.title) && Objects.equals(cards, list.cards) && Objects.equals(board, list.board);
+        if (this == o) return true;
+        if (!(o instanceof Listing)) return false;
+        Listing listing = (Listing) o;
+        return listId == listing.listId && title.equals(listing.title) && cards.equals(listing.cards) && board.equals(listing.board);
     }
 
     /**
