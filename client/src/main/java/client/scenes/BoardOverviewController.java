@@ -19,24 +19,7 @@ public class BoardOverviewController {
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
-    public TitledPane TODO;
 
-
-    /**
-     * Function that goes to add a card.
-     *
-     * @param actionEvent the action event on the button
-     * @throws IOException the exception which might be caused
-     */
-    public void switchToCardScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("CardOverview.fxml"));
-        primaryStage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(root);
-        primaryStage.setScene(overview);
-        primaryStage.show();
-    }
-
-    //TODO make button inside titled pane top-center aligned
 
     /**
      * Adds a new list with no contents, beside the 'add' button with a title.
@@ -45,7 +28,17 @@ public class BoardOverviewController {
      */
     public void addList(String title) {
         Button addCardButton = new Button("+");
-        addCardButton.setOnAction(this::addCard);
+
+        // when the + button is clicked, a dialog pops up, and we can enter the card title
+        addCardButton.setOnAction(event -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Card title");
+            dialog.setHeaderText("Please enter a name for the card:");
+            dialog.showAndWait().ifPresent(name -> {
+                addCard(addCardButton,name);
+            });
+        });
+
 
         Button deleteListButton = new Button("delete list");
         deleteListButton.setOnAction(this::deleteList);
@@ -68,8 +61,8 @@ public class BoardOverviewController {
 
         // set up the list itself
         TitledPane titledPane = new TitledPane(title, vBox);
-        titledPane.setPrefHeight(TODO.getPrefHeight());
-        titledPane.setMinWidth(TODO.getMinWidth());
+        titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
+        titledPane.setMinWidth(135);
         titledPane.setAnimated(false);
         hBox.getChildren().add(titledPane);
     }
@@ -100,13 +93,21 @@ public class BoardOverviewController {
     /**
      * <h3>Adds a (placeholder, as of now) card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>
-     * @param actionEvent the action event that caused this method to be called.
+     *
      */
-    public void addCard(javafx.event.ActionEvent actionEvent) {
-        Button clickedButton = (Button) actionEvent.getSource();
+
+
+    /**
+     * <h3>Adds a card to its assigned list.</h3>
+     * <p>The method gets the button causing the action, and generates another button to place above it.</p>
+     * @param clickedButton the "add" button for adding a card
+     * @param cardName the title of the card which will be inserted
+     */
+    public void addCard(Button clickedButton, String cardName) {
+        //Button clickedButton = (Button) actionEvent.getSource();
         VBox vBox = (VBox) clickedButton.getParent().getParent();
 
-        Button newCard = new Button("New Card");
+        Button newCard = new Button(cardName);
         Button edit = new Button("Edit");
         Button delete = new Button("x");
         delete.setOnAction(this::deleteCard);
@@ -162,4 +163,17 @@ public class BoardOverviewController {
         primaryStage.show();
     }
 
+    /**
+     * Function that goes to the card details.
+     *
+     * @param actionEvent the action event on the button
+     * @throws IOException the exception which might be caused
+     */
+    public void switchToCardScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("CardOverview.fxml"));
+        primaryStage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(root);
+        primaryStage.setScene(overview);
+        primaryStage.show();
+    }
 }
