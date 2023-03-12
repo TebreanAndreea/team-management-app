@@ -23,9 +23,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
+import commons.Quote;
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
-import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -58,5 +59,18 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    }
+
+    /**
+     * This method creates a get request to the server entered by the user.
+     * @param userUrl a string representing the url
+     * @return a Response object
+     */
+    public Response checkServer(String userUrl){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(userUrl).path("api/connection")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get();
     }
 }
