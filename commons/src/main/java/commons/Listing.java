@@ -17,6 +17,7 @@ public class Listing {
         orphanRemoval = true
     )
     private List<Card> cards;
+
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
