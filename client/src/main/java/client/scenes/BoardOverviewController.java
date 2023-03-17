@@ -1,23 +1,32 @@
 package client.scenes;
 
+import javafx.event.EventTarget;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.io.IOException;
+
 
 public class BoardOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
+
+    private EventTarget target;
+
 
     /**
      * Adds a new list with no contents, beside the 'add' button with a title.
@@ -56,6 +65,7 @@ public class BoardOverviewController {
             titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
             titledPane.setMinWidth(135);
             titledPane.setAnimated(false);
+
             hBox.getChildren().add(titledPane);
         });
     }
@@ -77,6 +87,14 @@ public class BoardOverviewController {
             VBox vBox = (VBox) addCardButton.getParent().getParent();
 
             Button newCard = new Button(name);
+
+            // make draggable
+            //makeDraggable(newCard);
+            newCard.setOnMousePressed(event->{
+                target = newCard.getParent(); // this is the hbox that needs to be dropped
+            });
+            newCard.setOnMouseReleased(this::handleDropping);
+
             Button edit = new Button("Edit");
             edit.setOnAction(this::editCard); // an event happens when the button is clicked
 
@@ -85,6 +103,7 @@ public class BoardOverviewController {
 
             HBox buttonList = new HBox();
             buttonList.getChildren().addAll(newCard,edit,delete);
+
 
             HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
             HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
@@ -122,7 +141,6 @@ public class BoardOverviewController {
         VBox vBox = (VBox) clicked.getParent();
         vBox.getChildren().remove(clicked);
     }
-
 
     /**
      * Deletes a list when the "delete button" is clicked.
@@ -165,4 +183,72 @@ public class BoardOverviewController {
         primaryStage.setScene(overview);
         primaryStage.show();
     }
+
+
+    private double startX;
+    private double startY;
+    public void makeDraggable(Node node){
+
+        node.setOnMousePressed(event->{
+            startX = event.getSceneX() - node.getTranslateX();
+            startY = event.getSceneY() - node.getTranslateY();
+        });
+
+
+        node.setOnMouseDragged(event->{
+            //node.setTranslateX(event.getSceneX() - startX);
+            //node.setTranslateY(event.getSceneY() - startY);
+
+            HBox hbox = (HBox) node.getParent();
+            hbox.setTranslateX(event.getSceneX() - startX);
+            hbox.setTranslateY(event.getSceneY() - startY);
+
+
+            /*hbox.getChildren().get(0).setTranslateX(event.getSceneX() - startX);
+            hbox.getChildren().get(0).setTranslateY(event.getSceneY() - startY);
+
+
+            hbox.getChildren().get(1).setTranslateX(event.getSceneX() - startX);
+            hbox.getChildren().get(1).setTranslateY(event.getSceneY() - startY);
+
+            hbox.getChildren().get(2).setTranslateX(event.getSceneX() - startX);
+            hbox.getChildren().get(2).setTranslateY(event.getSceneY() - startY);*/
+        });
+
+    }
+
+
+    /**
+     * This method handles dropping an hbox in another titledPane.
+     * @param mouseEvent the mouse event
+     */
+    private void handleDropping(MouseEvent mouseEvent) {
+        double mouseX = mouseEvent.getScreenX();
+        double mouseY = mouseEvent.getScreenY();
+
+        int dim = hBox.getChildren().size();
+
+
+        for (int i=0;i<dim;i++){
+            TitledPane titledPane = (TitledPane)hBox.getChildren().get(i);
+            VBox vBox = (VBox)titledPane.getContent();
+
+            // check if mouse is inside this vbox
+            Bounds vboxBounds = vBox.getLayoutBounds();
+            Point2D coordinates = vBox.localToScreen(vboxBounds.getMinX(), vboxBounds.getMinY());
+            double x1 = coordinates.getX();
+            double y1 = coordinates.getY();
+
+            double x2 = x1 + vBox.getWidth();
+            double y2 = y1 + vBox.getHeight();
+
+            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){
+                // the mouse is inside this vbox
+                vBox.getChildren().add((HBox)target);
+            }
+        }
+
+    }
+
+
 }
