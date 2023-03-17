@@ -15,7 +15,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import javax.inject.Inject;
 import java.io.IOException;
 
@@ -92,7 +91,7 @@ public class BoardOverviewController {
     }
 
     /**
-     * Saving the list into the database
+     * Saving the list into the database.
      *
      * @param list the list
      */
