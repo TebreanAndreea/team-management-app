@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.scenes.BoardOverviewController;
 import client.scenes.MainController;
 import com.google.inject.Binder;
 import com.google.inject.Module;
