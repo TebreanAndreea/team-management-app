@@ -1,5 +1,7 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.*;
 
 import javax.persistence.*;
@@ -12,12 +14,12 @@ public class Listing {
     private long listId;
     private String title;
     @OneToMany(
-        mappedBy = "list",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+            mappedBy = "list",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Card> cards;
-
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
@@ -32,6 +34,7 @@ public class Listing {
 
     /**
      * Creates a new list.
+     *
      * @param title the title of the list.
      * @param board the board containing the list.
      */
@@ -44,6 +47,7 @@ public class Listing {
 
     /**
      * Getter for the id.
+     *
      * @return the id of the list object.
      */
     public long getListId() {
@@ -52,6 +56,7 @@ public class Listing {
 
     /**
      * Getter for the title.
+     *
      * @return title of the list.
      */
     public String getTitle() {
@@ -60,6 +65,7 @@ public class Listing {
 
     /**
      * Setter for the title.
+     *
      * @param title the title to be set.
      */
     public void setTitle(String title) {
@@ -68,6 +74,7 @@ public class Listing {
 
     /**
      * Getter for the Set of cards.
+     *
      * @return the Set of cards.
      */
     public List<Card> getCards() {
@@ -76,6 +83,7 @@ public class Listing {
 
     /**
      * Getter for the board.
+     *
      * @return the board containing the list.
      */
     public Board getBoard() {
@@ -84,6 +92,7 @@ public class Listing {
 
     /**
      * Compares the list to another object.
+     *
      * @param o the object being compared with.
      */
     @Override
@@ -101,6 +110,6 @@ public class Listing {
     public int hashCode() {
         return Objects.hash(listId, title, cards, board);
     }
-    
+
 
 }

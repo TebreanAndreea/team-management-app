@@ -1,9 +1,11 @@
 package client.scenes;
 
+import client.MyFXML;
+import client.MyModule;
 import client.utils.ServerUtils;
-import javafx.fxml.FXMLLoader;
+import com.google.inject.Injector;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -13,11 +15,15 @@ import javafx.stage.Stage;
 import javax.inject.Inject;
 import java.io.IOException;
 
+import static com.google.inject.Guice.createInjector;
+
 public class HomePageOverviewController {
     private Stage primaryStage;
     private Scene overview;
 
     private ServerUtils server;
+    private static final Injector INJECTOR = createInjector(new MyModule());
+    private static final MyFXML FXML = new MyFXML(INJECTOR);
 
     /**
      * Constructor which initialize the server.
@@ -43,10 +49,9 @@ public class HomePageOverviewController {
         String userUrl = textArea.getText().trim();
 
         if (checkConnection(userUrl)) {
-
-            Parent root = FXMLLoader.load(getClass().getResource("BoardOverview.fxml"));
+            var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            overview = new Scene(root);
+            overview = new Scene(boardOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
         } else {

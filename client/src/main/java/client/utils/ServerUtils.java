@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
+import commons.Listing;
 import commons.Quote;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
@@ -72,5 +73,13 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .get();
+    }
+
+    public List<Listing> getListings() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/listings") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Listing>>() {});
     }
 }

@@ -15,6 +15,9 @@
  */
 package client;
 
+import client.scenes.BoardOverviewController;
+import client.scenes.CardOverviewController;
+import client.scenes.HomePageOverviewController;
 import client.scenes.MainController;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -25,5 +28,8 @@ public class MyModule implements Module {
     @Override
     public void configure(Binder binder) {
         binder.bind(MainController.class).in(Scopes.SINGLETON);
+        binder.bind(HomePageOverviewController.class).in(Scopes.SINGLETON);
+        binder.bind(BoardOverviewController.class).in(Scopes.SINGLETON);
+        binder.bind(CardOverviewController.class).in(Scopes.SINGLETON);
     }
 }
