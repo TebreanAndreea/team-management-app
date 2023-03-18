@@ -1,4 +1,4 @@
-﻿
+
 Agenda Meeting
 
 
@@ -25,9 +25,8 @@ Toadere, Marin Perković (minute taker), Vasko Guenov
 
 15:48 - 16:50		**Announcements**
 
-`			`Friday is the deadline for the Heuristic Evaluation draft.
-
-`			`Keep in mind that everyone should have a meaningful merge request every week.
+- Friday is the deadline for the Heuristic Evaluation draft.
+- Keep in mind that everyone should have a meaningful merge request every week.
 
 16:50 - 16:52		**Approval of the agenda -** Does anyone have any additions to the agenda?
 
