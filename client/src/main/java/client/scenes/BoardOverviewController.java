@@ -1,5 +1,8 @@
 package client.scenes;
 
+import client.utils.ServerUtils;
+import commons.Listing;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,7 +13,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class BoardOverviewController {
@@ -18,7 +23,25 @@ public class BoardOverviewController {
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
+    private ServerUtils server;
 
+
+
+    /**
+     * Constructor which initialize the server.
+     * @param server the server instance used for communication
+     */
+
+    @Inject
+    public BoardOverviewController (ServerUtils server){
+        this.server = server;
+    }
+    public BoardOverviewController ( ){
+    }
+
+    public void setServer(ServerUtils server) {
+        this.server = server;
+    }
     /**
      * Adds a new list with no contents, beside the 'add' button with a title.
      */
@@ -39,6 +62,11 @@ public class BoardOverviewController {
             vBox.setSpacing(20);
             vBox.setAlignment(Pos.TOP_CENTER);
 
+            //saving the list into the database
+            Listing newList = new Listing(name, null);
+            saveListDB(newList);
+
+
             // add the "Add card" button below the cards
             HBox addCardButtonRow = new HBox();
             addCardButtonRow.setAlignment(Pos.CENTER);
@@ -51,6 +79,8 @@ public class BoardOverviewController {
             deleteListButtonRow.getChildren().add(deleteListButton);
             vBox.getChildren().add(deleteListButtonRow);
 
+
+
             // set up the list itself
             TitledPane titledPane = new TitledPane(name, vBox);
             titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
@@ -59,6 +89,27 @@ public class BoardOverviewController {
             hBox.getChildren().add(titledPane);
         });
     }
+
+    /**
+     * Saving the list into the database.
+     *
+     * @param list the list
+     */
+    public void saveListDB(Listing list) {
+        try {
+            server.saveList(list);
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+            return;
+        }
+
+       // clearFields();
+      //  MainController.showOverview();
+    }
+
 
     /**
      * <h3>Adds a card to its assigned list.</h3>

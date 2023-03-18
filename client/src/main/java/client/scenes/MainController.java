@@ -15,6 +15,7 @@ public class MainController {
     private Stage primaryStage;
     private HomePageOverviewController overviewController;
     private Scene overview;
+    private BoardOverviewController boardOverviewController;
 
     /**
      * This method initializes the primary stage and displays the stage.
