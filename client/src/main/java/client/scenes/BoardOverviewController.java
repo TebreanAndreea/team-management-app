@@ -229,11 +229,10 @@ public class BoardOverviewController {
         int dim = hBox.getChildren().size();
 
 
-        for (int i=0;i<dim;i++){
+        for (int i=0;i<dim;i++){ // check if mouse is inside this vbox
             TitledPane titledPane = (TitledPane)hBox.getChildren().get(i);
             VBox vBox = (VBox)titledPane.getContent();
 
-            // check if mouse is inside this vbox
             Bounds vboxBounds = vBox.getLayoutBounds();
             Point2D coordinates = vBox.localToScreen(vboxBounds.getMinX(), vboxBounds.getMinY());
             double x1 = coordinates.getX();
@@ -244,9 +243,8 @@ public class BoardOverviewController {
 
             if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){ // the mouse is inside this vbox
 
-                // check for collisions between cards
                 int nrCards = vBox.getChildren().size()-2;
-                for (int j=0;j<nrCards-1;j++){
+                for (int j=0;j<nrCards-1;j++){ // check for collisions between cards to insert it in the correct place
                     HBox hBoxUp = (HBox)vBox.getChildren().get(j);
 
                     Bounds hboxBounds = hBoxUp.getLayoutBounds();
@@ -275,7 +273,6 @@ public class BoardOverviewController {
                 vBox.getChildren().add(nrCards,(HBox)target);
             }
         }
-
     }
 
 }
