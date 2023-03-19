@@ -200,11 +200,11 @@ public class BoardOverviewController {
             //node.setTranslateY(event.getSceneY() - startY);
 
             HBox hbox = (HBox) node.getParent();
-            hbox.setTranslateX(event.getSceneX() - startX);
-            hbox.setTranslateY(event.getSceneY() - startY);
+            //hbox.setTranslateX(event.getSceneX() - startX);
+            //hbox.setTranslateY(event.getSceneY() - startY);
 
 
-            /*hbox.getChildren().get(0).setTranslateX(event.getSceneX() - startX);
+            hbox.getChildren().get(0).setTranslateX(event.getSceneX() - startX);
             hbox.getChildren().get(0).setTranslateY(event.getSceneY() - startY);
 
 
@@ -212,14 +212,14 @@ public class BoardOverviewController {
             hbox.getChildren().get(1).setTranslateY(event.getSceneY() - startY);
 
             hbox.getChildren().get(2).setTranslateX(event.getSceneX() - startX);
-            hbox.getChildren().get(2).setTranslateY(event.getSceneY() - startY);*/
+            hbox.getChildren().get(2).setTranslateY(event.getSceneY() - startY);
         });
 
     }
 
 
     /**
-     * This method handles dropping an hbox in another titledPane.
+     * This method handles dropping a hbox in another titledPane.
      * @param mouseEvent the mouse event
      */
     private void handleDropping(MouseEvent mouseEvent) {
@@ -242,13 +242,40 @@ public class BoardOverviewController {
             double x2 = x1 + vBox.getWidth();
             double y2 = y1 + vBox.getHeight();
 
-            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){
-                // the mouse is inside this vbox
-                vBox.getChildren().add((HBox)target);
+            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){ // the mouse is inside this vbox
+
+                // check for collisions between cards
+                int nrCards = vBox.getChildren().size()-2;
+                for (int j=0;j<nrCards-1;j++){
+                    HBox hBoxUp = (HBox)vBox.getChildren().get(j);
+
+                    Bounds hboxBounds = hBoxUp.getLayoutBounds();
+                    Point2D coord = hBoxUp.localToScreen(hboxBounds.getMinX(), hboxBounds.getMinY());
+
+                    double yMiddleUp = (coord.getY() * 2 + hBoxUp.getHeight())/2;
+
+                    HBox hBoxDown = (HBox)vBox.getChildren().get(j+1);
+                    hboxBounds = hBoxDown.getLayoutBounds();
+                    coord = hBoxDown.localToScreen(hboxBounds.getMinX(),hboxBounds.getMinY());
+
+                    double yMiddleDown = (coord.getY() * 2 + hBoxDown.getHeight())/2;
+
+
+                    if (j == 0 && mouseY < yMiddleUp) {
+                        vBox.getChildren().add(0, (HBox) target);
+                        return;
+                    }
+
+                    if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
+                        vBox.getChildren().add(j+1, (HBox) target);
+                        return;
+                    }
+                }
+
+                vBox.getChildren().add(nrCards,(HBox)target);
             }
         }
 
     }
-
 
 }
