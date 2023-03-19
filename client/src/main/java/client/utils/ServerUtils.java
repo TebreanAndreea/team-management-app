@@ -23,8 +23,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
+<<<<<<< client/src/main/java/client/utils/ServerUtils.java
+import commons.Card;
+>>>>>>> client/src/main/java/client/utils/ServerUtils.java
 import commons.Listing;
 import commons.Quote;
+import commons.SubTask;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -74,6 +78,7 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .get();
     }
+<<<<<<< client/src/main/java/client/utils/ServerUtils.java
 
     public List<Listing> getListings() {
         return ClientBuilder.newClient(new ClientConfig()) //
@@ -81,5 +86,52 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Listing>>() {});
+
+    public Listing saveList(Listing list) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/lists")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+    }
+
+    /**
+     * A method that sends a list to the card, I experimented, it may become redundant later.
+     * //@param list - the sent list
+     * @return
+     */
+//    public Listing sendList(Listing list) {
+//        return ClientBuilder.newClient(new ClientConfig())
+//            .target(SERVER).path("api/card/setList")
+//            .request(APPLICATION_JSON)
+//            .accept(APPLICATION_JSON)
+//            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+//    }
+
+    /**
+     * A method that creates a post request for the card.
+     * @param card - the card we are saving
+     * @return a subtask
+     */
+    public Card saveCard(Card card) {
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/card")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+    }
+
+    /**
+     * A method that creates a post request for the subtask.
+     * @param subTask - the subtask we are saving
+     * @return a subtask
+     */
+    public SubTask saveSubtask(SubTask subTask) {
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/subtask")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+>>>>>>> client/src/main/java/client/utils/ServerUtils.java
     }
 }
