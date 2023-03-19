@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.utils.ServerUtils;
+import commons.Board;
 import commons.Card;
 import commons.Listing;
 import commons.SubTask;
@@ -36,8 +37,6 @@ public class BoardOverviewController {
     // the lists in the UI and the lists we have in the DB
     private Map<VBox, Listing> map = new HashMap<>();
 
-
-
     /**
      * Constructor which initialize the server.
      * @param server the server instance used for communication
@@ -53,8 +52,26 @@ public class BoardOverviewController {
     public void setServer(ServerUtils server) {
         this.server = server;
     }
+
     /**
-     * Adds a new list with no contents, beside the 'add' button with a title.
+     * Initializes the controller and immediately fetches the lists from the database.
+     */
+    public void initialize() {
+        server.registerForMessages("/topic/boards", Board.class, q -> {
+            refresh();
+        });
+        server.registerForMessages("/topic/listings", Listing.class, q -> {
+            System.out.println("listing");
+            refresh();
+        });
+        server.registerForMessages("/topic/cards", Card.class, q -> {
+            refresh();
+        });
+        refresh();
+    }
+
+    /**
+     * Adds a new list with no contents, besides the 'add' button with a title.
      */
     public void addList() {
 

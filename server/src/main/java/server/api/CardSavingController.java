@@ -2,6 +2,7 @@ package server.api;
 
 import commons.Card;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +16,13 @@ import server.database.CardRepository;
 public class CardSavingController {
 
     private final CardRepository repo;
+    private final SimpMessagingTemplate msgs;
 
 //    private Listing list;
 
-    public CardSavingController(CardRepository repo) {
+    public CardSavingController(CardRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
+        this.msgs = msgs;
     }
 
     /**
@@ -31,6 +34,7 @@ public class CardSavingController {
     public ResponseEntity<Card> add(@RequestBody Card card) {
 
 //            card.setList(list);
+        msgs.convertAndSend("/topic/card", card);
         Card save = repo.save(card);
         return ResponseEntity.ok(save);
     }
