@@ -23,9 +23,6 @@ public class Card {
     )
     private List<SubTask> subTasks;
     private boolean complete;
-
-
-
     @ManyToOne
     @JoinColumn(name = "list_id")
     private Listing list;
@@ -160,14 +157,6 @@ public class Card {
      */
     public void setComplete(boolean complete) {
         this.complete = complete;
-    }
-
-    /**
-     * Setter for the list.
-     * @param list - the list of the card.
-     */
-    public void setList(Listing list) {
-        this.list = list;
     }
 
     /**

@@ -1,5 +1,7 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +13,11 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long boardId;
     private String title;
+    @JsonManagedReference
     @OneToMany(
-        mappedBy = "board",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+            mappedBy = "board",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Listing> lists;
     private String accessKey;
@@ -22,9 +25,10 @@ public class Board {
 
     /**
      * Constructor for a Board item.
-     * @param title - title of the board
+     *
+     * @param title     - title of the board
      * @param accessKey - unique accessKey for the board
-     * @param password - password of the board
+     * @param password  - password of the board
      */
     public Board(String title, String accessKey, String password) {
         this.title = title;
@@ -43,6 +47,7 @@ public class Board {
 
     /**
      * Getter for the board id.
+     *
      * @return - this board's id
      */
     public long getBoardId() {
@@ -51,6 +56,7 @@ public class Board {
 
     /**
      * Getter for the board title.
+     *
      * @return - this board's title
      */
     public String getTitle() {
@@ -59,6 +65,7 @@ public class Board {
 
     /**
      * Setter for this board's title.
+     *
      * @param title - new title of the board
      */
     public void setTitle(String title) {
@@ -67,6 +74,7 @@ public class Board {
 
     /**
      * Getter for the board lists.
+     *
      * @return - this board's lists
      */
     public List<Listing> getLists() {
@@ -75,6 +83,7 @@ public class Board {
 
     /**
      * Setter for this board's lists.
+     *
      * @param lists - new lists in the board
      */
     public void setLists(List<Listing> lists) {
@@ -83,6 +92,7 @@ public class Board {
 
     /**
      * Getter for the accessKey of the board.
+     *
      * @return - this board's accessKey
      */
     public String getAccessKey() {
@@ -91,6 +101,7 @@ public class Board {
 
     /**
      * Setter for this board's accessKey.
+     *
      * @param accessKey - the new accessKey of the board
      */
     public void setAccessKey(String accessKey) {
@@ -99,6 +110,7 @@ public class Board {
 
     /**
      * Getter for the password of the board.
+     *
      * @return - this board's password
      */
     public String getPassword() {
@@ -107,6 +119,7 @@ public class Board {
 
     /**
      * Setter for this board's password.
+     *
      * @param password - the new password of the board
      */
     public void setPassword(String password) {
@@ -115,6 +128,7 @@ public class Board {
 
     /**
      * Equals method for board items.
+     *
      * @param o - Board that is compared with this board
      * @return - true if they are equal, false otherwise
      */
@@ -128,6 +142,7 @@ public class Board {
 
     /**
      * Hashcode method for the boards.
+     *
      * @return - this board's hashcode
      */
     @Override

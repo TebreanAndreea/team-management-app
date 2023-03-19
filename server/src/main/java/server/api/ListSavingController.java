@@ -2,11 +2,10 @@ package server.api;
 
 import commons.Listing;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.ListingRepository;
+
+import java.util.List;
 
 
 @RestController
@@ -26,5 +25,9 @@ public class ListSavingController {
        // }
         Listing saved = repo.save(list);
         return ResponseEntity.ok(saved);
+    }
+    @GetMapping(path = { "", "/" })
+    public List<Listing> getAll() {
+        return repo.findAll();
     }
 }

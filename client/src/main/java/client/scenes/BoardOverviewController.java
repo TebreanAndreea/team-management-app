@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 //import java.util.List;
+import java.util.List;
 import java.util.Map;
 
 public class BoardOverviewController {
@@ -117,8 +118,8 @@ public class BoardOverviewController {
             alert.showAndWait();
         }
 
-       // clearFields();
-      //  MainController.showOverview();
+        // clearFields();
+        //  MainController.showOverview();
     }
 
     /**
@@ -195,6 +196,7 @@ public class BoardOverviewController {
             saveCardDB(curCard, curList);
             curList.getCards().add(curCard);
         });
+
     }
 
     /**
@@ -265,5 +267,68 @@ public class BoardOverviewController {
         overview = new Scene(root);
         primaryStage.setScene(overview);
         primaryStage.show();
+    }
+    /**
+     * addList method which accepts a Listing as a parameter.
+     * <h5>NOTE: The IDs of the cards are stored within their user data.</h5>
+     *
+     * @param listing the listing from which to create a listing
+     */
+    private void addListWithListing(Listing listing) {
+        Button addCardButton = new Button("+");
+
+        addCardButton.setOnAction(this::addCard);
+
+        Button deleteListButton = new Button("delete list");
+        deleteListButton.setOnAction(this::deleteList);
+
+        VBox vBox = new VBox();
+        vBox.setSpacing(20);
+        vBox.setAlignment(Pos.TOP_CENTER);
+        List<Card> cards = listing.getCards();
+        for (Card c : cards) {
+            Button newCard = new Button(c.getName());
+            newCard.setUserData(c.getCardId());
+            Button edit = new Button("Edit");
+            edit.setOnAction(this::editCard); // an event happens when the button is clicked
+
+            Button delete = new Button("x");
+            delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
+
+            HBox buttonList = new HBox();
+            buttonList.getChildren().addAll(newCard, edit, delete);
+            vBox.getChildren().add(buttonList);
+        }
+        // add the "Add card" button below the cards
+        HBox addCardButtonRow = new HBox();
+        addCardButtonRow.setAlignment(Pos.CENTER);
+        addCardButtonRow.getChildren().add(addCardButton);
+        vBox.getChildren().add(addCardButtonRow);
+
+        // add the "Delete list button at the bottom of this list
+        HBox deleteListButtonRow = new HBox();
+        deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
+        deleteListButtonRow.getChildren().add(deleteListButton);
+        vBox.getChildren().add(deleteListButtonRow);
+
+        map.put(vBox, listing);
+        // set up the list itself
+        TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
+        titledPane.setUserData(listing.getListId());
+        titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
+        titledPane.setMinWidth(135);
+        titledPane.setAnimated(false);
+        hBox.getChildren().add(titledPane);
+    }
+
+    /**
+     * fetches the listings from the JSON file and displays them.
+     */
+    public void refresh() {
+        List<Listing> listings = server.getListings();
+        hBox.getChildren().clear();
+        map = new HashMap<>();
+        for (Listing listing : listings)
+            addListWithListing(listing);
     }
 }

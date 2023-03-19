@@ -104,10 +104,10 @@ public class ServerUtils {
      */
     public Card saveCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/card")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+                .target(SERVER).path("api/card")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
 
     /**
@@ -117,9 +117,21 @@ public class ServerUtils {
      */
     public SubTask saveSubtask(SubTask subTask) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/subtask")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+                .target(SERVER).path("api/subtask")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+    }
+
+    /**
+     * Fetches all listings from the database.
+     * @return all listings stored in a List Object
+     */
+    public List<Listing> getListings() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/lists") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Listing>>() {});
     }
 }
