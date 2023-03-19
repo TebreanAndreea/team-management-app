@@ -231,6 +231,7 @@ public class BoardOverviewController {
 
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
+        titledPane.setUserData(listing.getListId());
         titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
         titledPane.setMinWidth(135);
         titledPane.setAnimated(false);
