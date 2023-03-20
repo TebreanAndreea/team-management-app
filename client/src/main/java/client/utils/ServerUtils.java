@@ -57,19 +57,19 @@ public class ServerUtils {
 
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/quotes") //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .get(new GenericType<List<Quote>>() {
-            });
+                .target(SERVER).path("api/quotes") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Quote>>() {
+                });
     }
 
     public Quote addQuote(Quote quote) {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/quotes") //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+                .target(SERVER).path("api/quotes") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
     }
 
     /**
@@ -80,18 +80,25 @@ public class ServerUtils {
      */
     public Response checkServer(String userUrl) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(userUrl).path("api/connection")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .get();
+                .target(userUrl).path("api/connection")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get();
     }
+
+    /**
+     * Saving the list into database.
+     *
+     * @param list to be saved into database
+     * @return the list
+     */
 
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/lists")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/lists")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -102,10 +109,10 @@ public class ServerUtils {
      */
     public Listing sendList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/card/setList")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/card/setList")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -116,10 +123,10 @@ public class ServerUtils {
      */
     public Card saveCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/card")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+                .target(SERVER).path("api/card")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
 
     /**
@@ -130,10 +137,10 @@ public class ServerUtils {
      */
     public SubTask saveSubtask(SubTask subTask) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/subtask")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+                .target(SERVER).path("api/subtask")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
     }
 
     /**
@@ -143,20 +150,20 @@ public class ServerUtils {
      */
     public List<Listing> getListings() {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/lists") //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .get(new GenericType<List<Listing>>() {
-            });
+                .target(SERVER).path("api/lists") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Listing>>() {
+                });
     }
 
     public Listing getListingsById(long id) {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/lists/" + id) //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .get(new GenericType<Listing>() {
-            });
+                .target(SERVER).path("api/lists/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<Listing>() {
+                });
 //            .getBy(new GenericType<List<Listing>>() {});
     }
 
@@ -167,10 +174,23 @@ public class ServerUtils {
      */
     public void deleteCard(long id) {
         ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/card/delete/" + id) //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .delete();
+                .target(SERVER).path("api/card/delete/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
+    /**
+     * Deleting a list from the Database.
+     *
+     * @param id the id of the list to be deleted
+     */
+    public void deleteList(Long id) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/lists/" + id)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
     }
 
     private StompSession session = connect("ws://localhost:8080/websocket");
