@@ -44,6 +44,6 @@ public class Main extends Application {
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
 
         var mainController = INJECTOR.getInstance(MainController.class);
-        mainController.initialize(primaryStage, overview,boardOverview,cardOverview);
+        mainController.initialize(primaryStage, overview, boardOverview, cardOverview);
     }
 }

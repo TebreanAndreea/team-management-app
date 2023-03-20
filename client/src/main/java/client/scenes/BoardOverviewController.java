@@ -3,6 +3,7 @@ package client.scenes;
 import javafx.event.EventTarget;
 
 import client.utils.ServerUtils;
+import commons.Board;
 import commons.Card;
 import commons.Listing;
 import commons.SubTask;
@@ -68,7 +69,24 @@ public class BoardOverviewController {
     }
 
     /**
-     * Adds a new list with no contents, beside the 'add' button with a title.
+     * Initializes the controller and immediately fetches the lists from the database.
+     */
+    public void initialize() {
+        server.registerForMessages("/topic/boards", Board.class, q -> {
+            refresh();
+        });
+        server.registerForMessages("/topic/listings", Listing.class, q -> {
+            System.out.println("listing");
+            refresh();
+        });
+        server.registerForMessages("/topic/cards", Card.class, q -> {
+            refresh();
+        });
+        refresh();
+    }
+
+    /**
+     * Adds a new list with no contents, besides the 'add' button with a title.
      */
     public void addList() {
 

@@ -3,6 +3,7 @@ package server.api;
 import commons.Listing;
 //import commons.Quote;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.ListingRepository;
 
@@ -14,9 +15,11 @@ import java.util.List;
 public class ListSavingController {
 
     private final ListingRepository repo;
+    private final SimpMessagingTemplate msgs;
 
-    public ListSavingController(ListingRepository repo) {
+    public ListSavingController(ListingRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
+        this.msgs = msgs;
     }
 
     @PostMapping(path = { "", "/" })
@@ -24,6 +27,9 @@ public class ListSavingController {
       //  if (list.getTitle()== null) {
       //      return ResponseEntity.badRequest().build();
        // }
+
+        msgs.convertAndSend("/topic/lists", list);
+
         Listing saved = repo.save(list);
         return ResponseEntity.ok(saved);
     }
