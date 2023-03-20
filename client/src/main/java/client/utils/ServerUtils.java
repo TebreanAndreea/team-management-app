@@ -57,19 +57,19 @@ public class ServerUtils {
 
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/quotes") //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .get(new GenericType<List<Quote>>() {
-            });
+                .target(SERVER).path("api/quotes") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Quote>>() {
+                });
     }
 
     public Quote addQuote(Quote quote) {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/quotes") //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+                .target(SERVER).path("api/quotes") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
     }
 
     /**
@@ -80,32 +80,32 @@ public class ServerUtils {
      */
     public Response checkServer(String userUrl) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(userUrl).path("api/connection")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .get();
+                .target(userUrl).path("api/connection")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get();
     }
 
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/lists")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/lists")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
-     * @param list - the sent list
      *
+     * @param list - the sent list
      * @return Listing
      */
     public Listing sendList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/card/setList")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/card/setList")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -116,10 +116,10 @@ public class ServerUtils {
      */
     public Card saveCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/card")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+                .target(SERVER).path("api/card")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
 
     /**
@@ -130,10 +130,10 @@ public class ServerUtils {
      */
     public SubTask saveSubtask(SubTask subTask) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/subtask")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+                .target(SERVER).path("api/subtask")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
     }
 
     /**
@@ -143,21 +143,48 @@ public class ServerUtils {
      */
     public List<Listing> getListings() {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/lists") //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .get(new GenericType<List<Listing>>() {
-            });
+                .target(SERVER).path("api/lists") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Listing>>() {
+                });
     }
 
     public Listing getListingsById(long id) {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/lists/" + id) //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .get(new GenericType<Listing>() {
-            });
+                .target(SERVER).path("api/lists/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<Listing>() {
+                });
 //            .getBy(new GenericType<List<Listing>>() {});
+    }
+
+    /**
+     * Fetches the card with the provided id from the database.
+     * @param id The id of the card to search for
+     * @return The card with the needed ID
+     */
+    public Card getCardsById(long id) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/card/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<Card>() {
+                });
+//            .getBy(new GenericType<List<Listing>>() {});
+    }
+
+    /**
+     * Updates the card with the new parameters.
+     * @param id The ID of the card to be updated
+     * @param newName Its new name (more parameters may be added)
+     * @return The updated card, if required
+     */
+    public Card updateCard(long id, String newName) {
+        Card currentCard = getCardsById(id);
+        currentCard.setName(newName);
+        return saveCard(currentCard);
     }
 
     /**
@@ -167,10 +194,14 @@ public class ServerUtils {
      */
     public void deleteCard(long id) {
         ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/card/delete/" + id) //
-            .request(APPLICATION_JSON) //
-            .accept(APPLICATION_JSON) //
-            .delete();
+                .target(SERVER).path("api/card/delete/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
+    public void editCard(String newName, long id) {
+
     }
 
     private StompSession session = connect("ws://localhost:8080/websocket");
@@ -180,16 +211,16 @@ public class ServerUtils {
         var stomp = new WebSocketStompClient(client);
         stomp.setMessageConverter(new MappingJackson2MessageConverter());
         try {
-            return stomp.connect(url, new StompSessionHandlerAdapter() {}).get();
-        }
-        catch (InterruptedException e) {
+            return stomp.connect(url, new StompSessionHandlerAdapter() {
+            }).get();
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-        catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
         throw new IllegalStateException();
     }
+
     public <T> void registerForMessages(String dest, Class<T> type, Consumer<T> consumer) {
         session.subscribe(dest, new StompFrameHandler() {
             @Override

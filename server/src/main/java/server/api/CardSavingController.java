@@ -3,13 +3,8 @@ package server.api;
 import commons.Card;
 import commons.Listing;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
 //import server.database.ListingRepository;
 
@@ -54,5 +49,19 @@ public class CardSavingController {
     @DeleteMapping(path = {"delete/{id}"})
     public void delete(@PathVariable long id) {
         repo.deleteById(id);
+    }
+
+    /**
+     * A get method that searches for a card via its ID.
+     *
+     * @param id the card's ID
+     * @return The response entity, containing the desired card
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Card> getById(@PathVariable("id") long id) {
+        if (id < 0 || !repo.existsById(id)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(repo.findById(id).get());
     }
 }

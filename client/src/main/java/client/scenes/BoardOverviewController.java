@@ -133,6 +133,7 @@ public class BoardOverviewController {
 
             hBox.getChildren().add(titledPane);
         });
+        refresh();
     }
 
 
@@ -256,12 +257,13 @@ public class BoardOverviewController {
         Button editButton = (Button) actionEvent.getSource();
         HBox hBox = (HBox) editButton.getParent();
         Button cardButton = (Button) hBox.getChildren().get(0);
-
+        Card currentCard = cardMap.get(hBox);
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Change the name of the card");
         dialog.setHeaderText("Please enter the new name for the card:");
         dialog.showAndWait().ifPresent(name -> {
             cardButton.setText(name);
+            server.updateCard(currentCard.getCardId(), name);
         });
     }
 
