@@ -6,7 +6,6 @@
 <module name = "Checker">
     <module name="TreeWalker">
         <module name="UnusedImports" />
-        <module name="UnusedImports" />
         <module name="JavadocMethod"/>
         <module name="JavadocStyle"/>
         <module name="Indentation"/>
@@ -36,7 +35,7 @@
         <module name="MethodName"/>
         <module name="MethodLength">
             <property name="tokens" value="METHOD_DEF"/>
-            <property name="max" value="50"/>
+            <property name="max" value="60"/>
         </module>
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>

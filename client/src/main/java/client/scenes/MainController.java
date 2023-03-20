@@ -2,6 +2,7 @@ package client.scenes;
 
 //import javafx.fxml.FXMLLoader;
 //import javafx.scene.Node;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,29 +14,60 @@ import javafx.util.Pair;
 public class MainController {
 
     private Stage primaryStage;
-    private HomePageOverviewController overviewController;
-    private Scene overview;
+    private HomePageOverviewController homePageOverviewController;
+    private Scene homePageOverview;
+
+    private BoardOverviewController boardOverviewController;
+    private Scene boardOverview;
+
+    private CardOverviewController cardOverviewController;
+    private Scene cardOverview;
 
     /**
-     * This method initializes the primary stage and displays the stage.
-     * @param primaryStage
-     * @param overview
+     * Initializes the application.
+     *
+     * @param primaryStage     The main stage of the application
+     * @param homePageOverview Homepage
+     * @param boardOverview    Board overview
+     * @param cardOverview     Card overview
      */
-    public void initialize(Stage primaryStage, Pair<HomePageOverviewController, Parent> overview){
+    public void initialize(Stage primaryStage,
+                           Pair<HomePageOverviewController, Parent> homePageOverview,
+                           Pair<BoardOverviewController, Parent> boardOverview,
+                           Pair<CardOverviewController, Parent> cardOverview) {
         this.primaryStage = primaryStage;
-        this.overviewController = overview.getKey();
-        this.overview = new Scene(overview.getValue());
+
+        this.homePageOverviewController = homePageOverview.getKey();
+        this.homePageOverview = new Scene(homePageOverview.getValue());
+
+        this.boardOverviewController = boardOverview.getKey();
+        this.boardOverview = new Scene(boardOverview.getValue());
+
+        this.cardOverviewController = cardOverview.getKey();
+        this.cardOverview = new Scene(cardOverview.getValue());
 
         showOverview();
         primaryStage.show();
     }
 
-    public void showOverview(){
+    public void showBoardOverview() {
+
+        primaryStage.setTitle("Quotes: Adding Quote");
+        primaryStage.setScene(boardOverview);
+    }
+
+    public void showOverview() {
         primaryStage.setTitle("Board: Overview");
-        primaryStage.setScene(overview);
+        primaryStage.setScene(homePageOverview);
 
         // to be implemented: refresh
         //overviewController.refresh();
     }
+
+    public void showCardOverview() {
+        primaryStage.setTitle("Card: Overview");
+        primaryStage.setScene(cardOverview);
+    }
+
 
 }

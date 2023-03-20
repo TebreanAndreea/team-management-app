@@ -39,9 +39,11 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
 
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
+        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
 
         var mainController = INJECTOR.getInstance(MainController.class);
-        mainController.initialize(primaryStage, overview);
+        mainController.initialize(primaryStage, overview, boardOverview, cardOverview);
     }
 }
