@@ -79,7 +79,7 @@ public class BoardOverviewController {
             System.out.println("listing");
             refresh();
         });
-        server.registerForMessages("/topic/cards", Card.class, q -> {
+        server.registerForMessages("/topic/card", Card.class, q -> {
             refresh();
         });
         refresh();
@@ -94,44 +94,49 @@ public class BoardOverviewController {
         dialog.setTitle("List name");
         dialog.setHeaderText("Please enter the name of the list");
         dialog.showAndWait().ifPresent(name -> {
+            //saving the list into the database
+            Listing newList = new Listing(name, null);
+            saveListDB(newList);
+            refresh();
+
             Button addCardButton = new Button("+");
 
             addCardButton.setOnAction(this::addCard);
 
             Button deleteListButton = new Button("delete list");
-            deleteListButton.setOnAction(this::deleteList);
+            //deleteListButton.setOnAction(this::deleteList);
+            deleteListButton.setOnAction(event -> {
+                deleteList(event, newList);
+            });
 
-            VBox vBox = new VBox();
-            vBox.setSpacing(20);
-            vBox.setAlignment(Pos.TOP_CENTER);
-
-            //saving the list into the database
-            Listing newList = new Listing(name, null);
-            saveListDB(newList);
-
-            map.put(vBox, newList);
-
-
-            // add the "Add card" button below the cards
-            HBox addCardButtonRow = new HBox();
-            addCardButtonRow.setAlignment(Pos.CENTER);
-            addCardButtonRow.getChildren().add(addCardButton);
-            vBox.getChildren().add(addCardButtonRow);
-
-            // add the "Delete list button at the bottom of this list
-            HBox deleteListButtonRow = new HBox();
-            deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
-            deleteListButtonRow.getChildren().add(deleteListButton);
-            vBox.getChildren().add(deleteListButtonRow);
-
-
-            // set up the list itself
-            TitledPane titledPane = new TitledPane(name, vBox);
-            titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
-            titledPane.setMinWidth(135);
-            titledPane.setAnimated(false);
-
-            hBox.getChildren().add(titledPane);
+//            VBox vBox = new VBox();
+//            vBox.setSpacing(20);
+//            vBox.setAlignment(Pos.TOP_CENTER);*/
+//
+//
+//            map.put(vBox, newList);
+//
+//
+//            // add the "Add card" button below the cards
+//            HBox addCardButtonRow = new HBox();
+//            addCardButtonRow.setAlignment(Pos.CENTER);
+//           addCardButtonRow.getChildren().add(addCardButton);
+//            vBox.getChildren().add(addCardButtonRow);
+//
+//            // add the "Delete list button at the bottom of this list
+//            HBox deleteListButtonRow = new HBox();
+//            deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
+//            deleteListButtonRow.getChildren().add(deleteListButton);
+//            vBox.getChildren().add(deleteListButtonRow);
+//
+//
+//            // set up the list itself
+//            TitledPane titledPane = new TitledPane(name, vBox);
+//            titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
+//            titledPane.setMinWidth(135);
+//            titledPane.setAnimated(false);
+//
+//            hBox.getChildren().add(titledPane);
         });
     }
 
@@ -280,21 +285,47 @@ public class BoardOverviewController {
 
     }
 
+
     /**
-     * Deletes a list when the "delete button" is clicked.
+     * Deletes a list when the "delete button" is clicked with all its task.
      *
      * @param actionEvent the action event that caused this method to be called
+     * @param list the list to be deleted
      */
-    public void deleteList(javafx.event.ActionEvent actionEvent) {
-        HBox clicked = (HBox) ((Button) actionEvent.getSource()).getParent();
-        VBox vbox = (VBox) clicked.getParent();
+
+
+    public void deleteList(javafx.event.ActionEvent actionEvent, Listing list){
+
+        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
+        VBox vbox = (VBox)clicked.getParent();
 
         TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
 
         HBox mainHBox = (HBox) titledPane.getParent();
         mainHBox.getChildren().remove(titledPane);
-    }
+        for(int i = 0; i < list.getCards().size(); i++) {
+            Card card = list.getCards().get(i);
+            try {
+                server.deleteCard(card.getCardId());
+            } catch (WebApplicationException e) {
+                var alert = new Alert(Alert.AlertType.ERROR);
+                alert.initModality(Modality.APPLICATION_MODAL);
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+                return;
+            }
+        }
 
+        try {
+            server.deleteList(list.getListId());
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+            return;
+        }
+    }
     /**
      * Function that enable you to go back to HomePage.
      *
@@ -432,7 +463,10 @@ public class BoardOverviewController {
         addCardButton.setOnAction(this::addCard);
 
         Button deleteListButton = new Button("delete list");
-        deleteListButton.setOnAction(this::deleteList);
+        // deleteListButton.setOnAction(this::deleteList);
+        deleteListButton.setOnAction(event -> {
+            deleteList(event, listing);
+        });
 
         VBox vBox = new VBox();
         vBox.setSpacing(20);

@@ -24,9 +24,9 @@ public class ListSavingController {
 
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Listing> add(@RequestBody Listing list) {
-      //  if (list.getTitle()== null) {
-      //      return ResponseEntity.badRequest().build();
-       // }
+        //  if (list.getTitle()== null) {
+        //      return ResponseEntity.badRequest().build();
+        // }
 
         msgs.convertAndSend("/topic/lists", list);
 
@@ -43,5 +43,14 @@ public class ListSavingController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(repo.findById(id).get());
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Listing> delete(@PathVariable("id") Long id) {
+        Listing list = repo.findById(id).orElse(null);
+        if (list == null) {
+            return ResponseEntity.notFound().build();
+        }
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
