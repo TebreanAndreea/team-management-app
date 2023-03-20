@@ -173,6 +173,14 @@ public class Card {
     }
 
     /**
+     * Setter for the list.
+     * @param list - the list we are setting
+     */
+    public void setList(Listing list) {
+        this.list = list;
+    }
+
+    /**
      * A hashcode value of the card.
      * @return - the new generated hash code of the card
      */
