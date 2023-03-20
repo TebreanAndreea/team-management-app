@@ -1,6 +1,13 @@
 package client.scenes;
 
 import javafx.event.EventTarget;
+
+import client.utils.ServerUtils;
+import commons.Card;
+import commons.Listing;
+import commons.SubTask;
+import jakarta.ws.rs.WebApplicationException;
+
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -14,9 +21,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.inject.Inject;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+//import java.util.List;
+import java.util.List;
+import java.util.Map;
 
 
 public class BoardOverviewController {
@@ -24,9 +39,31 @@ public class BoardOverviewController {
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
+    private ServerUtils server;
 
     private EventTarget target;
 
+    //A map that will keep track of all dependencies between
+    // the lists in the UI and the lists we have in the DB
+    private Map<VBox, Listing> map = new HashMap<>();
+
+
+
+    /**
+     * Constructor which initialize the server.
+     * @param server the server instance used for communication
+     */
+
+    @Inject
+    public BoardOverviewController (ServerUtils server){
+        this.server = server;
+    }
+    public BoardOverviewController ( ){
+    }
+
+    public void setServer(ServerUtils server) {
+        this.server = server;
+    }
 
     /**
      * Adds a new list with no contents, beside the 'add' button with a title.
@@ -48,6 +85,13 @@ public class BoardOverviewController {
             vBox.setSpacing(20);
             vBox.setAlignment(Pos.TOP_CENTER);
 
+            //saving the list into the database
+            Listing newList = new Listing(name, null);
+            saveListDB(newList);
+
+            map.put(vBox, newList);
+
+
             // add the "Add card" button below the cards
             HBox addCardButtonRow = new HBox();
             addCardButtonRow.setAlignment(Pos.CENTER);
@@ -60,6 +104,8 @@ public class BoardOverviewController {
             deleteListButtonRow.getChildren().add(deleteListButton);
             vBox.getChildren().add(deleteListButtonRow);
 
+
+
             // set up the list itself
             TitledPane titledPane = new TitledPane(name, vBox);
             titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
@@ -68,6 +114,58 @@ public class BoardOverviewController {
 
             hBox.getChildren().add(titledPane);
         });
+    }
+
+
+    /**
+     * Saving the list into the database.
+     *
+     * @param list the list
+     */
+    public void saveListDB(Listing list) {
+        try {
+            server.saveList(list);
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+
+        // clearFields();
+        //  MainController.showOverview();
+    }
+
+    /**
+     * Saves the card into db.
+     * @param card - the card we need to save
+     * @param list - the list that has the card
+     */
+    public void saveCardDB(Card card, Listing list) {
+        try {
+            //server.sendList(list);
+            server.saveCard(card);
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    /**
+     * A method that saves the subtask.
+     * @param subTask - the subtask that needs saving
+     */
+    public void saveSubtaskDB(SubTask subTask) {
+        try {
+            server.saveSubtask(subTask);
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 
 
@@ -86,6 +184,8 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter a name for the card:");
         dialog.showAndWait().ifPresent(name -> {
             VBox vBox = (VBox) addCardButton.getParent().getParent();
+
+
 
             Button newCard = new Button(name);
 
@@ -114,7 +214,13 @@ public class BoardOverviewController {
             vBox.getChildren().add(buttonList);
             vBox.getChildren().add(plusBox);
             vBox.getChildren().add(deleteListBox);
+
+            Listing curList = map.get(vBox);
+            Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
+            saveCardDB(curCard, curList);
+            curList.getCards().add(curCard);
         });
+
     }
 
     /**
@@ -279,6 +385,70 @@ public class BoardOverviewController {
                 vBox.getChildren().add(nrCards,(HBox)target);
             }
         }
+    }
+
+    /**
+     * addList method which accepts a Listing as a parameter.
+     * <h5>NOTE: The IDs of the cards are stored within their user data.</h5>
+     *
+     * @param listing the listing from which to create a listing
+     */
+    private void addListWithListing(Listing listing) {
+        Button addCardButton = new Button("+");
+
+        addCardButton.setOnAction(this::addCard);
+
+        Button deleteListButton = new Button("delete list");
+        deleteListButton.setOnAction(this::deleteList);
+
+        VBox vBox = new VBox();
+        vBox.setSpacing(20);
+        vBox.setAlignment(Pos.TOP_CENTER);
+        List<Card> cards = listing.getCards();
+        for (Card c : cards) {
+            Button newCard = new Button(c.getName());
+            newCard.setUserData(c.getCardId());
+            Button edit = new Button("Edit");
+            edit.setOnAction(this::editCard); // an event happens when the button is clicked
+
+            Button delete = new Button("x");
+            delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
+
+            HBox buttonList = new HBox();
+            buttonList.getChildren().addAll(newCard, edit, delete);
+            vBox.getChildren().add(buttonList);
+        }
+        // add the "Add card" button below the cards
+        HBox addCardButtonRow = new HBox();
+        addCardButtonRow.setAlignment(Pos.CENTER);
+        addCardButtonRow.getChildren().add(addCardButton);
+        vBox.getChildren().add(addCardButtonRow);
+
+        // add the "Delete list button at the bottom of this list
+        HBox deleteListButtonRow = new HBox();
+        deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
+        deleteListButtonRow.getChildren().add(deleteListButton);
+        vBox.getChildren().add(deleteListButtonRow);
+
+        map.put(vBox, listing);
+        // set up the list itself
+        TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
+        titledPane.setUserData(listing.getListId());
+        titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
+        titledPane.setMinWidth(135);
+        titledPane.setAnimated(false);
+        hBox.getChildren().add(titledPane);
+    }
+
+    /**
+     * fetches the listings from the JSON file and displays them.
+     */
+    public void refresh() {
+        List<Listing> listings = server.getListings();
+        hBox.getChildren().clear();
+        map = new HashMap<>();
+        for (Listing listing : listings)
+            addListWithListing(listing);
     }
 
 }
