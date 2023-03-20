@@ -75,7 +75,7 @@ public class BoardOverviewController {
         server.registerForMessages("/topic/boards", Board.class, q -> {
             refresh();
         });
-        server.registerForMessages("/topic/listings", Listing.class, q -> {
+        server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
             refresh();
         });
