@@ -89,13 +89,13 @@ public class ServerUtils {
      * //@param list - the sent list
      * @return
      */
-//    public Listing sendList(Listing list) {
-//        return ClientBuilder.newClient(new ClientConfig())
-//            .target(SERVER).path("api/card/setList")
-//            .request(APPLICATION_JSON)
-//            .accept(APPLICATION_JSON)
-//            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
-//    }
+    public Listing sendList(Listing list) {
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/card/setList")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+    }
 
     /**
      * A method that creates a post request for the card.
@@ -133,5 +133,22 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Listing>>() {});
+    }
+
+    public Listing getListingsById(long id) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+            .target(SERVER).path("api/lists/" +id) //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .get(new GenericType<Listing>(){});
+//            .getBy(new GenericType<List<Listing>>() {});
+    }
+
+    public void deleteCard(long id) {
+            ClientBuilder.newClient(new ClientConfig()) //
+            .target(SERVER).path("api/card/delete/" + id) //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .delete();
     }
 }

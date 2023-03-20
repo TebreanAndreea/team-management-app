@@ -46,6 +46,7 @@ public class BoardOverviewController {
     //A map that will keep track of all dependencies between
     // the lists in the UI and the lists we have in the DB
     private Map<VBox, Listing> map = new HashMap<>();
+    private Map<HBox, Card> cardMap = new HashMap<>();
 
 
 
@@ -141,16 +142,17 @@ public class BoardOverviewController {
      * @param card - the card we need to save
      * @param list - the list that has the card
      */
-    public void saveCardDB(Card card, Listing list) {
+    public Card saveCardDB(Card card, Listing list) {
         try {
-            //server.sendList(list);
-            server.saveCard(card);
+            server.sendList(list);
+            return server.saveCard(card);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
             alert.initModality(Modality.APPLICATION_MODAL);
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
+        return null;
     }
 
     /**
@@ -217,8 +219,9 @@ public class BoardOverviewController {
 
             Listing curList = map.get(vBox);
             Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
-            saveCardDB(curCard, curList);
-            curList.getCards().add(curCard);
+            Card updatedCard = saveCardDB(curCard, curList);
+            curList.getCards().add(updatedCard);
+            cardMap.put(buttonList,updatedCard);
         });
 
     }
@@ -247,7 +250,13 @@ public class BoardOverviewController {
     public void deleteCard(javafx.event.ActionEvent actionEvent) {
         HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
         VBox vBox = (VBox) clicked.getParent();
+         Card card = cardMap.get(clicked);
+         server.deleteCard(card.getCardId());
         vBox.getChildren().remove(clicked);
+
+
+
+
     }
 
     /**
@@ -417,6 +426,7 @@ public class BoardOverviewController {
             HBox buttonList = new HBox();
             buttonList.getChildren().addAll(newCard, edit, delete);
             vBox.getChildren().add(buttonList);
+            cardMap.put(buttonList,c);
         }
         // add the "Add card" button below the cards
         HBox addCardButtonRow = new HBox();

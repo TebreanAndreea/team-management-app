@@ -1,13 +1,11 @@
 package server.api;
 
 import commons.Card;
+import commons.Listing;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
-//import server.database.ListingRepository;
+import server.database.ListingRepository;
 
 
 @RestController
@@ -16,7 +14,7 @@ public class CardSavingController {
 
     private final CardRepository repo;
 
-//    private Listing list;
+    private Listing list;
 
     public CardSavingController(CardRepository repo) {
         this.repo = repo;
@@ -30,15 +28,21 @@ public class CardSavingController {
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Card> add(@RequestBody Card card) {
 
-//            card.setList(list);
+            card.setList(list);
         Card save = repo.save(card);
         return ResponseEntity.ok(save);
     }
 
-//    @PostMapping(path = {"/setList" })
-//    public ResponseEntity<Listing> getList(@RequestBody Listing list) {
-//
-//        this.list = list;
-//        return ResponseEntity.ok(list);
-//    }
+    @PostMapping(path = {"/setList" })
+    public ResponseEntity<Listing> getList(@RequestBody Listing list) {
+
+        this.list = list;
+        return ResponseEntity.ok(list);
+    }
+
+    @DeleteMapping(path = {"delete/{id}"})
+    public void delete (@PathVariable long id)
+    {
+        repo.deleteById(id);
+    }
 }
