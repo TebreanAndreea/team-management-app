@@ -49,17 +49,18 @@ public class BoardOverviewController {
     private Map<HBox, Card> cardMap = new HashMap<>();
 
 
-
     /**
      * Constructor which initialize the server.
+     *
      * @param server the server instance used for communication
      */
 
     @Inject
-    public BoardOverviewController (ServerUtils server){
+    public BoardOverviewController(ServerUtils server) {
         this.server = server;
     }
-    public BoardOverviewController ( ){
+
+    public BoardOverviewController() {
     }
 
     public void setServer(ServerUtils server) {
@@ -106,7 +107,6 @@ public class BoardOverviewController {
             vBox.getChildren().add(deleteListButtonRow);
 
 
-
             // set up the list itself
             TitledPane titledPane = new TitledPane(name, vBox);
             titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
@@ -139,8 +139,10 @@ public class BoardOverviewController {
 
     /**
      * Saves the card into db.
+     *
      * @param card - the card we need to save
      * @param list - the list that has the card
+     * @return card
      */
     public Card saveCardDB(Card card, Listing list) {
         try {
@@ -157,6 +159,7 @@ public class BoardOverviewController {
 
     /**
      * A method that saves the subtask.
+     *
      * @param subTask - the subtask that needs saving
      */
     public void saveSubtaskDB(SubTask subTask) {
@@ -174,6 +177,7 @@ public class BoardOverviewController {
     /**
      * <h3>Adds a card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>
+     *
      * @param actionEvent the action event.
      */
     public void addCard(javafx.event.ActionEvent actionEvent) {
@@ -188,12 +192,11 @@ public class BoardOverviewController {
             VBox vBox = (VBox) addCardButton.getParent().getParent();
 
 
-
             Button newCard = new Button(name);
 
             // make draggable
             //makeDraggable(newCard);
-            newCard.setOnMousePressed(event->{
+            newCard.setOnMousePressed(event -> {
                 target = newCard.getParent(); // this is the hbox that needs to be dropped
             });
 
@@ -206,11 +209,11 @@ public class BoardOverviewController {
             delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
 
             HBox buttonList = new HBox();
-            buttonList.getChildren().addAll(newCard,edit,delete);
+            buttonList.getChildren().addAll(newCard, edit, delete);
 
 
-            HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
-            HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size()-1);
+            HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
+            HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
 
 
             vBox.getChildren().add(buttonList);
@@ -221,17 +224,18 @@ public class BoardOverviewController {
             Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
             Card updatedCard = saveCardDB(curCard, curList);
             curList.getCards().add(updatedCard);
-            cardMap.put(buttonList,updatedCard);
+            cardMap.put(buttonList, updatedCard);
         });
 
     }
 
     /**
      * This method allows the user to change the name of a card.
+     *
      * @param actionEvent the action event
      */
-    public void editCard(javafx.event.ActionEvent actionEvent){
-        Button editButton = (Button)actionEvent.getSource();
+    public void editCard(javafx.event.ActionEvent actionEvent) {
+        Button editButton = (Button) actionEvent.getSource();
         HBox hBox = (HBox) editButton.getParent();
         Button cardButton = (Button) hBox.getChildren().get(0);
 
@@ -245,27 +249,27 @@ public class BoardOverviewController {
 
     /**
      * <h3>Deletes the card on which the button is clicked.</h3>
+     *
      * @param actionEvent the action  event that caused this method to be called
      */
     public void deleteCard(javafx.event.ActionEvent actionEvent) {
-        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
+        HBox clicked = (HBox) ((Button) actionEvent.getSource()).getParent();
         VBox vBox = (VBox) clicked.getParent();
-         Card card = cardMap.get(clicked);
-         server.deleteCard(card.getCardId());
+        Card card = cardMap.get(clicked);
+        server.deleteCard(card.getCardId());
         vBox.getChildren().remove(clicked);
-
-
 
 
     }
 
     /**
      * Deletes a list when the "delete button" is clicked.
+     *
      * @param actionEvent the action event that caused this method to be called
      */
-    public void deleteList(javafx.event.ActionEvent actionEvent){
-        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
-        VBox vbox = (VBox)clicked.getParent();
+    public void deleteList(javafx.event.ActionEvent actionEvent) {
+        HBox clicked = (HBox) ((Button) actionEvent.getSource()).getParent();
+        VBox vbox = (VBox) clicked.getParent();
 
         TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
 
@@ -281,7 +285,7 @@ public class BoardOverviewController {
      */
     public void switchToHomePageScene(javafx.event.ActionEvent actionEvent) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("HomePageOverview.fxml"));
-        primaryStage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(root);
         primaryStage.setScene(overview);
         primaryStage.show();
@@ -295,7 +299,7 @@ public class BoardOverviewController {
      */
     public void switchToCardScene(javafx.event.ActionEvent actionEvent) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("CardOverview.fxml"));
-        primaryStage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(root);
         primaryStage.setScene(overview);
         primaryStage.show();
@@ -304,15 +308,16 @@ public class BoardOverviewController {
 
     private double startX;
     private double startY;
-    public void makeDraggable(Node node){
 
-        node.setOnMousePressed(event->{
+    public void makeDraggable(Node node) {
+
+        node.setOnMousePressed(event -> {
             startX = event.getSceneX() - node.getTranslateX();
             startY = event.getSceneY() - node.getTranslateY();
         });
 
 
-        node.setOnMouseDragged(event->{
+        node.setOnMouseDragged(event -> {
             //node.setTranslateX(event.getSceneX() - startX);
             //node.setTranslateY(event.getSceneY() - startY);
 
@@ -337,6 +342,7 @@ public class BoardOverviewController {
 
     /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
+     *
      * @param mouseEvent the mouse event
      */
     private void handleDropping(MouseEvent mouseEvent) {
@@ -346,9 +352,9 @@ public class BoardOverviewController {
         int dim = hBox.getChildren().size();
 
 
-        for (int i=0;i<dim;i++){ // check if mouse is inside this vbox
-            TitledPane titledPane = (TitledPane)hBox.getChildren().get(i);
-            VBox vBox = (VBox)titledPane.getContent();
+        for (int i = 0; i < dim; i++) { // check if mouse is inside this vbox
+            TitledPane titledPane = (TitledPane) hBox.getChildren().get(i);
+            VBox vBox = (VBox) titledPane.getContent();
 
             Bounds vboxBounds = vBox.getLayoutBounds();
             Point2D coordinates = vBox.localToScreen(vboxBounds.getMinX(), vboxBounds.getMinY());
@@ -358,26 +364,26 @@ public class BoardOverviewController {
             double x2 = x1 + vBox.getWidth();
             double y2 = y1 + vBox.getHeight();
 
-            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){ // the mouse is   inside this vbox
+            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) { // the mouse is   inside this vbox
 
                 // if we drop the target within the same list, we first need to delete it
-                if (vBox.getChildren().contains((HBox)target))
-                    vBox.getChildren().remove((HBox)target);
+                if (vBox.getChildren().contains((HBox) target))
+                    vBox.getChildren().remove((HBox) target);
 
-                int nrCards = vBox.getChildren().size()-2;
-                for (int j=0;j<nrCards-1;j++){ // check for collisions between cards to insert it in the correct place
-                    HBox hBoxUp = (HBox)vBox.getChildren().get(j);
+                int nrCards = vBox.getChildren().size() - 2;
+                for (int j = 0; j < nrCards - 1; j++) { // check for collisions between cards to insert it in the correct place
+                    HBox hBoxUp = (HBox) vBox.getChildren().get(j);
 
                     Bounds hboxBounds = hBoxUp.getLayoutBounds();
                     Point2D coord = hBoxUp.localToScreen(hboxBounds.getMinX(), hboxBounds.getMinY());
 
-                    double yMiddleUp = (coord.getY() * 2 + hBoxUp.getHeight())/2;
+                    double yMiddleUp = (coord.getY() * 2 + hBoxUp.getHeight()) / 2;
 
-                    HBox hBoxDown = (HBox)vBox.getChildren().get(j+1);
+                    HBox hBoxDown = (HBox) vBox.getChildren().get(j + 1);
                     hboxBounds = hBoxDown.getLayoutBounds();
-                    coord = hBoxDown.localToScreen(hboxBounds.getMinX(),hboxBounds.getMinY());
+                    coord = hBoxDown.localToScreen(hboxBounds.getMinX(), hboxBounds.getMinY());
 
-                    double yMiddleDown = (coord.getY() * 2 + hBoxDown.getHeight())/2;
+                    double yMiddleDown = (coord.getY() * 2 + hBoxDown.getHeight()) / 2;
 
 
                     if (j == 0 && mouseY < yMiddleUp) {
@@ -386,12 +392,12 @@ public class BoardOverviewController {
                     }
 
                     if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
-                        vBox.getChildren().add(j+1, (HBox) target);
+                        vBox.getChildren().add(j + 1, (HBox) target);
                         return;
                     }
                 }
 
-                vBox.getChildren().add(nrCards,(HBox)target);
+                vBox.getChildren().add(nrCards, (HBox) target);
             }
         }
     }
@@ -426,7 +432,7 @@ public class BoardOverviewController {
             HBox buttonList = new HBox();
             buttonList.getChildren().addAll(newCard, edit, delete);
             vBox.getChildren().add(buttonList);
-            cardMap.put(buttonList,c);
+            cardMap.put(buttonList, c);
         }
         // add the "Add card" button below the cards
         HBox addCardButtonRow = new HBox();

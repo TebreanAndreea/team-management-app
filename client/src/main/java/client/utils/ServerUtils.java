@@ -50,44 +50,48 @@ public class ServerUtils {
 
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {});
+            .target(SERVER).path("api/quotes") //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .get(new GenericType<List<Quote>>() {
+            });
     }
 
     public Quote addQuote(Quote quote) {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+            .target(SERVER).path("api/quotes") //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
     }
 
     /**
      * This method creates a get request to the server entered by the user.
+     *
      * @param userUrl a string representing the url
      * @return a Response object
      */
-    public Response checkServer(String userUrl){
+    public Response checkServer(String userUrl) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(userUrl).path("api/connection")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .get();
+            .target(userUrl).path("api/connection")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .get();
     }
+
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/lists")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+            .target(SERVER).path("api/lists")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
-     * //@param list - the sent list
-     * @return
+     * @param list - the sent list
+     *
+     * @return Listing
      */
     public Listing sendList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
@@ -99,53 +103,63 @@ public class ServerUtils {
 
     /**
      * A method that creates a post request for the card.
+     *
      * @param card - the card we are saving
      * @return a subtask
      */
     public Card saveCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/card")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+            .target(SERVER).path("api/card")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
 
     /**
      * A method that creates a post request for the subtask.
+     *
      * @param subTask - the subtask we are saving
      * @return a subtask
      */
     public SubTask saveSubtask(SubTask subTask) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/subtask")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+            .target(SERVER).path("api/subtask")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
     }
 
     /**
      * Fetches all listings from the database.
+     *
      * @return all listings stored in a List Object
      */
     public List<Listing> getListings() {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/lists") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Listing>>() {});
+            .target(SERVER).path("api/lists") //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .get(new GenericType<List<Listing>>() {
+            });
     }
 
     public Listing getListingsById(long id) {
         return ClientBuilder.newClient(new ClientConfig()) //
-            .target(SERVER).path("api/lists/" +id) //
+            .target(SERVER).path("api/lists/" + id) //
             .request(APPLICATION_JSON) //
             .accept(APPLICATION_JSON) //
-            .get(new GenericType<Listing>(){});
+            .get(new GenericType<Listing>() {
+            });
 //            .getBy(new GenericType<List<Listing>>() {});
     }
 
+    /**
+     * Sends a delete request.
+     *
+     * @param id - the id of the card we want to delete
+     */
     public void deleteCard(long id) {
-            ClientBuilder.newClient(new ClientConfig()) //
+        ClientBuilder.newClient(new ClientConfig()) //
             .target(SERVER).path("api/card/delete/" + id) //
             .request(APPLICATION_JSON) //
             .accept(APPLICATION_JSON) //

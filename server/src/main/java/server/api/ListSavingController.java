@@ -1,7 +1,7 @@
 package server.api;
 
 import commons.Listing;
-import commons.Quote;
+//import commons.Quote;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.ListingRepository;
