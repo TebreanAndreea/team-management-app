@@ -70,6 +70,7 @@ public class BoardOverviewController {
         });
     }
 
+
     /**
      * <h3>Adds a card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>
@@ -93,6 +94,7 @@ public class BoardOverviewController {
             newCard.setOnMousePressed(event->{
                 target = newCard.getParent(); // this is the hbox that needs to be dropped
             });
+
             newCard.setOnMouseReleased(this::handleDropping);
 
             Button edit = new Button("Edit");
@@ -219,7 +221,7 @@ public class BoardOverviewController {
 
 
     /**
-     * This method handles dropping a hbox in another titledPane.
+     * This method handles dropping a hbox in another titledPane or within the same titledPane.
      * @param mouseEvent the mouse event
      */
     private void handleDropping(MouseEvent mouseEvent) {
@@ -241,7 +243,11 @@ public class BoardOverviewController {
             double x2 = x1 + vBox.getWidth();
             double y2 = y1 + vBox.getHeight();
 
-            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){ // the mouse is inside this vbox
+            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2){ // the mouse is   inside this vbox
+
+                // if we drop the target within the same list, we first need to delete it
+                if (vBox.getChildren().contains((HBox)target))
+                    vBox.getChildren().remove((HBox)target);
 
                 int nrCards = vBox.getChildren().size()-2;
                 for (int j=0;j<nrCards-1;j++){ // check for collisions between cards to insert it in the correct place
