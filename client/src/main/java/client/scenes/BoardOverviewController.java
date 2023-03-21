@@ -138,6 +138,7 @@ public class BoardOverviewController {
 //
 //            hBox.getChildren().add(titledPane);
         });
+        refresh();
     }
 
 
@@ -225,13 +226,14 @@ public class BoardOverviewController {
 
             newCard.setOnMouseReleased(this::handleDropping);
 
-            Button edit = new Button("Edit");
+            Button edit = new Button("\uD83D\uDD89");
             edit.setOnAction(this::editCard); // an event happens when the button is clicked
 
-            Button delete = new Button("x");
+            Button delete = new Button("\uD83D\uDDD9");
             delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
 
             HBox buttonList = new HBox();
+            buttonList.setAlignment(Pos.CENTER);
             buttonList.getChildren().addAll(newCard, edit, delete);
 
 
@@ -261,12 +263,13 @@ public class BoardOverviewController {
         Button editButton = (Button) actionEvent.getSource();
         HBox hBox = (HBox) editButton.getParent();
         Button cardButton = (Button) hBox.getChildren().get(0);
-
+        Card currentCard = cardMap.get(hBox);
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Change the name of the card");
         dialog.setHeaderText("Please enter the new name for the card:");
         dialog.showAndWait().ifPresent(name -> {
             cardButton.setText(name);
+            server.updateCard(currentCard.getCardId(), name);
         });
     }
 
@@ -475,14 +478,15 @@ public class BoardOverviewController {
         for (Card c : cards) {
             Button newCard = new Button(c.getName());
             newCard.setUserData(c.getCardId());
-            Button edit = new Button("Edit");
+            Button edit = new Button("\uD83D\uDD89");
             edit.setOnAction(this::editCard); // an event happens when the button is clicked
 
-            Button delete = new Button("x");
+            Button delete = new Button("\uD83D\uDDD9");
             delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
 
             HBox buttonList = new HBox();
             buttonList.getChildren().addAll(newCard, edit, delete);
+            buttonList.setAlignment(Pos.CENTER);
             vBox.getChildren().add(buttonList);
             cardMap.put(buttonList, c);
         }
