@@ -200,10 +200,6 @@ public class ServerUtils {
                 .delete();
     }
 
-    public void editCard(String newName, long id) {
-
-    }
-
     private StompSession session = connect("ws://localhost:8080/websocket");
 
     private StompSession connect(String url) {
