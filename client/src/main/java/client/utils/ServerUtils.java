@@ -86,6 +86,13 @@ public class ServerUtils {
                 .get();
     }
 
+    /**
+     * Saving the list into database.
+     *
+     * @param list to be saved into database
+     * @return the list
+     */
+
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/lists")
@@ -197,6 +204,19 @@ public class ServerUtils {
                 .target(SERVER).path("api/card/delete/" + id) //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
+    /**
+     * Deleting a list from the Database.
+     *
+     * @param id the id of the list to be deleted
+     */
+    public void deleteList(Long id) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/lists/" + id)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
                 .delete();
     }
 
