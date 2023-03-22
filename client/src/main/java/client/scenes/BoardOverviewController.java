@@ -478,6 +478,14 @@ public class BoardOverviewController {
         for (Card c : cards) {
             Button newCard = new Button(c.getName());
             newCard.setUserData(c.getCardId());
+
+            // make this card draggable
+            //makeDraggable(newCard);
+            newCard.setOnMousePressed(event -> {
+                target = newCard.getParent(); // this is the hbox that needs to be dropped
+            });
+
+            newCard.setOnMouseReleased(this::handleDropping);
             Button edit = new Button("\uD83D\uDD89");
             edit.setOnAction(this::editCard); // an event happens when the button is clicked
 
