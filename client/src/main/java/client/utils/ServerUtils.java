@@ -168,6 +168,20 @@ public class ServerUtils {
     }
 
     /**
+     * Update a list by changing its name.
+     *
+     * @param id the id of the list to be updated
+     * @param newName the new name
+     * @return The updated list
+     */
+
+    public Listing updateList(long id, String newName) {
+        Listing currentList = getListingsById(id);
+        currentList.setTitle(newName);
+        return saveList(currentList);
+    }
+
+    /**
      * Sends a delete request.
      *
      * @param id - the id of the card we want to delete
