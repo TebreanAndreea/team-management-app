@@ -99,15 +99,21 @@ public class BoardOverviewController {
             saveListDB(newList);
             refresh();
 
-            Button addCardButton = new Button("+");
-
-            addCardButton.setOnAction(this::addCard);
-
-            Button deleteListButton = new Button("delete list");
-            //deleteListButton.setOnAction(this::deleteList);
-            deleteListButton.setOnAction(event -> {
-                deleteList(event, newList);
-            });
+//            Button addCardButton = new Button("+");
+//
+//            addCardButton.setOnAction(this::addCard);
+//
+//
+//            Button editListButton = new Button("Edit");
+//            editListButton.setOnAction(event -> {
+//                editList(event, newList);
+//            });
+//
+//            Button deleteListButton = new Button("delete list");
+//            //deleteListButton.setOnAction(this::deleteList);
+//            deleteListButton.setOnAction(event -> {
+//                deleteList(event, newList);
+//            });
 
 //            VBox vBox = new VBox();
 //            vBox.setSpacing(20);
@@ -274,6 +280,27 @@ public class BoardOverviewController {
     }
 
     /**
+     * Edit a List by changing its name.
+     *
+     * @param actionEvent the action event
+     * @param list the list to be edited
+     */
+    public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
+        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
+        VBox vbox = (VBox)clicked.getParent();
+        TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change the name of the list");
+        dialog.setHeaderText("Please enter the new name of the list");
+        dialog.showAndWait().ifPresent(name -> {
+            titledPane.setText(name);
+           // list.setTitle(name);
+            server.updateList(list.getListId(), name);
+          //  refresh();
+        });
+    }
+
+    /**
      * <h3>Deletes the card on which the button is clicked.</h3>
      *
      * @param actionEvent the action  event that caused this method to be called
@@ -284,8 +311,6 @@ public class BoardOverviewController {
         Card card = cardMap.get(clicked);
         server.deleteCard(card.getCardId());
         vBox.getChildren().remove(clicked);
-
-
     }
 
 
@@ -465,6 +490,12 @@ public class BoardOverviewController {
 
         addCardButton.setOnAction(this::addCard);
 
+
+        Button editListButton = new Button("Edit");
+        editListButton.setOnAction(event -> {
+            editList(event, listing);
+        });
+
         Button deleteListButton = new Button("delete list");
         // deleteListButton.setOnAction(this::deleteList);
         deleteListButton.setOnAction(event -> {
@@ -499,6 +530,7 @@ public class BoardOverviewController {
         // add the "Delete list button at the bottom of this list
         HBox deleteListButtonRow = new HBox();
         deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
+        deleteListButtonRow.getChildren().add(editListButton);
         deleteListButtonRow.getChildren().add(deleteListButton);
         vBox.getChildren().add(deleteListButtonRow);
 

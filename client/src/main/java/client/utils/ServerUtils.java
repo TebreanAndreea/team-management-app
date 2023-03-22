@@ -168,6 +168,19 @@ public class ServerUtils {
     }
 
     /**
+     * Update a list by changing its name.
+     *
+     * @param id the id of the list to be updated
+     * @param newName the new name
+     * @return The updated list
+     */
+
+    public Listing updateList(long id, String newName) {
+        Listing currentList = getListingsById(id);
+        currentList.setTitle(newName);
+        return saveList(currentList);
+    }
+    /**
      * Fetches the card with the provided id from the database.
      * @param id The id of the card to search for
      * @return The card with the needed ID
