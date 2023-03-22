@@ -103,8 +103,8 @@ public class ServerUtils {
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
-     * @param list - the sent list
      *
+     * @param list - the sent list
      * @return Listing
      */
     public Listing sendList(Listing list) {
@@ -180,6 +180,32 @@ public class ServerUtils {
         currentList.setTitle(newName);
         return saveList(currentList);
     }
+    /**
+     * Fetches the card with the provided id from the database.
+     * @param id The id of the card to search for
+     * @return The card with the needed ID
+     */
+    public Card getCardsById(long id) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/card/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<Card>() {
+                });
+//            .getBy(new GenericType<List<Listing>>() {});
+    }
+
+    /**
+     * Updates the card with the new parameters.
+     * @param id The ID of the card to be updated
+     * @param newName Its new name (more parameters may be added)
+     * @return The updated card, if required
+     */
+    public Card updateCard(long id, String newName) {
+        Card currentCard = getCardsById(id);
+        currentCard.setName(newName);
+        return saveCard(currentCard);
+    }
 
     /**
      * Sends a delete request.
@@ -214,16 +240,16 @@ public class ServerUtils {
         var stomp = new WebSocketStompClient(client);
         stomp.setMessageConverter(new MappingJackson2MessageConverter());
         try {
-            return stomp.connect(url, new StompSessionHandlerAdapter() {}).get();
-        }
-        catch (InterruptedException e) {
+            return stomp.connect(url, new StompSessionHandlerAdapter() {
+            }).get();
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-        catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
         throw new IllegalStateException();
     }
+
     public <T> void registerForMessages(String dest, Class<T> type, Consumer<T> consumer) {
         session.subscribe(dest, new StompFrameHandler() {
             @Override
