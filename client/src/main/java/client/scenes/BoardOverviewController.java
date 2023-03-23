@@ -426,10 +426,8 @@ public class BoardOverviewController {
         double mouseX = mouseEvent.getScreenX();
         double mouseY = mouseEvent.getScreenY();
 
-        int dim = hBox.getChildren().size();
 
-
-        for (int i = 0; i < dim; i++) { // check if mouse is inside this vbox
+        for (int i = 0; i < hBox.getChildren().size(); i++) { // check if mouse is inside this vbox
             TitledPane titledPane = (TitledPane) hBox.getChildren().get(i);
             VBox vBox = (VBox) titledPane.getContent();
 
@@ -441,13 +439,23 @@ public class BoardOverviewController {
             double x2 = x1 + vBox.getWidth();
             double y2 = y1 + vBox.getHeight();
 
-            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) { // the mouse is   inside this vbox
+            if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) { // the mouse is inside this vbox
 
-                // if we drop the target within the same list, we first need to delete it
-                if (vBox.getChildren().contains((HBox) target))
-                    vBox.getChildren().remove((HBox) target);
+
+                Card card = cardMap.get((HBox)target);
+                server.deleteCard(card.getCardId()); // delete the card from its initial list
+                vBox.getChildren().remove((HBox) target); // this is for duplicate children
+
+
+                Listing list = map.get(vBox);
+                Card updatedCard = saveCardDB(card,list);  // add this card to this list
+                list.getCards().add(updatedCard);
+                cardMap.put((HBox) target,updatedCard);
+
 
                 int nrCards = vBox.getChildren().size() - 2;
+
+                boolean foundPlace = false;
                 for (int j = 0; j < nrCards - 1; j++) { // check for collisions between cards to insert it in the correct place
                     HBox hBoxUp = (HBox) vBox.getChildren().get(j);
 
@@ -465,18 +473,38 @@ public class BoardOverviewController {
 
                     if (j == 0 && mouseY < yMiddleUp) {
                         vBox.getChildren().add(0, (HBox) target);
-                        return;
-                    }
+                        foundPlace = true;
+                    } else {
 
-                    if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
-                        vBox.getChildren().add(j + 1, (HBox) target);
-                        return;
+                        if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
+                            vBox.getChildren().add(j + 1, (HBox) target);
+                            foundPlace = true;
+                        }
                     }
                 }
 
-                vBox.getChildren().add(nrCards, (HBox) target);
+                if (foundPlace == false) // add at the end
+                    vBox.getChildren().add(nrCards, (HBox) target);
+
+                for (int j=0;j<nrCards+1;j++){ // we delete all the cards from this list
+                    HBox hBox = (HBox) vBox.getChildren().get(j);
+                    Card card2 = cardMap.get(hBox);
+                    server.deleteCard(card2.getCardId());
+                }
+
+                for (int j=0;j<nrCards+1;j++){ // we have all the cards in good order, we add them to the list
+                    HBox hBox = (HBox) vBox.getChildren().get(j);
+                    Card card2 = cardMap.get(hBox);
+                    Card updated = saveCardDB(card2,list);
+                    list.getCards().add(updated);
+                    cardMap.put(hBox,updated);
+                }
             }
         }
+    }
+
+    public void handleDragAndDropBackend(){
+
     }
 
     /**
@@ -509,6 +537,14 @@ public class BoardOverviewController {
         for (Card c : cards) {
             Button newCard = new Button(c.getName());
             newCard.setUserData(c.getCardId());
+
+            // make this card draggable
+            //makeDraggable(newCard);
+            newCard.setOnMousePressed(event -> {
+                target = newCard.getParent(); // this is the hbox that needs to be dropped
+            });
+
+            newCard.setOnMouseReleased(this::handleDropping);
             Button edit = new Button("\uD83D\uDD89");
             edit.setOnAction(this::editCard); // an event happens when the button is clicked
 
