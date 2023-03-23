@@ -41,10 +41,10 @@ public class BoardOverviewController {
     private Scene overview;
     public HBox hBox;
     private ServerUtils server;
-
+    private ListController listController;
     private EventTarget target;
 
-    //A map that will keep track of all dependencies between
+    // A map that will keep track of all dependencies between
     // the lists in the UI and the lists we have in the DB
     private Map<VBox, Listing> map = new HashMap<>();
     private Map<HBox, Card> cardMap = new HashMap<>();
@@ -52,21 +52,19 @@ public class BoardOverviewController {
 
     /**
      * Constructor which initialize the server.
-     *
      * @param server the server instance used for communication
+     * @param listController the controller for a list
      */
 
     @Inject
-    public BoardOverviewController(ServerUtils server) {
+    public BoardOverviewController(ServerUtils server, ListController listController) {
         this.server = server;
+        this.listController = listController;
     }
 
     public BoardOverviewController() {
     }
 
-    public void setServer(ServerUtils server) {
-        this.server = server;
-    }
 
     /**
      * Initializes the controller and immediately fetches the lists from the database.
@@ -89,83 +87,10 @@ public class BoardOverviewController {
      * Adds a new list with no contents, besides the 'add' button with a title.
      */
     public void addList() {
-
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("List name");
-        dialog.setHeaderText("Please enter the name of the list");
-        dialog.showAndWait().ifPresent(name -> {
-            //saving the list into the database
-            Listing newList = new Listing(name, null);
-            saveListDB(newList);
-            refresh();
-
-//            Button addCardButton = new Button("+");
-//
-//            addCardButton.setOnAction(this::addCard);
-//
-//
-//            Button editListButton = new Button("Edit");
-//            editListButton.setOnAction(event -> {
-//                editList(event, newList);
-//            });
-//
-//            Button deleteListButton = new Button("delete list");
-//            //deleteListButton.setOnAction(this::deleteList);
-//            deleteListButton.setOnAction(event -> {
-//                deleteList(event, newList);
-//            });
-
-//            VBox vBox = new VBox();
-//            vBox.setSpacing(20);
-//            vBox.setAlignment(Pos.TOP_CENTER);*/
-//
-//
-//            map.put(vBox, newList);
-//
-//
-//            // add the "Add card" button below the cards
-//            HBox addCardButtonRow = new HBox();
-//            addCardButtonRow.setAlignment(Pos.CENTER);
-//           addCardButtonRow.getChildren().add(addCardButton);
-//            vBox.getChildren().add(addCardButtonRow);
-//
-//            // add the "Delete list button at the bottom of this list
-//            HBox deleteListButtonRow = new HBox();
-//            deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
-//            deleteListButtonRow.getChildren().add(deleteListButton);
-//            vBox.getChildren().add(deleteListButtonRow);
-//
-//
-//            // set up the list itself
-//            TitledPane titledPane = new TitledPane(name, vBox);
-//            titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
-//            titledPane.setMinWidth(135);
-//            titledPane.setAnimated(false);
-//
-//            hBox.getChildren().add(titledPane);
-        });
+        listController.addList();
         refresh();
     }
 
-
-    /**
-     * Saving the list into the database.
-     *
-     * @param list the list
-     */
-    public void saveListDB(Listing list) {
-        try {
-            server.saveList(list);
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-
-        // clearFields();
-        //  MainController.showOverview();
-    }
 
     /**
      * Saves the card into db.
@@ -286,18 +211,7 @@ public class BoardOverviewController {
      * @param list the list to be edited
      */
     public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
-        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
-        VBox vbox = (VBox)clicked.getParent();
-        TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Change the name of the list");
-        dialog.setHeaderText("Please enter the new name of the list");
-        dialog.showAndWait().ifPresent(name -> {
-            titledPane.setText(name);
-           // list.setTitle(name);
-            server.updateList(list.getListId(), name);
-          //  refresh();
-        });
+        listController.editList(actionEvent,list);
     }
 
     /**
@@ -320,39 +234,8 @@ public class BoardOverviewController {
      * @param actionEvent the action event that caused this method to be called
      * @param list the list to be deleted
      */
-
-
     public void deleteList(javafx.event.ActionEvent actionEvent, Listing list){
-
-        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
-        VBox vbox = (VBox)clicked.getParent();
-
-        TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
-
-        HBox mainHBox = (HBox) titledPane.getParent();
-        mainHBox.getChildren().remove(titledPane);
-        for(int i = 0; i < list.getCards().size(); i++) {
-            Card card = list.getCards().get(i);
-            try {
-                server.deleteCard(card.getCardId());
-            } catch (WebApplicationException e) {
-                var alert = new Alert(Alert.AlertType.ERROR);
-                alert.initModality(Modality.APPLICATION_MODAL);
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
-                return;
-            }
-        }
-
-        try {
-            server.deleteList(list.getListId());
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-            return;
-        }
+        listController.deleteList(actionEvent,list);
     }
     /**
      * Function that enable you to go back to HomePage.
@@ -503,9 +386,6 @@ public class BoardOverviewController {
         }
     }
 
-    public void handleDragAndDropBackend(){
-
-    }
 
     /**
      * addList method which accepts a Listing as a parameter.
