@@ -15,7 +15,7 @@ import javafx.stage.Modality;
 
 public class ListController {
 
-    ServerUtils server;
+    private ServerUtils server;
 
     @Inject
     public ListController(ServerUtils server) {

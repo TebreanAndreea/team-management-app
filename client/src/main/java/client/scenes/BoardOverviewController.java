@@ -149,8 +149,7 @@ public class BoardOverviewController {
 
             Button newCard = new Button(name);
 
-            // make draggable
-            //makeDraggable(newCard);
+            // make this card draggable
             newCard.setOnMousePressed(event -> {
                 target = newCard.getParent(); // this is the hbox that needs to be dropped
             });
@@ -171,10 +170,7 @@ public class BoardOverviewController {
             HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
             HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
 
-
-            vBox.getChildren().add(buttonList);
-            vBox.getChildren().add(plusBox);
-            vBox.getChildren().add(deleteListBox);
+            vBox.getChildren().addAll(buttonList,plusBox,deleteListBox);
 
             Listing curList = map.get(vBox);
             Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
@@ -266,40 +262,6 @@ public class BoardOverviewController {
     }
 
 
-    private double startX;
-    private double startY;
-
-    public void makeDraggable(Node node) {
-
-        node.setOnMousePressed(event -> {
-            startX = event.getSceneX() - node.getTranslateX();
-            startY = event.getSceneY() - node.getTranslateY();
-        });
-
-
-        node.setOnMouseDragged(event -> {
-            //node.setTranslateX(event.getSceneX() - startX);
-            //node.setTranslateY(event.getSceneY() - startY);
-
-            HBox hbox = (HBox) node.getParent();
-            //hbox.setTranslateX(event.getSceneX() - startX);
-            //hbox.setTranslateY(event.getSceneY() - startY);
-
-
-            hbox.getChildren().get(0).setTranslateX(event.getSceneX() - startX);
-            hbox.getChildren().get(0).setTranslateY(event.getSceneY() - startY);
-
-
-            hbox.getChildren().get(1).setTranslateX(event.getSceneX() - startX);
-            hbox.getChildren().get(1).setTranslateY(event.getSceneY() - startY);
-
-            hbox.getChildren().get(2).setTranslateX(event.getSceneX() - startX);
-            hbox.getChildren().get(2).setTranslateY(event.getSceneY() - startY);
-        });
-
-    }
-
-
     /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
      *
@@ -324,20 +286,16 @@ public class BoardOverviewController {
 
             if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) { // the mouse is inside this vbox
 
-
                 Card card = cardMap.get((HBox)target);
                 server.deleteCard(card.getCardId()); // delete the card from its initial list
                 vBox.getChildren().remove((HBox) target); // this is for duplicate children
-
 
                 Listing list = map.get(vBox);
                 Card updatedCard = saveCardDB(card,list);  // add this card to this list
                 list.getCards().add(updatedCard);
                 cardMap.put((HBox) target,updatedCard);
 
-
                 int nrCards = vBox.getChildren().size() - 2;
-
                 boolean foundPlace = false;
                 for (int j = 0; j < nrCards - 1; j++) { // check for collisions between cards to insert it in the correct place
                     HBox hBoxUp = (HBox) vBox.getChildren().get(j);
@@ -353,12 +311,10 @@ public class BoardOverviewController {
 
                     double yMiddleDown = (coord.getY() * 2 + hBoxDown.getHeight()) / 2;
 
-
                     if (j == 0 && mouseY < yMiddleUp) {
                         vBox.getChildren().add(0, (HBox) target);
                         foundPlace = true;
                     } else {
-
                         if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
                             vBox.getChildren().add(j + 1, (HBox) target);
                             foundPlace = true;
@@ -398,7 +354,6 @@ public class BoardOverviewController {
 
         addCardButton.setOnAction(this::addCard);
 
-
         Button editListButton = new Button("Edit");
         editListButton.setOnAction(event -> {
             editList(event, listing);
@@ -419,9 +374,8 @@ public class BoardOverviewController {
             newCard.setUserData(c.getCardId());
 
             // make this card draggable
-            //makeDraggable(newCard);
             newCard.setOnMousePressed(event -> {
-                target = newCard.getParent(); // this is the hbox that needs to be dropped
+                target = newCard.getParent(); // this is the hBox that needs to be dropped
             });
 
             newCard.setOnMouseReleased(this::handleDropping);
