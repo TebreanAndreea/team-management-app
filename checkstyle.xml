@@ -35,7 +35,7 @@
         <module name="MethodName"/>
         <module name="MethodLength">
             <property name="tokens" value="METHOD_DEF"/>
-            <property name="max" value="80"/>
+            <property name="max" value="60"/>
         </module>
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>
