@@ -30,11 +30,13 @@ public class MainController {
      * @param homePageOverview Homepage
      * @param boardOverview    Board overview
      * @param cardOverview     Card overview
+     * @param initialOverview Initial overview
      */
     public void initialize(Stage primaryStage,
                            Pair<HomePageOverviewController, Parent> homePageOverview,
                            Pair<BoardOverviewController, Parent> boardOverview,
-                           Pair<CardOverviewController, Parent> cardOverview) {
+                           Pair<CardOverviewController, Parent> cardOverview,
+                           Pair<InitialOvreviewController, Parent> initialOverview) {
         this.primaryStage = primaryStage;
 
         this.homePageOverviewController = homePageOverview.getKey();
@@ -45,6 +47,8 @@ public class MainController {
 
         this.cardOverviewController = cardOverview.getKey();
         this.cardOverview = new Scene(cardOverview.getValue());
+
+
 
         showOverview();
         primaryStage.show();

@@ -22,14 +22,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import commons.Card;
-import commons.Listing;
-import commons.Quote;
-import commons.SubTask;
+import commons.*;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -250,5 +248,17 @@ public class ServerUtils {
                 consumer.accept((T) payload);
             }
         });
+    }
+
+    public void addBoard(Board board) {
+    }
+
+    public List<Board> getBoardsFromDB() {
+        Board b1 = new Board("title", "", "");
+        Board b2 = new Board("title2","","");
+        List<Board> list = new ArrayList<>();
+        list.add(b1);
+        list.add(b2);
+        return list;
     }
 }

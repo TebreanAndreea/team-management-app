@@ -49,6 +49,8 @@ public class BoardOverviewController {
     private Map<VBox, Listing> map = new HashMap<>();
     private Map<HBox, Card> cardMap = new HashMap<>();
 
+    Board board;
+
 
     /**
      * Constructor which initialize the server.
@@ -523,4 +525,8 @@ public class BoardOverviewController {
             addListWithListing(listing);
     }
 
+    //Setter for the board
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }
