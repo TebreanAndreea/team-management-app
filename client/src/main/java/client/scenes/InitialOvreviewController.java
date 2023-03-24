@@ -8,6 +8,7 @@ import commons.Board;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 //import javafx.scene.control.ScrollPane;
@@ -63,11 +64,15 @@ public class InitialOvreviewController {
      * The method switches to one board which was chosen.
      * @param actionEvent - the event that was triggered when a user decided which board he wants
      */
-    public void switchtoBoard (ActionEvent actionEvent)
+    public void switchToBoard (ActionEvent actionEvent)
     {
         Button goToBoard = (Button) actionEvent.getSource();
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         boardOverview.getKey().setBoard(boardsMap.get(goToBoard));
+        boardOverview.getKey().refresh();
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(boardOverview.getValue());
+        primaryStage.setScene(overview);
     }
 
 
@@ -113,7 +118,7 @@ public class InitialOvreviewController {
             newBoard.setPrefHeight(70);
             newBoard.setPrefWidth(80);
             newBoard.setText(boards.get(i).getTitle());
-            newBoard.setOnAction(this::switchtoBoard);
+            newBoard.setOnAction(this::switchToBoard);
             hbox.getChildren().add(newBoard);
             boardsMap.put(newBoard, boards.get(i));
         }

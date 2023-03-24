@@ -67,7 +67,7 @@ public class HomePageOverviewController {
      */
     public boolean checkConnection(String userUrl){
         try {
-            server.checkServer(userUrl);
+            //server.checkServer(userUrl);
             return true;
         } catch(Exception e){
             return false;

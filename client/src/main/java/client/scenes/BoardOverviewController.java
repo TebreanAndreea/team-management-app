@@ -1,5 +1,8 @@
 package client.scenes;
 
+import client.MyFXML;
+import client.MyModule;
+import com.google.inject.Injector;
 import javafx.event.EventTarget;
 
 import client.utils.ServerUtils;
@@ -34,12 +37,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.inject.Guice.createInjector;
+
 
 public class BoardOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
+
+    public Label boardName;
     private ServerUtils server;
 
     private EventTarget target;
@@ -49,7 +56,12 @@ public class BoardOverviewController {
     private Map<VBox, Listing> map = new HashMap<>();
     private Map<HBox, Card> cardMap = new HashMap<>();
 
-    Board board;
+    Board board = new Board("test","","");
+
+
+    private static final Injector INJECTOR = createInjector(new MyModule());
+    private static final MyFXML FXML = new MyFXML(INJECTOR);
+
 
 
     /**
@@ -97,68 +109,38 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter the name of the list");
         dialog.showAndWait().ifPresent(name -> {
             //saving the list into the database
-            Listing newList = new Listing(name, null);
-            saveListDB(newList);
+            Listing newList = new Listing(name, board);
+            newList = saveListDB(board, newList);
+            board.getLists().add(newList);
             refresh();
 
             Button addCardButton = new Button("+");
-
             addCardButton.setOnAction(this::addCard);
 
             Button deleteListButton = new Button("delete list");
-            //deleteListButton.setOnAction(this::deleteList);
-            deleteListButton.setOnAction(event -> {
-                deleteList(event, newList);
-            });
-
-//            VBox vBox = new VBox();
-//            vBox.setSpacing(20);
-//            vBox.setAlignment(Pos.TOP_CENTER);*/
-//
-//
-//            map.put(vBox, newList);
-//
-//
-//            // add the "Add card" button below the cards
-//            HBox addCardButtonRow = new HBox();
-//            addCardButtonRow.setAlignment(Pos.CENTER);
-//           addCardButtonRow.getChildren().add(addCardButton);
-//            vBox.getChildren().add(addCardButtonRow);
-//
-//            // add the "Delete list button at the bottom of this list
-//            HBox deleteListButtonRow = new HBox();
-//            deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
-//            deleteListButtonRow.getChildren().add(deleteListButton);
-//            vBox.getChildren().add(deleteListButtonRow);
-//
-//
-//            // set up the list itself
-//            TitledPane titledPane = new TitledPane(name, vBox);
-//            titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
-//            titledPane.setMinWidth(135);
-//            titledPane.setAnimated(false);
-//
-//            hBox.getChildren().add(titledPane);
+            Listing finalNewList = newList;
+            deleteListButton.setOnAction(event -> deleteList(event, finalNewList));
         });
         refresh();
     }
 
-
     /**
      * Saving the list into the database.
-     *
      * @param list the list
+     * @param board the board
+     * @return the saved list
      */
-    public void saveListDB(Listing list) {
+    public Listing saveListDB(Board board, Listing list) {
         try {
-            server.saveList(list);
+            server.sendBoard(board);
+            return server.saveList(list);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
             alert.initModality(Modality.APPLICATION_MODAL);
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
-
+        throw new RuntimeException("Could not save list");
         // clearFields();
         //  MainController.showOverview();
     }
@@ -337,11 +319,12 @@ public class BoardOverviewController {
      * @param actionEvent the event used
      * @throws IOException the exemption it might be caused
      */
-    public void switchToHomePageScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("HomePageOverview.fxml"));
+    public void switchToInitialOverviewScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        var initialOverview = FXML.load(InitialOvreviewController.class, "client", "scenes", "InitialOverview.fxml");
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(root);
+        overview = new Scene(initialOverview.getValue());
         primaryStage.setScene(overview);
+
         primaryStage.show();
     }
 
@@ -518,7 +501,8 @@ public class BoardOverviewController {
      * fetches the listings from the JSON file and displays them.
      */
     public void refresh() {
-        List<Listing> listings = server.getListings();
+        boardName.setText(board.getTitle());
+        List<Listing> listings = board.getLists();
         hBox.getChildren().clear();
         map = new HashMap<>();
         for (Listing listing : listings)
