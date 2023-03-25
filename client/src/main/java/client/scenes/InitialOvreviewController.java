@@ -138,7 +138,7 @@ public class InitialOvreviewController {
             newBoard.setOnMouseEntered(event -> {
                 var root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
                 root.getKey().setBoard(boardsMap.get(newBoard));
-                root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+                root.getKey().refresh();
                 SubScene subScene = new SubScene(root.getValue(), 600, 400);
                 scrollPane.setContent(subScene);
                 double scaleFactor = Math.min(250 / subScene.getWidth(), 238 / subScene.getHeight());
@@ -159,9 +159,9 @@ public class InitialOvreviewController {
 
     public void hoverStyle (Button button)
     {
-        button.setStyle("-fx-border-width: 15 px;" +
+        button.setStyle("-fx-border-width: 5px;" +
             "-fx-background-color: white;" +
-            "-fx-border-color: #4b4b4b;" +
+            "-fx-border-color: #656565;" +
             "-fx-text-fill: #4a4ad5;" +
             "-fx-font-family: 'Segoe Script';" +
             "-fx-font-size: 15 px;" +
@@ -171,7 +171,7 @@ public class InitialOvreviewController {
 
     public void normalStyle (Button button)
     {
-        button.setStyle("-fx-border-width: 10 px;" +
+        button.setStyle("-fx-border-width: 3px;" +
             "-fx-background-color: white;" +
             "-fx-border-color: gray;" +
             "-fx-text-fill: #4a4ad5;" +
