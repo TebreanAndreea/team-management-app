@@ -8,14 +8,17 @@ import commons.Board;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+//import javafx.geometry.Bounds;
+import javafx.scene.*;
 import javafx.scene.control.Button;
 //import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
 //import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+//import javafx.scene.transform.Scale;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 
@@ -30,10 +33,15 @@ public class InitialOvreviewController {
 
     private Stage primaryStage;
     private Scene overview;
-    public HBox hBox;
 
     @FXML
     public VBox vBoxBoard;
+
+    @FXML
+    public ScrollPane scrollPane;
+
+    @FXML
+    public ScrollPane masterScrollPane;
     private ServerUtils server;
 
     private EventTarget target;
@@ -104,24 +112,70 @@ public class InitialOvreviewController {
     public void refresh ()
     {
         vBoxBoard.getChildren().clear();
+        masterScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+
         List<Board> boards = server.getBoardsFromDB();
         HBox hbox = new HBox();
         for (int i = 0; i < boards.size(); i++ )
         {
-            if (i % 5 == 0) {
+            if (i % 3 == 0) {
                 hbox = new HBox();
                 vBoxBoard.getChildren().add(hbox);
                 hbox.setPrefHeight(70);
                 hbox.setSpacing(20);
             }
             Button newBoard = new Button();
-            newBoard.setPrefHeight(70);
-            newBoard.setPrefWidth(80);
+            newBoard.setMaxSize(90, 60);
+            newBoard.setMinSize(90,60);
             newBoard.setText(boards.get(i).getTitle());
             newBoard.setOnAction(this::switchToBoard);
-            hbox.getChildren().add(newBoard);
+            normalStyle(newBoard);
+
             boardsMap.put(newBoard, boards.get(i));
+            newBoard.setOnMouseEntered(event -> {
+                var root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+                root.getKey().setBoard(boardsMap.get(newBoard));
+                root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+                SubScene subScene = new SubScene(root.getValue(), 600, 400);
+                scrollPane.setContent(subScene);
+                double scaleFactor = Math.min(250 / subScene.getWidth(), 238 / subScene.getHeight());
+                Scale scale = new Scale(scaleFactor, scaleFactor);
+                subScene.getTransforms().clear();
+                subScene.getTransforms().add(scale);
+                hoverStyle(newBoard);
+            });
+            newBoard.setOnMouseExited(event -> {
+                scrollPane.setContent(null);
+                normalStyle(newBoard);
+
+            });
+            hbox.getChildren().add(newBoard);
         }
 
+    }
+
+    public void hoverStyle (Button button)
+    {
+        button.setStyle("-fx-border-width: 15 px;" +
+            "-fx-background-color: white;" +
+            "-fx-border-color: #4b4b4b;" +
+            "-fx-text-fill: #4a4ad5;" +
+            "-fx-font-family: 'Segoe Script';" +
+            "-fx-font-size: 15 px;" +
+            "-fx-rotate: 350;" +
+            "-fx-font-weight: bolder");
+    }
+
+    public void normalStyle (Button button)
+    {
+        button.setStyle("-fx-border-width: 10 px;" +
+            "-fx-background-color: white;" +
+            "-fx-border-color: gray;" +
+            "-fx-text-fill: #4a4ad5;" +
+            "-fx-font-family: 'Segoe Script';" +
+            "-fx-font-size: 15 px;");
     }
 }

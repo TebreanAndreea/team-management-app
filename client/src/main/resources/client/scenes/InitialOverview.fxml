@@ -11,15 +11,20 @@
    <children>
       <Button layoutX="487.0" layoutY="360.0" mnemonicParsing="false" onAction="#addBoard" text="New Board" />
       <Button layoutX="403.0" layoutY="360.0" mnemonicParsing="false" onAction="#searchViaKey" text="Join via Key" />
-      <Label layoutX="262.0" layoutY="23.0" prefHeight="34.0" prefWidth="75.0" text="Boards" textAlignment="CENTER">
+      <Label layoutX="45.0" layoutY="27.0" prefHeight="34.0" prefWidth="75.0" text="Boards" textAlignment="CENTER">
          <font>
             <Font size="23.0" />
          </font>
       </Label>
-      <ScrollPane layoutX="46.0" layoutY="85.0" prefHeight="250.0" prefWidth="509.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="85.0">
+      <ScrollPane fx:id="masterScrollPane" layoutX="14.0" layoutY="85.0" prefHeight="250.0" prefWidth="323.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="263.0" AnchorPane.topAnchor="85.0">
          <content>
-            <VBox fx:id="vBoxBoard" prefHeight="249.0" prefWidth="500.0" spacing="13.0" />
+            <VBox fx:id="vBoxBoard" prefHeight="248.0" prefWidth="322.0" spacing="13.0" />
          </content>
+      </ScrollPane>
+      <ScrollPane fx:id="scrollPane" layoutX="347.0" layoutY="126.0" prefHeight="167.0" prefWidth="238.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="167.0" prefWidth="238.0" />
+        </content>
       </ScrollPane>
    </children>
 </AnchorPane>
