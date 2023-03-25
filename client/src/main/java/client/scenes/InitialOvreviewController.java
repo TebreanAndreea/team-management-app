@@ -10,6 +10,7 @@ import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 //import javafx.geometry.Bounds;
 import javafx.scene.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 //import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane;
@@ -104,6 +105,41 @@ public class InitialOvreviewController {
      * @param actionEvent - the event triggered
      */
     public void searchViaKey(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Access key");
+        dialog.setHeaderText("Please enter your access key:");
+        dialog.showAndWait().ifPresent(key -> {
+            if (key.length() < 10 || key.length() > 10)
+            {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Input Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid access key.");
+                alert.showAndWait();
+            }
+
+            List<Board> boards = server.getBoardsFromDB();
+            for (Board b : boards)
+            {
+                if (key.equals(b.getAccessKey()))
+                {
+                    var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+                    boardOverview.getKey().setBoard(b);
+                    boardOverview.getKey().refresh();
+                    primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+                    overview = new Scene(boardOverview.getValue());
+                    primaryStage.setScene(overview);
+                    return;
+                }
+            }
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Input Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Invalid access key.");
+            alert.showAndWait();
+        });
+
     }
 
     /**
@@ -164,7 +200,7 @@ public class InitialOvreviewController {
             "-fx-border-color: #656565;" +
             "-fx-text-fill: #4a4ad5;" +
             "-fx-font-family: 'Segoe Script';" +
-            "-fx-font-size: 15 px;" +
+            "-fx-font-size: 10 px;" +
             "-fx-rotate: 350;" +
             "-fx-font-weight: bolder");
     }
@@ -176,6 +212,6 @@ public class InitialOvreviewController {
             "-fx-border-color: gray;" +
             "-fx-text-fill: #4a4ad5;" +
             "-fx-font-family: 'Segoe Script';" +
-            "-fx-font-size: 15 px;");
+            "-fx-font-size: 10 px;");
     }
 }

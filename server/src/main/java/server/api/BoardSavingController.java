@@ -48,6 +48,8 @@ public class BoardSavingController {
     public ResponseEntity<Board> add(@RequestBody Board board) {
         msgs.convertAndSend("/topic/boards", board);
         Board save = repo.save(board);
+        save.setAccessKey();
+        save = repo.save(save);
         return ResponseEntity.ok(save);
     }
     @GetMapping("/{id}")
