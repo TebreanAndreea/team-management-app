@@ -1,5 +1,8 @@
 package client.scenes;
 
+import client.MyFXML;
+import client.MyModule;
+import com.google.inject.Injector;
 import javafx.event.EventTarget;
 
 import client.utils.ServerUtils;
@@ -34,12 +37,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.inject.Guice.createInjector;
+
 
 public class BoardOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
+
+    public Label boardName;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -48,6 +55,13 @@ public class BoardOverviewController {
     // the lists in the UI and the lists we have in the DB
     private Map<VBox, Listing> map = new HashMap<>();
     private Map<HBox, Card> cardMap = new HashMap<>();
+
+    Board board = new Board("test","","");
+
+
+    private static final Injector INJECTOR = createInjector(new MyModule());
+    private static final MyFXML FXML = new MyFXML(INJECTOR);
+
 
 
     /**
@@ -90,7 +104,6 @@ public class BoardOverviewController {
         listController.addList();
         refresh();
     }
-
 
     /**
      * Saves the card into db.
@@ -239,11 +252,12 @@ public class BoardOverviewController {
      * @param actionEvent the event used
      * @throws IOException the exemption it might be caused
      */
-    public void switchToHomePageScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("HomePageOverview.fxml"));
+    public void switchToInitialOverviewScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        var initialOverview = FXML.load(InitialOvreviewController.class, "client", "scenes", "InitialOverview.fxml");
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(root);
+        overview = new Scene(initialOverview.getValue());
         primaryStage.setScene(overview);
+
         primaryStage.show();
     }
 
@@ -418,11 +432,16 @@ public class BoardOverviewController {
      * fetches the listings from the JSON file and displays them.
      */
     public void refresh() {
-        List<Listing> listings = server.getListings();
+        boardName.setText(board.getTitle());
+        List<Listing> listings = board.getLists();
         hBox.getChildren().clear();
         map = new HashMap<>();
         for (Listing listing : listings)
             addListWithListing(listing);
     }
 
+    //Setter for the board
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }

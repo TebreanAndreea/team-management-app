@@ -49,9 +49,9 @@ public class HomePageOverviewController {
         String userUrl = textArea.getText().trim();
 
         if (checkConnection(userUrl)) {
-            var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+            var intialOverview = FXML.load(InitialOvreviewController.class, "client", "scenes", "InitialOverview.fxml");
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            overview = new Scene(boardOverview.getValue());
+            overview = new Scene(intialOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
         } else {
@@ -67,7 +67,7 @@ public class HomePageOverviewController {
      */
     public boolean checkConnection(String userUrl){
         try {
-            server.checkServer(userUrl);
+            //server.checkServer(userUrl);
             return true;
         } catch(Exception e){
             return false;
