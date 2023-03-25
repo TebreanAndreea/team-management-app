@@ -29,47 +29,29 @@ import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import commons.Card;
+import commons.Listing;
+import commons.SubTask;
+import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.client.ClientConfig;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.*;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private static final String SERVER = "http://localhost:8080/";
+    private static String SERVER = "http://localhost:8080/";
 
-    public void getQuotesTheHardWay() throws IOException {
-        var url = new URL("http://localhost:8080/api/quotes");
-        var is = url.openConnection().getInputStream();
-        var br = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
-        }
-    }
-
-    public List<Quote> getQuotes() {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {
-                });
-    }
-
-    public Quote addQuote(Quote quote) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
-    }
 
     /**
      * This method creates a get request to the server entered by the user.
@@ -78,6 +60,7 @@ public class ServerUtils {
      * @return a Response object
      */
     public Response checkServer(String userUrl) {
+        this.SERVER = userUrl;
         return ClientBuilder.newClient(new ClientConfig())
                 .target(userUrl).path("api/connection")
                 .request(APPLICATION_JSON)
@@ -164,6 +147,19 @@ public class ServerUtils {
 //            .getBy(new GenericType<List<Listing>>() {});
     }
 
+    /**
+     * Update a list by changing its name.
+     *
+     * @param id the id of the list to be updated
+     * @param newName the new name
+     * @return The updated list
+     */
+
+    public Listing updateList(long id, String newName) {
+        Listing currentList = getListingsById(id);
+        currentList.setTitle(newName);
+        return saveList(currentList);
+    }
     /**
      * Fetches the card with the provided id from the database.
      * @param id The id of the card to search for
