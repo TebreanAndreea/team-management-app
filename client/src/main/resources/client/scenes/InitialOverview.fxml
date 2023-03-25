@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.InitialOvreviewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.InitialOverviewController">
    <children>
       <Button layoutX="487.0" layoutY="360.0" mnemonicParsing="false" onAction="#addBoard" text="New Board" />
       <Button layoutX="403.0" layoutY="360.0" mnemonicParsing="false" onAction="#searchViaKey" text="Join via Key" />

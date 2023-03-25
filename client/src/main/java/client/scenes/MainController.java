@@ -36,7 +36,7 @@ public class MainController {
                            Pair<HomePageOverviewController, Parent> homePageOverview,
                            Pair<BoardOverviewController, Parent> boardOverview,
                            Pair<CardOverviewController, Parent> cardOverview,
-                           Pair<InitialOvreviewController, Parent> initialOverview) {
+                           Pair<InitialOverviewController, Parent> initialOverview) {
         this.primaryStage = primaryStage;
 
         this.homePageOverviewController = homePageOverview.getKey();

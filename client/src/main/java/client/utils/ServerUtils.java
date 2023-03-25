@@ -44,7 +44,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private static String SERVER = "http://localhost:8080/";
+    private String SERVER = "http://localhost:8080/";
 
 
     /**
