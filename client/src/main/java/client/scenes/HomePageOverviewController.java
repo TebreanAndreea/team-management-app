@@ -55,7 +55,7 @@ public class HomePageOverviewController {
         String userUrl = textArea.getText().trim();
 
         if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
-            String fileName = username.getText().trim()+".txt";
+            String fileName = username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
             File file = new File(fileName);
             if(!file.exists()){
                 file.createNewFile();
