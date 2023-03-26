@@ -11,22 +11,22 @@
                 <Font size="29.0" />
             </font>
         </Label>
-        <TextArea layoutX="200.0" layoutY="128.0" prefHeight="16.0" prefWidth="200.0" />
-        <Label layoutX="84.0" layoutY="127.0" prefHeight="40.0" prefWidth="113.0" text="Server Adress:">
+        <TextField fx:id="serverAddress" layoutX="200.0" layoutY="128.0" prefHeight="37.0" prefWidth="200.0" />
+        <Label layoutX="84.0" layoutY="127.0" prefHeight="40.0" prefWidth="113.0" text="Server Address:">
             <font>
                 <Font size="17.0" />
             </font>
         </Label>
-        <Button layoutX="408.0" layoutY="129.0" mnemonicParsing="false" onAction="#switchToBoard" text="Connect">
+        <Button fx:id="connect" layoutX="408.0" layoutY="129.0" mnemonicParsing="false" onAction="#switchToBoard" text="Connect">
             <font>
                 <Font size="16.0" />
             </font>
         </Button>
-      <TextField fx:id="username" layoutX="200.0" layoutY="81.0" prefHeight="37.0" prefWidth="200.0" />
-      <Label layoutX="84.0" layoutY="81.0" prefHeight="37.0" prefWidth="114.0" text="Username:">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
+        <TextField fx:id="username" layoutX="200.0" layoutY="81.0" prefHeight="37.0" prefWidth="200.0" />
+        <Label layoutX="84.0" layoutY="81.0" prefHeight="37.0" prefWidth="114.0" text="Username:">
+            <font>
+                <Font size="17.0" />
+            </font>
+        </Label>
     </children>
 </AnchorPane>
