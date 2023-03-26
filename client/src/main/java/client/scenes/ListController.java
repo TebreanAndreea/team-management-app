@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
+import commons.Board;
 import commons.Card;
 import commons.Listing;
 import jakarta.ws.rs.WebApplicationException;
@@ -16,6 +17,7 @@ import javafx.stage.Modality;
 public class ListController {
 
     private ServerUtils server;
+    private Board board;
 
     @Inject
     public ListController(ServerUtils server) {
@@ -32,19 +34,28 @@ public class ListController {
         dialog.setHeaderText("Please enter the name of the list");
         dialog.showAndWait().ifPresent(name -> {
             //saving the list into the database
-            Listing newList = new Listing(name, null);
-            saveListDB(newList);
+            Listing newList = new Listing(name, board);
+            saveListDB(newList,board);
 
         });
+    }
+    /**
+     * Sets the board.
+     *
+     * @param board the new board
+     */
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     /**
      * Saving the list into the database.
-     *
+     * @param board the board
      * @param list the list
      */
-    public void saveListDB(Listing list) {
+    public void saveListDB(Listing list,Board board) {
         try {
+            server.sendBoard(board);
             server.saveList(list);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);

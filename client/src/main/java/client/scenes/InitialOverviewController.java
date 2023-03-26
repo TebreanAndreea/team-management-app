@@ -24,13 +24,14 @@ import javafx.stage.Stage;
 
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 import static com.google.inject.Guice.createInjector;
 
-public class InitialOvreviewController {
+public class InitialOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
@@ -53,9 +54,10 @@ public class InitialOvreviewController {
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
     private int curPlacedBoards;
+    private String fileName="temp.txt";
 
     @Inject
-    public InitialOvreviewController(ServerUtils server) {
+    public InitialOverviewController(ServerUtils server) {
         this.server = server;
         curPlacedBoards = 0;
         boardsMap = new HashMap<>();
@@ -64,19 +66,19 @@ public class InitialOvreviewController {
     /**
      * The initial method to load up all boards.
      */
-    public void initialize()
-    {
+    public void initialize() {
         refresh();
     }
 
     /**
      * The method switches to one board which was chosen.
+     *
      * @param actionEvent - the event that was triggered when a user decided which board he wants
      */
-    public void switchToBoard (ActionEvent actionEvent)
-    {
+    public void switchToBoard(ActionEvent actionEvent) {
         Button goToBoard = (Button) actionEvent.getSource();
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+        boardOverview.getKey().setFileName(fileName);
         boardOverview.getKey().setBoard(boardsMap.get(goToBoard));
         boardOverview.getKey().refresh();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -85,9 +87,9 @@ public class InitialOvreviewController {
     }
 
 
-
     /**
      * A method that adds a board to the db and UI.
+     *
      * @param actionEvent - the event that was triggered by the add board button
      */
     public void addBoard(ActionEvent actionEvent) {
@@ -95,13 +97,17 @@ public class InitialOvreviewController {
         dialog.setTitle("Board title");
         dialog.setHeaderText("Please enter a name for the board:");
         dialog.showAndWait().ifPresent(name -> {
-            server.addBoard(new Board(name,"",""));
+            Board res = server.addBoard(new Board(name, "", ""));
+            res.setAccessKey();
+            server.addBoard(res);
+            writeNewBoardToFile(res);
             refresh();
         });
     }
 
     /**
      * Join a board by the access key.
+     *
      * @param actionEvent - the event triggered
      */
     public void searchViaKey(ActionEvent actionEvent) {
@@ -109,8 +115,7 @@ public class InitialOvreviewController {
         dialog.setTitle("Access key");
         dialog.setHeaderText("Please enter your access key:");
         dialog.showAndWait().ifPresent(key -> {
-            if (key.length() < 10 || key.length() > 10)
-            {
+            if (key.length() < 10 || key.length() > 10) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
@@ -119,10 +124,9 @@ public class InitialOvreviewController {
             }
 
             List<Board> boards = server.getBoardsFromDB();
-            for (Board b : boards)
-            {
-                if (key.equals(b.getAccessKey()))
-                {
+            for (Board b : boards) {
+                if (key.equals(b.getAccessKey())) {
+                    writeNewBoardToFile(b);
                     var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
                     boardOverview.getKey().setBoard(b);
                     boardOverview.getKey().refresh();
@@ -145,18 +149,26 @@ public class InitialOvreviewController {
     /**
      * A method that refreshes and puts each board in the UI.
      */
-    public void refresh ()
-    {
+    public void refresh() {
         vBoxBoard.getChildren().clear();
         masterScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
 
-        List<Board> boards = server.getBoardsFromDB();
+        List<Board> boards = new ArrayList<>();
+        try (Scanner scanner = new Scanner(new File(fileName))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                long id = Long.parseLong(line.split(" ")[0]);
+                boards.add(server.getBoardByID(id));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("No such file");
+        }
         HBox hbox = new HBox();
-        for (int i = 0; i < boards.size(); i++ )
-        {
+        for (int i = 0; i < boards.size(); i++) {
             if (i % 3 == 0) {
                 hbox = new HBox();
                 vBoxBoard.getChildren().add(hbox);
@@ -165,7 +177,7 @@ public class InitialOvreviewController {
             }
             Button newBoard = new Button();
             newBoard.setMaxSize(90, 60);
-            newBoard.setMinSize(90,60);
+            newBoard.setMinSize(90, 60);
             newBoard.setText(boards.get(i).getTitle());
             newBoard.setOnAction(this::switchToBoard);
             normalStyle(newBoard);
@@ -193,25 +205,55 @@ public class InitialOvreviewController {
 
     }
 
-    public void hoverStyle (Button button)
-    {
+    public void hoverStyle(Button button) {
         button.setStyle("-fx-border-width: 5px;" +
-            "-fx-background-color: white;" +
-            "-fx-border-color: #656565;" +
-            "-fx-text-fill: #4a4ad5;" +
-            "-fx-font-family: 'Segoe Script';" +
-            "-fx-font-size: 10 px;" +
-            "-fx-rotate: 350;" +
-            "-fx-font-weight: bolder");
+                "-fx-background-color: white;" +
+                "-fx-border-color: #656565;" +
+                "-fx-text-fill: #4a4ad5;" +
+                "-fx-font-family: 'Adobe Thai';" +
+                "-fx-font-size: 14 px;" +
+                "-fx-rotate: 350;" +
+                "-fx-font-weight: bolder");
     }
 
-    public void normalStyle (Button button)
-    {
+    public void normalStyle(Button button) {
         button.setStyle("-fx-border-width: 3px;" +
-            "-fx-background-color: white;" +
-            "-fx-border-color: gray;" +
-            "-fx-text-fill: #4a4ad5;" +
-            "-fx-font-family: 'Segoe Script';" +
-            "-fx-font-size: 10 px;");
+                "-fx-background-color: white;" +
+                "-fx-border-color: gray;" +
+                "-fx-text-fill: #4a4ad5;" +
+                "-fx-font-family: 'Adobe Thai';" +
+                "-fx-font-size: 14 px;");
+    }
+
+    /**
+     * Sets the file name.
+     * @param fileName - the file name
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+    /**
+     * A method that writes a new board to the user's stored boards file.
+     *
+     * @param board - the board to be written
+     */
+    private void writeNewBoardToFile(Board board) {
+        try (Scanner scanner = new Scanner(new File(fileName))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                long id = Long.parseLong(line.split(" ")[0]);
+                if (id == board.getBoardId()) {
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("No such file");
+        }
+        try (FileWriter writer = new FileWriter(fileName, true)) {
+            writer.write(board.getBoardId() + " " + board.getTitle() + "\n");
+        } catch (IOException e) {
+            System.out.println("Error writing to file");
+        }
+
     }
 }
