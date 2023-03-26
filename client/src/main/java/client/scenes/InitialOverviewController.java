@@ -5,6 +5,7 @@ import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Board;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
@@ -67,6 +68,9 @@ public class InitialOverviewController {
      * The initial method to load up all boards.
      */
     public void initialize() {
+        server.registerForMessages("/topic/boards", Board.class, q -> {
+            Platform.runLater(() -> refresh());
+        });
         refresh();
     }
 
