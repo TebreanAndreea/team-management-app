@@ -50,6 +50,9 @@ public class ListSavingController {
         if (list == null) {
             return ResponseEntity.notFound().build();
         }
+
+        msgs.convertAndSend("/topic/lists", list);
+
         repo.deleteById(id);
         return ResponseEntity.ok().build();
     }
