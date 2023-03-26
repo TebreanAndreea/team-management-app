@@ -4,12 +4,11 @@ import client.MyFXML;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -29,6 +28,10 @@ public class HomePageOverviewController {
 
     @javafx.fxml.FXML
     private TextField username;
+    @javafx.fxml.FXML
+    private TextField serverAddress;
+    @javafx.fxml.FXML
+    private Button connect;
 
     /**
      * Constructor which initialize the server.
@@ -41,6 +44,22 @@ public class HomePageOverviewController {
 
 
     /**
+     * Initializes the controller and makes Enter input the data.
+     */
+    public void initialize() {
+        username.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                connect.fire();
+            }
+        });
+        serverAddress.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                connect.fire();
+            }
+        });
+    }
+
+    /**
      * Function that goes from the homepage back to the board.
      *
      * @param actionEvent the action event on the button
@@ -51,8 +70,10 @@ public class HomePageOverviewController {
         // before switching to the board scene, we need to validate the URL
 
         AnchorPane anchorPane = (AnchorPane) ((Button)actionEvent.getSource()).getParent();
-        TextArea textArea = (TextArea) anchorPane.getChildren().get(1);
-        String userUrl = textArea.getText().trim();
+        String userUrl = serverAddress.getText().trim();
+        if (!userUrl.startsWith("http://")) {
+            userUrl = "http://" + userUrl;
+        }
 
         if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
             String fileName = username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
@@ -70,7 +91,7 @@ public class HomePageOverviewController {
         } else {
             // put a message in the text area
             if(username.getText().trim().length() > 0)
-                textArea.setText("Invalid url");
+                serverAddress.setText("Invalid url");
             else
                 username.setText("Invalid username");
         }
