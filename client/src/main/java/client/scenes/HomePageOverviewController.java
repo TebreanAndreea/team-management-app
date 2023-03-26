@@ -9,10 +9,12 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 
 import static com.google.inject.Guice.createInjector;
@@ -24,6 +26,9 @@ public class HomePageOverviewController {
     private ServerUtils server;
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+
+    @javafx.fxml.FXML
+    private TextField username;
 
     /**
      * Constructor which initialize the server.
@@ -44,19 +49,30 @@ public class HomePageOverviewController {
     public void switchToBoard(javafx.event.ActionEvent actionEvent) throws IOException {
 
         // before switching to the board scene, we need to validate the URL
+
         AnchorPane anchorPane = (AnchorPane) ((Button)actionEvent.getSource()).getParent();
         TextArea textArea = (TextArea) anchorPane.getChildren().get(1);
         String userUrl = textArea.getText().trim();
 
-        if (checkConnection(userUrl)) {
-            var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+        if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
+            String fileName = username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
+            File file = new File(fileName);
+            if(!file.exists()){
+                file.createNewFile();
+            }
+            var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
+            initialOverview.getKey().setFileName(fileName);
+            initialOverview.getKey().refresh();
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            overview = new Scene(boardOverview.getValue());
+            overview = new Scene(initialOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
         } else {
             // put a message in the text area
-            textArea.setText("Invalid url");
+            if(username.getText().trim().length() > 0)
+                textArea.setText("Invalid url");
+            else
+                username.setText("Invalid username");
         }
     }
 

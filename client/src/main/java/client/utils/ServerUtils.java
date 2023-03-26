@@ -15,12 +15,20 @@
  */
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import commons.*;
+
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import commons.Card;
 import commons.Listing;
 import commons.SubTask;
@@ -36,7 +44,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private static String SERVER = "http://localhost:8080/";
+    private String SERVER = "http://localhost:8080/";
 
 
     /**
@@ -56,7 +64,6 @@ public class ServerUtils {
 
     /**
      * Saving the list into database.
-     *
      * @param list to be saved into database
      * @return the list
      */
@@ -71,7 +78,6 @@ public class ServerUtils {
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
-     *
      * @param list - the sent list
      * @return Listing
      */
@@ -231,5 +237,58 @@ public class ServerUtils {
                 consumer.accept((T) payload);
             }
         });
+    }
+
+    /**
+     * Adds a board to the database.
+     * @param board the board to be added
+     * @return the board saved
+     */
+    public Board addBoard(Board board) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/boards")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Gets all boards from the database.
+     * @return a list of all boards
+     */
+    public List<Board> getBoardsFromDB() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Board>>() {
+                });
+    }
+
+    /**
+     * Assigns a board to a listing.
+     * @param board the 'parent' board
+     * @return the board saved
+     */
+    public Board sendBoard(Board board) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/lists/setBoard")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Fetches a board by its unique id.
+     * @param id the board's id
+     * @return the board with the corresponding id
+     */
+    public Board getBoardByID(long id) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<Board>() {
+                });
     }
 }

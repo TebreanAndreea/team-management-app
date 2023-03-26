@@ -19,6 +19,11 @@ public class Listing {
             orphanRemoval = true
     )
     private List<Card> cards;
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "board_id")
