@@ -97,11 +97,19 @@ public class InitialOverviewController {
         dialog.setTitle("Board title");
         dialog.setHeaderText("Please enter a name for the board:");
         dialog.showAndWait().ifPresent(name -> {
-            Board res = server.addBoard(new Board(name, "", ""));
-            res.setAccessKey();
-            server.addBoard(res);
-            writeNewBoardToFile(res);
-            refresh();
+
+            if(!name.isEmpty()) {
+                Board res = server.addBoard(new Board(name, "", ""));
+                res.setAccessKey();
+                server.addBoard(res);
+                writeNewBoardToFile(res);
+                refresh();
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                addBoard(actionEvent);
+            }
         });
     }
 

@@ -197,7 +197,7 @@ public class BoardOverviewController {
             } else {
 
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
-                emptyField.setContentText("Name field eas submitted empty, please enter a name");
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
                 emptyField.showAndWait();
                 addCard(actionEvent);
             }
@@ -216,7 +216,7 @@ public class BoardOverviewController {
         HBox hBox = (HBox) editButton.getParent();
         Button cardButton = (Button) hBox.getChildren().get(0);
         Card currentCard = cardMap.get(hBox);
-        TextInputDialog dialog = new TextInputDialog();
+        TextInputDialog dialog = new TextInputDialog(currentCard.getName());
         dialog.setTitle("Change the name of the card");
         dialog.setHeaderText("Please enter the new name for the card:");
         dialog.showAndWait().ifPresent(name -> {
@@ -226,7 +226,7 @@ public class BoardOverviewController {
                 server.updateCard(currentCard.getCardId(), name);
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
-                emptyField.setContentText("Name field eas submitted empty, please enter a name");
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
                 emptyField.showAndWait();
                 editCard(actionEvent);
             }

@@ -86,7 +86,7 @@ public class ListController {
         HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
         VBox vbox = (VBox)clicked.getParent();
         TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
-        TextInputDialog dialog = new TextInputDialog();
+        TextInputDialog dialog = new TextInputDialog(list.getTitle());
         dialog.setTitle("Change the name of the list");
         dialog.setHeaderText("Please enter the new name of the list");
         dialog.showAndWait().ifPresent(name -> {
