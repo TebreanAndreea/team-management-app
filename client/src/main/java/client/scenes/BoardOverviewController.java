@@ -1,9 +1,13 @@
 package client.scenes;
 
+
+import javafx.application.Platform;
+
 import client.MyFXML;
 import client.MyModule;
 import com.google.inject.Injector;
 import javafx.event.ActionEvent;
+
 import javafx.event.EventTarget;
 
 import client.utils.ServerUtils;
@@ -85,14 +89,14 @@ public class BoardOverviewController {
      */
     public void initialize() {
         server.registerForMessages("/topic/boards", Board.class, q -> {
-            refresh();
+            Platform.runLater(() -> refresh());
         });
         server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
-            refresh();
+            Platform.runLater(() -> refresh());
         });
         server.registerForMessages("/topic/card", Card.class, q -> {
-            refresh();
+            Platform.runLater(() -> refresh());
         });
         refresh();
     }

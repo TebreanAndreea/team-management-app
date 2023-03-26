@@ -48,6 +48,11 @@ public class CardSavingController {
 
     @DeleteMapping(path = {"delete/{id}"})
     public void delete(@PathVariable long id) {
+        Card card = repo.findById(id).orElse(null);
+        if (card == null) {
+            return;
+        }
+        msgs.convertAndSend("/topic/card", card);
         repo.deleteById(id);
     }
 
