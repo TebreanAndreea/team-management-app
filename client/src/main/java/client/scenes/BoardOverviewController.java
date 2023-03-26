@@ -157,40 +157,51 @@ public class BoardOverviewController {
         dialog.setTitle("Card title");
         dialog.setHeaderText("Please enter a name for the card:");
         dialog.showAndWait().ifPresent(name -> {
-            VBox vBox = (VBox) addCardButton.getParent().getParent();
+
+            if(!name.isEmpty()) {
+                VBox vBox = (VBox) addCardButton.getParent().getParent();
 
 
-            Button newCard = new Button(name);
+                Button newCard = new Button(name);
 
-            // make this card draggable
-            newCard.setOnMousePressed(event -> {
-                target = newCard.getParent(); // this is the hbox that needs to be dropped
-            });
+                // make this card draggable
+                newCard.setOnMousePressed(event -> {
+                    target = newCard.getParent(); // this is the hbox that needs to be dropped
+                });
 
-            newCard.setOnMouseReleased(this::handleDropping);
-            setupButton(newCard);
-            Button edit = new Button("\uD83D\uDD89");
-            edit.setOnAction(this::editCard); // an event happens when the button is clicked
-            setupButton(edit);
-            Button delete = new Button("\uD83D\uDDD9");
-            delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-            setupButton(delete);
-            HBox buttonList = new HBox();
-            buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
-            buttonList.setAlignment(Pos.CENTER);
-            buttonList.getChildren().addAll(newCard, edit, delete);
+                newCard.setOnMouseReleased(this::handleDropping);
+                setupButton(newCard);
+                Button edit = new Button("\uD83D\uDD89");
+                edit.setOnAction(this::editCard); // an event happens when the button is clicked
+                setupButton(edit);
+                Button delete = new Button("\uD83D\uDDD9");
+                delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
+                setupButton(delete);
+                HBox buttonList = new HBox();
+                buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
+                buttonList.setAlignment(Pos.CENTER);
+                buttonList.getChildren().addAll(newCard, edit, delete);
 
 
-            HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
-            HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
+                HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
+                HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
 
-            vBox.getChildren().addAll(buttonList, plusBox, deleteListBox);
+                vBox.getChildren().addAll(buttonList, plusBox, deleteListBox);
 
-            Listing curList = map.get(vBox);
-            Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
-            Card updatedCard = saveCardDB(curCard, curList);
-            curList.getCards().add(updatedCard);
-            cardMap.put(buttonList, updatedCard);
+                Listing curList = map.get(vBox);
+                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
+                Card updatedCard = saveCardDB(curCard, curList);
+                curList.getCards().add(updatedCard);
+                cardMap.put(buttonList, updatedCard);
+
+            } else {
+
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                addCard(actionEvent);
+            }
+
         });
 
     }
@@ -205,12 +216,21 @@ public class BoardOverviewController {
         HBox hBox = (HBox) editButton.getParent();
         Button cardButton = (Button) hBox.getChildren().get(0);
         Card currentCard = cardMap.get(hBox);
-        TextInputDialog dialog = new TextInputDialog();
+        TextInputDialog dialog = new TextInputDialog(currentCard.getName());
         dialog.setTitle("Change the name of the card");
         dialog.setHeaderText("Please enter the new name for the card:");
         dialog.showAndWait().ifPresent(name -> {
-            cardButton.setText(name);
-            server.updateCard(currentCard.getCardId(), name);
+
+            if(!name.isEmpty()) {
+                cardButton.setText(name);
+                server.updateCard(currentCard.getCardId(), name);
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                editCard(actionEvent);
+            }
+
         });
     }
 

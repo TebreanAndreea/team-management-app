@@ -33,9 +33,19 @@ public class ListController {
         dialog.setTitle("List name");
         dialog.setHeaderText("Please enter the name of the list");
         dialog.showAndWait().ifPresent(name -> {
-            //saving the list into the database
-            Listing newList = new Listing(name, board);
-            saveListDB(newList,board);
+
+            //verifies if the input field was submitted empty or not
+            if(!name.isEmpty()) {
+                //saving the list into the database
+                Listing newList = new Listing(name, board);
+                saveListDB(newList, board);
+            } else {
+                //sends alert and return to the input dialog after
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                addList();
+            }
 
         });
     }
@@ -76,12 +86,21 @@ public class ListController {
         HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
         VBox vbox = (VBox)clicked.getParent();
         TitledPane titledPane = (TitledPane) vbox.getParent().getParent();
-        TextInputDialog dialog = new TextInputDialog();
+        TextInputDialog dialog = new TextInputDialog(list.getTitle());
         dialog.setTitle("Change the name of the list");
         dialog.setHeaderText("Please enter the new name of the list");
         dialog.showAndWait().ifPresent(name -> {
-            titledPane.setText(name);
-            server.updateList(list.getListId(), name);
+
+            if(!name.isEmpty()) {
+                titledPane.setText(name);
+                server.updateList(list.getListId(), name);
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                editList(actionEvent, list);
+            }
+
         });
     }
 
