@@ -366,6 +366,7 @@ public class BoardOverviewController {
                             foundPlace = true;
                         }
                     }
+                }
 
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
                     HBox hBox = (HBox) vBox.getChildren().get(j);
@@ -383,7 +384,7 @@ public class BoardOverviewController {
             }
         }
     }
-}
+
 
 
     /**
