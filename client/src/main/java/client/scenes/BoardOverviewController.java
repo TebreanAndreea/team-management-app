@@ -17,12 +17,10 @@ import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -294,15 +292,23 @@ public class BoardOverviewController {
      * Function that goes to the card details.
      *
      * @param actionEvent the action event on the button
+     * @param cardID the id of a card
+     * @param list the list of the card
      * @throws IOException the exception which might be caused
      */
-    public void switchToCardScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("CardOverview.fxml"));
+    public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
+        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
+        cardOverview.getKey().setCardId(cardID);
+        cardOverview.getKey().setFileName(fileName);
+        cardOverview.getKey().setBoard(board);
+        cardOverview.getKey().setList(list);
+        cardOverview.getKey().refreshCardDetails();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(root);
+        overview = new Scene(cardOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
     }
+
 
 
     /**
@@ -395,7 +401,6 @@ public class BoardOverviewController {
      */
     private void addListWithListing(Listing listing) {
         Button addCardButton = new Button("+");
-
         addCardButton.setOnAction(this::addCard);
         setupAddCardButton(addCardButton);
         Button editListButton = new Button("Edit");
@@ -414,17 +419,37 @@ public class BoardOverviewController {
         vBox.setAlignment(Pos.TOP_CENTER);
         List<Card> cards = listing.getCards();
         for (Card c : cards) {
-            Button newCard = new Button(c.getName());
+            Button newCard;
+            if(!c.getDescription().equals("")) {
+                Label markDescription = new Label("\u2630");
+                markDescription.setStyle("-fx-font-size: 5px;");
+                Label nameCard = new Label(c.getName());
+                nameCard.setStyle("-fx-font-size: 15x;");
+                HBox hbox = new HBox(markDescription, nameCard);
+                hbox.setSpacing(8);
+                newCard = new Button();
+                newCard.setGraphic(hbox);
+            } else newCard = new Button(c.getName());
+            newCard.setPrefHeight(20);
+            newCard.setPrefWidth(100);
             newCard.setUserData(c.getCardId());
             setupButton(newCard);
             // make this card draggable
             newCard.setOnMousePressed(event -> {
                 target = newCard.getParent(); // this is the hBox that needs to be dropped
             });
-
             newCard.setOnMouseReleased(this::handleDropping);
             Button edit = new Button("\uD83D\uDD89");
-            edit.setOnAction(this::editCard); // an event happens when the button is clicked
+            //edit.setOnAction(this::editCard); // an event happens when the button is clicked
+            edit.setOnMousePressed(event -> {
+                if(event.getClickCount() == 2) {
+                    try {
+                        switchToCardScene(event, c.getCardId(), listing);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
             setupButton(edit);
             Button delete = new Button("\uD83D\uDDD9");
             delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
@@ -436,19 +461,15 @@ public class BoardOverviewController {
             vBox.getChildren().add(buttonList);
             cardMap.put(buttonList, c);
         }
-        // add the "Add card" button below the cards
-        HBox addCardButtonRow = new HBox();
+        HBox addCardButtonRow = new HBox(); // add the "Add card" button below the cards
         addCardButtonRow.setAlignment(Pos.CENTER);
         addCardButtonRow.getChildren().add(addCardButton);
         vBox.getChildren().add(addCardButtonRow);
-
-        // add the "Delete list button at the bottom of this list
-        HBox deleteListButtonRow = new HBox();
+        HBox deleteListButtonRow = new HBox();// add the "Delete list button at the bottom of this list
         deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
         deleteListButtonRow.getChildren().add(editListButton);
         deleteListButtonRow.getChildren().add(deleteListButton);
         vBox.getChildren().add(deleteListButtonRow);
-
         map.put(vBox, listing);
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);

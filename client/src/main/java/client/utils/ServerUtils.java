@@ -188,6 +188,19 @@ public class ServerUtils {
         currentCard.setName(newName);
         return saveCard(currentCard);
     }
+    /**
+     * Update a card description.
+     *
+     * @param id id of the card
+     * @param description the new description
+     * @return the card
+     */
+    public Card updateCardDescription(long id, String description) {
+        Card currentCard = getCardsById(id);
+        currentCard.setDescription(description);
+        return saveCard(currentCard);
+    }
+
 
     /**
      * Sends a delete request.
