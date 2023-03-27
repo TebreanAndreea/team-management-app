@@ -245,6 +245,7 @@ public class BoardOverviewController {
      * @param list        the list to be edited
      */
     public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
+        listController.setBoard(board);
         listController.editList(actionEvent, list);
     }
 

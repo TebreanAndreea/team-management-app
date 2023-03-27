@@ -75,6 +75,14 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
+    public Listing saveUpdatedList(Listing list) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/lists")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .put(Entity.entity(list, APPLICATION_JSON), Listing.class);
+
+    }
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
@@ -86,7 +94,7 @@ public class ServerUtils {
                 .target(SERVER).path("api/card/setList")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .put(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -152,7 +160,7 @@ public class ServerUtils {
     public Listing updateList(long id, String newName) {
         Listing currentList = getListingsById(id);
         currentList.setTitle(newName);
-        return saveList(currentList);
+        return saveUpdatedList(currentList);
     }
     /**
      * Fetches the card with the provided id from the database.

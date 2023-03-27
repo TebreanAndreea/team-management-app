@@ -14,6 +14,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
+import java.util.List;
+
 public class ListController {
 
     private ServerUtils server;
@@ -93,6 +95,7 @@ public class ListController {
 
             if(!name.isEmpty()) {
                 titledPane.setText(name);
+                server.sendBoard(board);
                 server.updateList(list.getListId(), name);
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
