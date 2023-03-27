@@ -1,11 +1,13 @@
 package server.api;
 
 import commons.Board;
+import commons.Card;
 import commons.Listing;
 //import commons.Quote;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import server.database.CardRepository;
 import server.database.ListingRepository;
 
 import java.util.List;
@@ -16,12 +18,14 @@ import java.util.List;
 public class ListSavingController {
 
     private final ListingRepository repo;
+    private final CardRepository cardRepo;
     private final SimpMessagingTemplate msgs;
 
     private Board board;
 
-    public ListSavingController(ListingRepository repo, SimpMessagingTemplate msgs) {
+    public ListSavingController(ListingRepository repo, CardRepository cardRepo, SimpMessagingTemplate msgs) {
         this.repo = repo;
+        this.cardRepo = cardRepo;
         this.msgs = msgs;
     }
 
@@ -65,5 +69,22 @@ public class ListSavingController {
     public ResponseEntity<Board> getBoard(@RequestBody Board board) {
         this.board = board;
         return ResponseEntity.ok(board);
+    }
+
+    /**
+     * A post method that edits the list.
+     * @param listing - the updated list
+     * @return list
+     */
+    @PostMapping(path = {"/edit"})
+    public ResponseEntity<Listing> editList(@RequestBody Listing listing) {
+        for (Card c : listing.getCards())
+        {
+            c.setList(listing);
+            cardRepo.save(c);
+        }
+        listing.setBoard(board);
+        listing = repo.save(listing);
+        return ResponseEntity.ok(listing);
     }
 }
