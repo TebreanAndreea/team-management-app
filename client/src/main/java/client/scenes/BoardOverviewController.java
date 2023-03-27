@@ -259,6 +259,8 @@ public class BoardOverviewController {
         Card card = cardMap.get(clicked);
         server.deleteCard(card.getCardId());
         vBox.getChildren().remove(clicked);
+
+
     }
 
 
@@ -313,8 +315,10 @@ public class BoardOverviewController {
         double mouseX = mouseEvent.getScreenX();
         double mouseY = mouseEvent.getScreenY();
 
+        int dim = hBox.getChildren().size();
 
-        for (int i = 0; i < hBox.getChildren().size(); i++) { // check if mouse is inside this vbox
+
+        for (int i = 0; i < dim; i++) { // check if mouse is inside this vbox
             TitledPane titledPane = (TitledPane) hBox.getChildren().get(i);
             VBox vBox = (VBox) titledPane.getContent();
 
@@ -362,10 +366,6 @@ public class BoardOverviewController {
                             foundPlace = true;
                         }
                     }
-                }
-
-                if (foundPlace == false) // add at the end
-                    vBox.getChildren().add(nrCards, (HBox) target);
 
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
                     HBox hBox = (HBox) vBox.getChildren().get(j);
