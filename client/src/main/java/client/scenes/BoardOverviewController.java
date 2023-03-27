@@ -259,8 +259,6 @@ public class BoardOverviewController {
         Card card = cardMap.get(clicked);
         server.deleteCard(card.getCardId());
         vBox.getChildren().remove(clicked);
-
-
     }
 
 
