@@ -31,6 +31,7 @@ public class BoardSavingController {
     private final BoardRepository repo;
     private SimpMessagingTemplate msgs;
 
+
     public BoardSavingController(BoardRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
         this.msgs = msgs;
@@ -44,9 +45,18 @@ public class BoardSavingController {
 //        THIS TEMPLATE NEEDS TO BE ADDED TO EVERY POSTMAPPING BEFORE REPO.SAVE
 //        msgs.convertAndSend("/topic/quotes", quote);
     @PostMapping(path = {"", "/"})
-    public ResponseEntity<Board> add(Board board) {
+    public ResponseEntity<Board> add(@RequestBody Board board) {
         msgs.convertAndSend("/topic/boards", board);
         Board save = repo.save(board);
+        save.setAccessKey();
+        save = repo.save(save);
         return ResponseEntity.ok(save);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Board> getById(@PathVariable("id") long id) {
+        if (id < 0 || !repo.existsById(id)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(repo.findById(id).get());
     }
 }

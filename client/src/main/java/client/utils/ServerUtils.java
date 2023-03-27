@@ -15,24 +15,25 @@
  */
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import commons.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+
+
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import commons.Card;
 import commons.Listing;
-import commons.Quote;
 import commons.SubTask;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
-
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -43,34 +44,8 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private static final String SERVER = "http://localhost:8080/";
+    private String SERVER = "http://localhost:8080/";
 
-    public void getQuotesTheHardWay() throws IOException {
-        var url = new URL("http://localhost:8080/api/quotes");
-        var is = url.openConnection().getInputStream();
-        var br = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
-        }
-    }
-
-    public List<Quote> getQuotes() {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {
-                });
-    }
-
-    public Quote addQuote(Quote quote) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
-    }
 
     /**
      * This method creates a get request to the server entered by the user.
@@ -79,6 +54,7 @@ public class ServerUtils {
      * @return a Response object
      */
     public Response checkServer(String userUrl) {
+        this.SERVER = userUrl;
         return ClientBuilder.newClient(new ClientConfig())
                 .target(userUrl).path("api/connection")
                 .request(APPLICATION_JSON)
@@ -88,7 +64,6 @@ public class ServerUtils {
 
     /**
      * Saving the list into database.
-     *
      * @param list to be saved into database
      * @return the list
      */
@@ -103,7 +78,6 @@ public class ServerUtils {
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
-     *
      * @param list - the sent list
      * @return Listing
      */
@@ -167,6 +141,19 @@ public class ServerUtils {
 //            .getBy(new GenericType<List<Listing>>() {});
     }
 
+    /**
+     * Update a list by changing its name.
+     *
+     * @param id the id of the list to be updated
+     * @param newName the new name
+     * @return The updated list
+     */
+
+    public Listing updateList(long id, String newName) {
+        Listing currentList = getListingsById(id);
+        currentList.setTitle(newName);
+        return saveList(currentList);
+    }
     /**
      * Fetches the card with the provided id from the database.
      * @param id The id of the card to search for
@@ -250,5 +237,58 @@ public class ServerUtils {
                 consumer.accept((T) payload);
             }
         });
+    }
+
+    /**
+     * Adds a board to the database.
+     * @param board the board to be added
+     * @return the board saved
+     */
+    public Board addBoard(Board board) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/boards")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Gets all boards from the database.
+     * @return a list of all boards
+     */
+    public List<Board> getBoardsFromDB() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Board>>() {
+                });
+    }
+
+    /**
+     * Assigns a board to a listing.
+     * @param board the 'parent' board
+     * @return the board saved
+     */
+    public Board sendBoard(Board board) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/lists/setBoard")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Fetches a board by its unique id.
+     * @param id the board's id
+     * @return the board with the corresponding id
+     */
+    public Board getBoardByID(long id) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<Board>() {
+                });
     }
 }

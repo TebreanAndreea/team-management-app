@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 @Entity
 public class Board {
@@ -100,12 +101,19 @@ public class Board {
     }
 
     /**
-     * Setter for this board's accessKey.
+     * Setter for this board's accessKey, which takes the id and adds to it random characters until it gets to 10 characters overall.
      *
-     * @param accessKey - the new accessKey of the board
      */
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
+    public void setAccessKey() {
+        String result = Long.toString(boardId);
+        Random random = new Random();
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        while (result.length()<10)
+        {
+            result += characters.charAt(random.nextInt(characters.length()));
+        }
+        this.accessKey = result;
+
     }
 
     /**

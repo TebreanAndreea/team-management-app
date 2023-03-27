@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.Board;
 import commons.Listing;
 //import commons.Quote;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ public class ListSavingController {
     private final ListingRepository repo;
     private final SimpMessagingTemplate msgs;
 
+    private Board board;
+
     public ListSavingController(ListingRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
         this.msgs = msgs;
@@ -24,12 +27,8 @@ public class ListSavingController {
 
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Listing> add(@RequestBody Listing list) {
-        //  if (list.getTitle()== null) {
-        //      return ResponseEntity.badRequest().build();
-        // }
-
+        list.setBoard(board);
         msgs.convertAndSend("/topic/lists", list);
-
         Listing saved = repo.save(list);
         return ResponseEntity.ok(saved);
     }
@@ -50,7 +49,21 @@ public class ListSavingController {
         if (list == null) {
             return ResponseEntity.notFound().build();
         }
+
+        msgs.convertAndSend("/topic/lists", list);
+
         repo.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * A post method that assignes the board to the list.
+     * @param board - the board that we are saving
+     * @return board
+     */
+    @PostMapping(path = {"/setBoard"})
+    public ResponseEntity<Board> getBoard(@RequestBody Board board) {
+        this.board = board;
+        return ResponseEntity.ok(board);
     }
 }
