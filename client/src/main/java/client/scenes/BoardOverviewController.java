@@ -317,7 +317,6 @@ public class BoardOverviewController {
 
         int dim = hBox.getChildren().size();
 
-
         for (int i = 0; i < dim; i++) { // check if mouse is inside this vbox
             TitledPane titledPane = (TitledPane) hBox.getChildren().get(i);
             VBox vBox = (VBox) titledPane.getContent();
@@ -367,6 +366,8 @@ public class BoardOverviewController {
                         }
                     }
                 }
+                if (foundPlace == false) // add at the end
+                    vBox.getChildren().add(nrCards, (HBox) target);
 
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
                     HBox hBox = (HBox) vBox.getChildren().get(j);
