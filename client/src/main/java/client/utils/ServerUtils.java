@@ -77,6 +77,19 @@ public class ServerUtils {
     }
 
     /**
+     * Sends a post request to the server to update the list.
+     * @param list - the updated list
+     * @return list
+     */
+    public Listing editList(Listing list) {
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/lists/edit")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+    }
+
+    /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
      * @param list - the sent list
      * @return Listing
@@ -152,7 +165,7 @@ public class ServerUtils {
     public Listing updateList(long id, String newName) {
         Listing currentList = getListingsById(id);
         currentList.setTitle(newName);
-        return saveList(currentList);
+        return editList(currentList);
     }
     /**
      * Fetches the card with the provided id from the database.
