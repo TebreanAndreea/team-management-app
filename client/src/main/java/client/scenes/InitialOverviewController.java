@@ -141,6 +141,7 @@ public class InitialOverviewController {
                     writeNewBoardToFile(b);
                     var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
                     boardOverview.getKey().setBoard(b);
+                    boardOverview.getKey().setFileName(fileName);
                     boardOverview.getKey().refresh();
                     primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     overview = new Scene(boardOverview.getValue());
