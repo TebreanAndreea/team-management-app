@@ -83,10 +83,10 @@ public class ServerUtils {
      */
     public Listing editList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/lists/edit")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/lists/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -193,6 +193,21 @@ public class ServerUtils {
         currentCard.setName(newName);
         return saveCard(currentCard);
     }
+
+    /**
+     * Update a card description.
+     *
+     * @param id id of the card
+     * @param description the new description
+     * @return the card
+     */
+    public Card updateCardDescription(long id, String description) {
+        Card currentCard = getCardsById(id);
+        currentCard.setDescription(description);
+        return saveCard(currentCard);
+    }
+
+
 
     /**
      * Sends a delete request.

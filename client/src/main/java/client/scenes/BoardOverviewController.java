@@ -17,12 +17,10 @@ import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -245,6 +243,7 @@ public class BoardOverviewController {
      * @param list        the list to be edited
      */
     public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
+        //listController.setBoard(board);
         listController.editList(actionEvent, list);
     }
 
@@ -293,15 +292,23 @@ public class BoardOverviewController {
      * Function that goes to the card details.
      *
      * @param actionEvent the action event on the button
+     * @param cardID the id of a card
+     * @param list the list of the card
      * @throws IOException the exception which might be caused
      */
-    public void switchToCardScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("CardOverview.fxml"));
+    public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
+        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
+        cardOverview.getKey().setCardId(cardID);
+        cardOverview.getKey().setFileName(fileName);
+        cardOverview.getKey().setBoard(board);
+        cardOverview.getKey().setList(list);
+        cardOverview.getKey().refreshCardDetails();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(root);
+        overview = new Scene(cardOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
     }
+
 
 
     /**
@@ -412,7 +419,7 @@ public class BoardOverviewController {
         vBox.setSpacing(20);
         vBox.setAlignment(Pos.TOP_CENTER);
         for (Card c : listing.getCards()) {
-            addCard(c,vBox);
+            addCard(c,vBox,listing);
         }
         // add the "Add card" button below the cards
         HBox addCardButtonRow = new HBox();
@@ -441,10 +448,22 @@ public class BoardOverviewController {
      * Adds a card to the vBox List.
      * @param c - the card we add
      * @param vBox - the vBox which contains the list
+     * @param listing - the list the card is in
      */
-    public void addCard (Card c, VBox vBox)
+    public void addCard (Card c, VBox vBox, Listing listing)
     {
-        Button newCard = new Button(c.getName());
+
+        Button newCard;
+        if(!c.getDescription().equals("")) {
+            Label markDescription = new Label("\u2630");
+            markDescription.setStyle("-fx-font-size: 5px;");
+            Label nameCard = new Label(c.getName());
+            nameCard.setStyle("-fx-font-size: 15x;");
+            HBox hbox = new HBox(markDescription, nameCard);
+            hbox.setSpacing(8);
+            newCard = new Button();
+            newCard.setGraphic(hbox);
+        } else newCard = new Button(c.getName());
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
         // make this card draggable
@@ -453,8 +472,19 @@ public class BoardOverviewController {
         });
 
         newCard.setOnMouseReleased(this::handleDropping);
+
         Button edit = new Button("\uD83D\uDD89");
-        edit.setOnAction(this::editCard); // an event happens when the button is clicked
+        //edit.setOnAction(this::editCard); // an event happens when the button is clicked
+        edit.setOnMousePressed(event -> {
+            if(event.getClickCount() == 2) {
+                try {
+                    switchToCardScene(event, c.getCardId(), listing);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         setupButton(edit);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked

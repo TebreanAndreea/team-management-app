@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
+
 public class ListController {
 
     private ServerUtils server;
@@ -93,6 +94,7 @@ public class ListController {
 
             if(!name.isEmpty()) {
                 titledPane.setText(name);
+
                 server.sendBoard(list.getBoard());
                 server.updateList(list.getListId(), name);
             } else {

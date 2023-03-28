@@ -28,6 +28,13 @@ public class ListSavingController {
         this.cardRepo = cardRepo;
         this.msgs = msgs;
     }
+    @PutMapping (path = { "", "/" })
+    public ResponseEntity<Listing> update(@RequestBody Listing list) {
+        list.setBoard(board);
+        msgs.convertAndSend("/topic/lists", list);
+        Listing saved = repo.save(list);
+        return ResponseEntity.ok(saved);
+    }
 
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Listing> add(@RequestBody Listing list) {
