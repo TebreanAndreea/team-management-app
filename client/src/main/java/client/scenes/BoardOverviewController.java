@@ -243,7 +243,7 @@ public class BoardOverviewController {
      * @param list        the list to be edited
      */
     public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
-        listController.setBoard(board);
+        //listController.setBoard(board);
         listController.editList(actionEvent, list);
     }
 
@@ -448,6 +448,7 @@ public class BoardOverviewController {
      * Adds a card to the vBox List.
      * @param c - the card we add
      * @param vBox - the vBox which contains the list
+     * @param listing - the list the card is in
      */
     public void addCard (Card c, VBox vBox, Listing listing)
     {

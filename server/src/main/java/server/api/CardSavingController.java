@@ -39,7 +39,7 @@ public class CardSavingController {
         return ResponseEntity.ok(save);
     }
 
-    @PutMapping(path = {"/setList"})
+    @PostMapping(path = {"/setList"})
     public ResponseEntity<Listing> getList(@RequestBody Listing list) {
 
         this.list = list;

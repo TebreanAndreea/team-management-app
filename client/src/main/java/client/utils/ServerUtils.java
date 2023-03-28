@@ -75,14 +75,6 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
-    public Listing saveUpdatedList(Listing list) {
-        return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/lists")
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .put(Entity.entity(list, APPLICATION_JSON), Listing.class);
-
-    }
 
     /**
      * Sends a post request to the server to update the list.
@@ -91,10 +83,10 @@ public class ServerUtils {
      */
     public Listing editList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/lists/edit")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/lists/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -107,7 +99,7 @@ public class ServerUtils {
                 .target(SERVER).path("api/card/setList")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .put(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
@@ -173,8 +165,7 @@ public class ServerUtils {
     public Listing updateList(long id, String newName) {
         Listing currentList = getListingsById(id);
         currentList.setTitle(newName);
-
-        return saveUpdatedList(currentList);
+        return editList(currentList);
     }
     /**
      * Fetches the card with the provided id from the database.
@@ -202,6 +193,7 @@ public class ServerUtils {
         currentCard.setName(newName);
         return saveCard(currentCard);
     }
+
     /**
      * Update a card description.
      *
@@ -214,6 +206,7 @@ public class ServerUtils {
         currentCard.setDescription(description);
         return saveCard(currentCard);
     }
+
 
 
     /**
