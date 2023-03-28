@@ -94,7 +94,8 @@ public class ListController {
 
             if(!name.isEmpty()) {
                 titledPane.setText(name);
-                server.sendBoard(board);
+
+                server.sendBoard(list.getBoard());
                 server.updateList(list.getListId(), name);
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);

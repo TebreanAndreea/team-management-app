@@ -401,6 +401,7 @@ public class BoardOverviewController {
      */
     private void addListWithListing(Listing listing) {
         Button addCardButton = new Button("+");
+
         addCardButton.setOnAction(this::addCard);
         setupAddCardButton(addCardButton);
         Button editListButton = new Button("Edit");
@@ -417,59 +418,22 @@ public class BoardOverviewController {
         VBox vBox = new VBox();
         vBox.setSpacing(20);
         vBox.setAlignment(Pos.TOP_CENTER);
-        List<Card> cards = listing.getCards();
-        for (Card c : cards) {
-            Button newCard;
-            if(!c.getDescription().equals("")) {
-                Label markDescription = new Label("\u2630");
-                markDescription.setStyle("-fx-font-size: 5px;");
-                Label nameCard = new Label(c.getName());
-                nameCard.setStyle("-fx-font-size: 15x;");
-                HBox hbox = new HBox(markDescription, nameCard);
-                hbox.setSpacing(8);
-                newCard = new Button();
-                newCard.setGraphic(hbox);
-            } else newCard = new Button(c.getName());
-            newCard.setPrefHeight(20);
-            newCard.setPrefWidth(100);
-            newCard.setUserData(c.getCardId());
-            setupButton(newCard);
-            // make this card draggable
-            newCard.setOnMousePressed(event -> {
-                target = newCard.getParent(); // this is the hBox that needs to be dropped
-            });
-            newCard.setOnMouseReleased(this::handleDropping);
-            Button edit = new Button("\uD83D\uDD89");
-            //edit.setOnAction(this::editCard); // an event happens when the button is clicked
-            edit.setOnMousePressed(event -> {
-                if(event.getClickCount() == 2) {
-                    try {
-                        switchToCardScene(event, c.getCardId(), listing);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-            setupButton(edit);
-            Button delete = new Button("\uD83D\uDDD9");
-            delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-            setupButton(delete);
-            HBox buttonList = new HBox();
-            buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
-            buttonList.getChildren().addAll(newCard, edit, delete);
-            buttonList.setAlignment(Pos.CENTER);
-            vBox.getChildren().add(buttonList);
-            cardMap.put(buttonList, c);
+        for (Card c : listing.getCards()) {
+            addCard(c,vBox,listing);
         }
-        HBox addCardButtonRow = new HBox(); // add the "Add card" button below the cards
+        // add the "Add card" button below the cards
+        HBox addCardButtonRow = new HBox();
         addCardButtonRow.setAlignment(Pos.CENTER);
         addCardButtonRow.getChildren().add(addCardButton);
         vBox.getChildren().add(addCardButtonRow);
-        HBox deleteListButtonRow = new HBox();// add the "Delete list button at the bottom of this list
+
+        // add the "Delete list button at the bottom of this list
+        HBox deleteListButtonRow = new HBox();
         deleteListButtonRow.setAlignment(Pos.BOTTOM_RIGHT);
         deleteListButtonRow.getChildren().add(editListButton);
         deleteListButtonRow.getChildren().add(deleteListButton);
         vBox.getChildren().add(deleteListButtonRow);
+
         map.put(vBox, listing);
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
@@ -478,6 +442,58 @@ public class BoardOverviewController {
         titledPane.setMinWidth(135);
         titledPane.setAnimated(false);
         hBox.getChildren().add(titledPane);
+    }
+
+    /**
+     * Adds a card to the vBox List.
+     * @param c - the card we add
+     * @param vBox - the vBox which contains the list
+     */
+    public void addCard (Card c, VBox vBox, Listing listing)
+    {
+
+        Button newCard;
+        if(!c.getDescription().equals("")) {
+            Label markDescription = new Label("\u2630");
+            markDescription.setStyle("-fx-font-size: 5px;");
+            Label nameCard = new Label(c.getName());
+            nameCard.setStyle("-fx-font-size: 15x;");
+            HBox hbox = new HBox(markDescription, nameCard);
+            hbox.setSpacing(8);
+            newCard = new Button();
+            newCard.setGraphic(hbox);
+        } else newCard = new Button(c.getName());
+        newCard.setUserData(c.getCardId());
+        setupButton(newCard);
+        // make this card draggable
+        newCard.setOnMousePressed(event -> {
+            target = newCard.getParent(); // this is the hBox that needs to be dropped
+        });
+
+        newCard.setOnMouseReleased(this::handleDropping);
+
+        Button edit = new Button("\uD83D\uDD89");
+        //edit.setOnAction(this::editCard); // an event happens when the button is clicked
+        edit.setOnMousePressed(event -> {
+            if(event.getClickCount() == 2) {
+                try {
+                    switchToCardScene(event, c.getCardId(), listing);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        setupButton(edit);
+        Button delete = new Button("\uD83D\uDDD9");
+        delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
+        setupButton(delete);
+        HBox buttonList = new HBox();
+        buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
+        buttonList.getChildren().addAll(newCard, edit, delete);
+        buttonList.setAlignment(Pos.CENTER);
+        vBox.getChildren().add(buttonList);
+        cardMap.put(buttonList, c);
     }
 
     /**
