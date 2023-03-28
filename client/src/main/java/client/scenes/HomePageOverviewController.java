@@ -70,12 +70,16 @@ public class HomePageOverviewController {
         // before switching to the board scene, we need to validate the URL
 
         AnchorPane anchorPane = (AnchorPane) ((Button)actionEvent.getSource()).getParent();
-        String userUrl = serverAddress.getText().trim();
-        if (!userUrl.startsWith("http://")) {
-            userUrl = "http://" + userUrl;
-        }
+        String userPort = serverAddress.getText().trim();
+        String userUrl = "http://localhost:" + userPort;
+//        if (!userUrl.startsWith("http://")) {
+//            userUrl = "http://" + userUrl;
+//        }
 
         if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
+
+            server.startWebSockets(userPort);
+
             String fileName = username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
             File file = new File(fileName);
             if(!file.exists()){
@@ -99,7 +103,7 @@ public class HomePageOverviewController {
 
     /**
      * This method checks if the url entered by the user is a valid one.
-     * @param userUrl the string representing the ur;
+     * @param userUrl the string representing the url
      * @return true if the url is valid, or false otherwise
      */
     public boolean checkConnection(String userUrl){

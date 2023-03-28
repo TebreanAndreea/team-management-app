@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageOverviewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageOverviewController">
     <children>
         <Label layoutX="24.0" layoutY="24.0" prefHeight="45.0" prefWidth="193.0" text="Client Connect">
             <font>
                 <Font size="29.0" />
             </font>
         </Label>
-        <TextField fx:id="serverAddress" layoutX="200.0" layoutY="128.0" prefHeight="37.0" prefWidth="200.0" />
+        <TextField fx:id="serverAddress" layoutX="200.0" layoutY="128.0" prefHeight="37.0" prefWidth="200.0" promptText="Enter port" />
         <Label layoutX="84.0" layoutY="127.0" prefHeight="40.0" prefWidth="113.0" text="Server Address:">
             <font>
                 <Font size="17.0" />

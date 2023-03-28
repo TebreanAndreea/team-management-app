@@ -45,7 +45,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 public class ServerUtils {
 
     private String SERVER = "http://localhost:8080/";
-
+    private String PORT = "8080";
 
     /**
      * This method creates a get request to the server entered by the user.
@@ -55,11 +55,25 @@ public class ServerUtils {
      */
     public Response checkServer(String userUrl) {
         this.SERVER = userUrl;
-        return ClientBuilder.newClient(new ClientConfig())
+        //this.PORT = port;
+
+        //session = connect("ws://localhost:" + port + "/websocket");
+        Response response =  ClientBuilder.newClient(new ClientConfig())
                 .target(userUrl).path("api/connection")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .get();
+
+
+        return response;
+    }
+
+    /**
+     * This method starts the websockets on a specific port, not working for the moment.
+     * @param port
+     */
+    public void startWebSockets(String port){
+        session = connect("ws://localhost:" + port + "/websocket");
     }
 
     /**
@@ -235,8 +249,7 @@ public class ServerUtils {
                 .delete();
     }
 
-    private StompSession session = connect("ws://localhost:8080/websocket");
-
+    private StompSession session = connect("ws://localhost:8080/websocket");;
     private StompSession connect(String url) {
         var client = new StandardWebSocketClient();
         var stomp = new WebSocketStompClient(client);
