@@ -69,7 +69,7 @@ public class ServerUtils {
     }
 
     /**
-     * This method starts the websockets on a specific port, not working for the moment
+     * This method starts the websockets on a specific port, not working for the moment.
      * @param port
      */
     public void startWebSockets(String port){

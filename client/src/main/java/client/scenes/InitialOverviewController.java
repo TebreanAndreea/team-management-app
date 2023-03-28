@@ -46,6 +46,7 @@ public class InitialOverviewController {
     @FXML
     public ScrollPane masterScrollPane;
     private ServerUtils server;
+    private MainController maincontroller;
 
     private EventTarget target;
 
@@ -58,8 +59,9 @@ public class InitialOverviewController {
     private String fileName="temp.txt";
 
     @Inject
-    public InitialOverviewController(ServerUtils server) {
+    public InitialOverviewController(ServerUtils server, MainController mainController) {
         this.server = server;
+        this.maincontroller = mainController;
         curPlacedBoards = 0;
         boardsMap = new HashMap<>();
     }
@@ -88,6 +90,18 @@ public class InitialOverviewController {
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(boardOverview.getValue());
         primaryStage.setScene(overview);
+    }
+
+    /**
+     * This method is used for disconnecting a client from the server and switch back to the Connection page.
+     * @param actionEvent the action event used when pressing the button
+     */
+    public void switchToHomePageScene(ActionEvent actionEvent){
+        var homePageOverview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(homePageOverview.getValue());
+        primaryStage.setScene(overview);
+        primaryStage.setTitle("Connection");
     }
 
 
