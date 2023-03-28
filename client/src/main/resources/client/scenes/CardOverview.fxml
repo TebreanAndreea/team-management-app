@@ -23,6 +23,7 @@
       </Label>
       <Button layoutX="494.0" layoutY="136.0" mnemonicParsing="false" onAction="#addDescription" text="Save" />
       <Button layoutX="187.0" layoutY="21.0" mnemonicParsing="false" onAction="#updateName" prefHeight="25.0" prefWidth="37.0" text="Edit" />
+      <Button layoutX="63.0" layoutY="183.0" mnemonicParsing="false" onAction="#addSubTask" text="+" />
 <!--      <Button layoutX="63.0" layoutY="183.0" mnemonicParsing="false" onAction="#addSubTask" text="+" />-->
    </children>
 </AnchorPane>
