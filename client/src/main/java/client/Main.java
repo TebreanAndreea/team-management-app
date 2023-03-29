@@ -17,6 +17,7 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -37,6 +38,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        File file = new File("user_files/temp.txt");
+        if(file.exists()){
+            file.delete();
+        }
+        file.createNewFile();
 
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");

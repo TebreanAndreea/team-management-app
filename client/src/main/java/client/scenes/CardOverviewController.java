@@ -41,7 +41,7 @@ public class CardOverviewController {
     public TextArea description;
 
     Board board = new Board("test", "", "");
-    private String fileName = "temp.txt";
+    private String fileName = "user_files/temp.txt";
 
     /**
      * Setter for the list.
