@@ -81,6 +81,9 @@ public class HomePageOverviewController {
             server.startWebSockets(userPort);
 
             String fileName = "user_files/"+username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
+            File test = new File("build.gradle");
+            if(!test.getAbsolutePath().contains("client"))
+                fileName = "client/" + fileName;
             File file = new File(fileName);
             if(!file.exists()){
                 file.createNewFile();

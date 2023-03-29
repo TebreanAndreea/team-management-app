@@ -70,6 +70,9 @@ public class InitialOverviewController {
      * The initial method to load up all boards.
      */
     public void initialize() {
+        File test = new File("build.gradle");
+        if(!test.getAbsolutePath().contains("client"))
+            fileName = "client/" + fileName;
         server.registerForMessages("/topic/boards", Board.class, q -> {
             Platform.runLater(() -> refresh());
         });
