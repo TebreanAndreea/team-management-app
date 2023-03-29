@@ -43,8 +43,8 @@ class BoardTest {
 
     @Test
     void getLists() {
-        List<Listing> v = new ArrayList<>();
-        assertEquals(v, board.getLists());
+        List<Listing> list2 = new ArrayList<>();
+        assertEquals(list2, board.getLists());
     }
 
     @Test

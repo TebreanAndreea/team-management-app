@@ -173,6 +173,14 @@ public class Card {
     }
 
     /**
+     * Getter for the list
+     * @return the list of this card
+     */
+    public Listing getList() {
+        return list;
+    }
+
+    /**
      * Setter for the list.
      * @param list - the list we are setting
      */
