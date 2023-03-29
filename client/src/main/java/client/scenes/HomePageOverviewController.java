@@ -87,6 +87,9 @@ public class HomePageOverviewController {
             server.startWebSockets(userPort);
 
             String fileName = "user_files/" + username.getText().trim() + userUrl.substring(userUrl.lastIndexOf(":") + 1) + ".txt";
+            File test = new File("build.gradle");
+            if (!test.getAbsolutePath().contains("client"))
+                fileName = "client/" + fileName;
             File file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
@@ -122,10 +125,18 @@ public class HomePageOverviewController {
         }
     }
 
+    /**
+     * This method sets the admin password.
+     * @param adminPassword the password
+     */
     public void setAdminPassword(String adminPassword) {
         this.adminPassword = adminPassword;
     }
-
+    /**
+     * This method opens the admin login dialog.
+     * TODO: fix the issue where admin password is not stored if the admin first logged in as a user.
+     * @param actionEvent the action event on the button
+     */
     public void adminLogin(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Input Dialog");
@@ -160,7 +171,7 @@ public class HomePageOverviewController {
                 primaryStage.show();
             } else {
                 if (!password.equals(adminPassword))
-                    System.out.println("Wrong password");
+                    System.out.println("Wrong password: " + adminPassword + " " + password);
                 else
                     System.out.println("Invalid server address");
             }

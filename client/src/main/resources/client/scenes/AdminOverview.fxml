@@ -11,7 +11,7 @@
          </content>
       </ScrollPane>
       <ScrollPane fx:id="previewPane" layoutX="155.0" layoutY="73.0" prefHeight="260.0" prefWidth="350.0" />
-      <Button layoutX="515.0" layoutY="194.0" mnemonicParsing="false" text="Delete" />
+      <Button fx:id="deleteButton" layoutX="515.0" layoutY="194.0" mnemonicParsing="false" onAction="#delete" prefHeight="44.0" prefWidth="69.0" style="-fx-background-color: red;" text="Delete" textFill="WHITE" />
       <TextField layoutX="14.0" layoutY="14.0" onKeyTyped="#findByText" prefHeight="26.0" prefWidth="134.0" promptText="Search..." />
       <VBox layoutX="152.0" layoutY="72.0" prefHeight="251.0" prefWidth="329.0" />
    </children>

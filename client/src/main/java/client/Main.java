@@ -39,22 +39,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        //If a file doesn't exist or it is not empty, create a new one
-        String adminPassword ="";
-        File file = new File("server/src/adminPass.txt");
-        Scanner scanner = new Scanner(file);
-        adminPassword = scanner.nextLine().trim();
-        scanner.close();
-        File temp = new File("user_files/temp.txt");
-        if (!temp.exists()) {
-            temp.createNewFile();
-        }
-        else if(temp.length() != 0){
-            temp.delete();
-            temp.createNewFile();
-        }
+        String pass = fileGeneration();
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
-        overview.getKey().setAdminPassword(adminPassword);
+        overview.getKey().setAdminPassword(pass);
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
         var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
@@ -63,5 +50,34 @@ public class Main extends Application {
 
         var mainController = INJECTOR.getInstance(MainController.class);
         mainController.initialize(primaryStage, overview, boardOverview, cardOverview, initialOverview);
+    }
+    /**
+     * This method generates the required files and returns the admin password.
+     * <p>NOTE: the pathing of the files changes depending of where the projects is run from.</p>
+     * @return the admin password
+     * @throws IOException if the file is not found
+     */
+    private String fileGeneration() throws IOException {
+        String adminPassword = "";
+        File test = new File("build.gradle");
+        File file = new File("server/src/adminPass.txt");
+        if (test.getAbsolutePath().contains("client")) {
+            file = new File("../server/src/adminPass.txt");
+        }
+        Scanner scanner = new Scanner(file);
+        adminPassword = scanner.nextLine().trim();
+        System.out.println(adminPassword);
+        scanner.close();
+        String pathname = "";
+
+        if (!test.getAbsolutePath().contains("client"))
+            pathname += "client/";
+        pathname += "user_files/temp.txt";
+        file = new File(pathname);
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
+        return adminPassword;
     }
 }

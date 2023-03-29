@@ -332,4 +332,12 @@ public class ServerUtils {
                 .get(new GenericType<Board>() {
                 });
     }
+
+    public void deleteBoard(Long id) {
+        ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
 }

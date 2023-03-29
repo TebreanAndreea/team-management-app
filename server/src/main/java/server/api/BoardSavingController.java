@@ -59,4 +59,15 @@ public class BoardSavingController {
         }
         return ResponseEntity.ok(repo.findById(id).get());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Board> delete(@PathVariable("id") Long id) {
+        Board board = repo.findById(id).orElse(null);
+        if (board == null) {
+            return ResponseEntity.notFound().build();
+        }
+        msgs.convertAndSend("/topic/boards", board);
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }

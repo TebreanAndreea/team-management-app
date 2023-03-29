@@ -1,6 +1,7 @@
 package client.scenes;
 
 
+import jakarta.ws.rs.BadRequestException;
 import javafx.application.Platform;
 
 import client.MyFXML;
@@ -17,6 +18,7 @@ import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
+import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -29,6 +31,8 @@ import javafx.scene.layout.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -47,9 +51,12 @@ public class BoardOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
-    public HBox hBox;
-    public Label accessKey;
-    public Label boardName;
+    @FXML
+    private HBox hBox;
+    @FXML
+    private Label accessKey;
+    @FXML
+    private Label boardName;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -161,7 +168,7 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter a name for the card:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
 
 
@@ -224,7 +231,7 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter the new name for the card:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 cardButton.setText(name);
                 server.updateCard(currentCard.getCardId(), name);
             } else {
@@ -293,8 +300,8 @@ public class BoardOverviewController {
      * Function that goes to the card details.
      *
      * @param actionEvent the action event on the button
-     * @param cardID the id of a card
-     * @param list the list of the card
+     * @param cardID      the id of a card
+     * @param list        the list of the card
      * @throws IOException the exception which might be caused
      */
     public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
@@ -309,7 +316,6 @@ public class BoardOverviewController {
         primaryStage.setScene(overview);
         primaryStage.show();
     }
-
 
 
     /**
@@ -393,7 +399,6 @@ public class BoardOverviewController {
     }
 
 
-
     /**
      * addList method which accepts a Listing as a parameter.
      * <h5>NOTE: The IDs of the cards are stored within their user data.</h5>
@@ -420,7 +425,7 @@ public class BoardOverviewController {
         vBox.setSpacing(20);
         vBox.setAlignment(Pos.TOP_CENTER);
         for (Card c : listing.getCards()) {
-            addCard(c,vBox,listing);
+            addCard(c, vBox, listing);
         }
         // add the "Add card" button below the cards
         HBox addCardButtonRow = new HBox();
@@ -447,15 +452,15 @@ public class BoardOverviewController {
 
     /**
      * Adds a card to the vBox List.
-     * @param c - the card we add
-     * @param vBox - the vBox which contains the list
+     *
+     * @param c       - the card we add
+     * @param vBox    - the vBox which contains the list
      * @param listing - the list the card is in
      */
-    public void addCard (Card c, VBox vBox, Listing listing)
-    {
+    public void addCard(Card c, VBox vBox, Listing listing) {
 
         Button newCard;
-        if(!c.getDescription().equals("")) {
+        if (!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
             markDescription.setStyle("-fx-font-size: 5px;");
             Label nameCard = new Label(c.getName());
@@ -478,7 +483,7 @@ public class BoardOverviewController {
         Button edit = new Button("\uD83D\uDD89");
         //edit.setOnAction(this::editCard); // an event happens when the button is clicked
         edit.setOnMousePressed(event -> {
-            if(event.getClickCount() == 2) {
+            if (event.getClickCount() == 2) {
                 try {
                     switchToCardScene(event, c.getCardId(), listing);
                 } catch (IOException e) {
@@ -504,13 +509,24 @@ public class BoardOverviewController {
      */
     public void refresh() {
         long id = board.getBoardId();
-        if (id != 0)
-            board = server.getBoardByID(id);
+        hBox.getChildren().clear();
+        if (id != 0) {
+            try {
+                board = server.getBoardByID(id);
+            } catch (BadRequestException e) {
+                Label noBoard = new Label("The board you are trying to access may have been deleted or does not exist.");
+                noBoard.setWrapText(true);
+                noBoard.setTextAlignment(TextAlignment.CENTER);
+                noBoard.setPrefWidth(500);
+                noBoard.setFont(new Font(20));
+                hBox.getChildren().add(noBoard);
+                return;
+            }
+        }
         listController.setBoard(board);
         boardName.setText(board.getTitle());
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
-        hBox.getChildren().clear();
         map = new HashMap<>();
         for (Listing listing : listings)
             addListWithListing(listing);
@@ -572,9 +588,10 @@ public class BoardOverviewController {
 
     /**
      * Sets up the delete list button.
+     *
      * @param button the button to set up
      */
-    private void setupDeleteListButton(Button button){
+    private void setupDeleteListButton(Button button) {
         button.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
         button.setStyle("-fx-background-color: transparent;");
         button.setTextFill(Color.RED);
@@ -590,9 +607,10 @@ public class BoardOverviewController {
 
     /**
      * Sets up the add card button.
+     *
      * @param button the button to set up
      */
-    private void setupAddCardButton(Button button){
+    private void setupAddCardButton(Button button) {
         button.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
         button.setStyle("-fx-background-color: transparent;");
         button.setTextFill(Color.GREEN);
@@ -605,12 +623,14 @@ public class BoardOverviewController {
             button.setTextFill(Color.GREEN);
         });
     }
+
     /**
      * Sets up the buttons contained in the lists.
+     *
      * @param button the button to set up
      */
-    private void setupButton(Button button){
-        HBox.setHgrow(button,Priority.ALWAYS);
+    private void setupButton(Button button) {
+        HBox.setHgrow(button, Priority.ALWAYS);
         button.setStyle("-fx-background-color: transparent");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMinWidth(Button.USE_PREF_SIZE);
