@@ -173,7 +173,7 @@ public class Card {
     }
 
     /**
-     * Getter for the list
+     * Getter for the list of the card.
      * @return the list of this card
      */
     public Listing getList() {

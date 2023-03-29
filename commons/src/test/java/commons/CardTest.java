@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class CardTest {
 
     private Card card;
-    private List<Tag> tags;
-    private List<SubTask> subtasks;
+    private List<Tag> tags = new ArrayList<>();
+    private List<SubTask> subtasks = new ArrayList<>();
 
     private Listing listing;
 
@@ -131,7 +131,7 @@ class CardTest {
 
     @Test
     void getList(){
-        assertNull(card.getList());
+        assertEquals(listing,card.getList());
     }
 
     @Test
