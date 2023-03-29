@@ -15,7 +15,7 @@
             <Font name="System Bold" size="28.0" />
          </font></Label>
       <TextArea fx:id="description" layoutX="12.0" layoutY="71.0" prefHeight="91.0" prefWidth="520.0" />
-      <VBox layoutX="15.0" layoutY="224.0" prefHeight="109.0" prefWidth="513.0" />
+      <VBox fx:id="vBox" layoutX="15.0" layoutY="224.0" prefHeight="109.0" prefWidth="513.0" />
       <Label layoutX="18.0" layoutY="183.0" prefHeight="17.0" prefWidth="141.0" text="Tasks">
          <font>
             <Font size="16.0" />

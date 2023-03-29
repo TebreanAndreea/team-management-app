@@ -130,6 +130,14 @@ public class ServerUtils {
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
 
+    public Card sendCard(Card card) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/setCard")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+    }
+
     /**
      * A method that creates a post request for the subtask.
      *

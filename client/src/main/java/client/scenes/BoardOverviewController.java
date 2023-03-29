@@ -128,23 +128,6 @@ public class BoardOverviewController {
     }
 
     /**
-     * A method that saves the subtask.
-     *
-     * @param subTask - the subtask that needs saving
-     */
-    public void saveSubtaskDB(SubTask subTask) {
-        try {
-            server.saveSubtask(subTask);
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-    }
-
-
-    /**
      * <h3>Adds a card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>
      *

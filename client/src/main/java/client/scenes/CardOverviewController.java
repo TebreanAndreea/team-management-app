@@ -10,18 +10,18 @@ import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import  javafx.scene.control.Label;
-import  javafx.scene.control.TextArea;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -160,7 +160,7 @@ public class CardOverviewController {
             if(!name.isEmpty()){
                 SubTask newSubTask = new SubTask(name, card);
                 System.out.println("Subtask added: " + newSubTask.getTitle());
-                saveSubtaskDB(newSubTask);
+                saveSubtaskDB(newSubTask, card);
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
                 emptyField.setContentText("Name field was submitted empty, please enter a name");
@@ -168,6 +168,8 @@ public class CardOverviewController {
                 addSubTask();
             }
         });
+
+        refreshSubTasks();
     }
 
     /**
@@ -175,17 +177,32 @@ public class CardOverviewController {
      *
      * @param subTask - the subtask that needs saving
      */
-    public void saveSubtaskDB(SubTask subTask) {
+    public SubTask saveSubtaskDB(SubTask subTask, Card card) {
         try {
-            server.saveSubtask(subTask);
+            server.sendCard(card);
+            return server.saveSubtask(subTask);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
             alert.initModality(Modality.APPLICATION_MODAL);
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
+
+        return null;
     }
 
+    public void showSubTaskList(SubTask subTask){
+
+        CheckBox checkBox = new CheckBox(subTask.getTitle());
+        Button editST = new Button("Edit");
+        Button deleteST = new Button("Delete");
+
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(checkBox,editST,deleteST);
+
+        vBox.getChildren().add(hBox);
+
+    }
 
     /**
      * Refreshing a card's details.
@@ -195,5 +212,15 @@ public class CardOverviewController {
         Card card = server.getCardsById(cardId);
         cardLabel.setText(card.getName());
         description.setText(card.getDescription());
+    }
+
+    public void refreshSubTasks(){
+        Card card = server.getCardsById(cardId);
+
+        vBox.getChildren().clear();
+
+        for(SubTask subTask : card.getSubTasks()) {
+            showSubTaskList(subTask);
+        }
     }
 }
