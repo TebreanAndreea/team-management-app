@@ -10,9 +10,11 @@ import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -118,7 +120,7 @@ public class CardOverviewController {
         card.setDescription(text);
         server.sendList(list);
         server.updateCardDescription(cardId, text);
-        refreshCardDetails();
+        refresh();
     }
 
     /**
@@ -145,7 +147,7 @@ public class CardOverviewController {
             }
 
         });
-        refreshCardDetails();
+        refresh();
     }
 
     /**
@@ -171,7 +173,7 @@ public class CardOverviewController {
             }
         });
 
-        refreshSubTasks();
+        refresh();
     }
 
 
@@ -196,6 +198,41 @@ public class CardOverviewController {
         return null;
     }
 
+    /**
+     * Method that displays the subtask of current card.
+     *
+     * @param subTask - subtask to be displayed
+     */
+    public void showSubTaskList(SubTask subTask){
+
+        CheckBox checkBox = new CheckBox(subTask.getTitle());
+        checkBox.setStyle("-fx-font-size: 12px;");
+        checkBox.setSelected(subTask.isDone());
+        //checkBox.setOnAction(this::markDone);
+        HBox hBoxCB = new HBox(checkBox);
+
+        Button editST = new Button("\uD83D\uDD89");
+        editST.setStyle("-fx-font-size: 10px;");
+        //editST.setOnAction(this::editSubTask);
+        Button deleteST = new Button("\uD83D\uDDD9");
+        deleteST.setStyle("-fx-font-size: 10px;");
+        //deleteST.setOnAction(this::deleteSubTask);
+        HBox hBoxButtons = new HBox(editST,deleteST);
+
+        HBox hBox = new HBox();
+        hBox.setSpacing(100);
+        hBox.getChildren().addAll(hBoxCB,hBoxButtons);
+
+        vBox.getChildren().add(hBox);
+    }
+
+    /**
+     * Method that refreshes all card components.
+     */
+    public void refresh() {
+        refreshSubTasks();
+        refreshCardDetails();
+    }
 
     /**
      * Refreshing a card's details.
@@ -214,9 +251,11 @@ public class CardOverviewController {
         Card card = server.getCardsById(cardId);
 
         vBox.getChildren().clear();
+        vBox.setSpacing(5);
+        vBox.setAlignment(Pos.TOP_CENTER);
 
-//        for(SubTask subTask : card.getSubTasks()) {
-//            showSubTaskList(subTask);
-//        }
+        for(SubTask subTask : card.getSubTasks()) {
+            showSubTaskList(subTask);
+        }
     }
 }
