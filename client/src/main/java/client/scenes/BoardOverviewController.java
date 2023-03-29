@@ -14,7 +14,6 @@ import client.utils.ServerUtils;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
-import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
 import javafx.geometry.Bounds;
@@ -37,7 +36,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-//import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 

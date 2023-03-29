@@ -38,7 +38,6 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
@@ -70,7 +69,7 @@ public class ServerUtils {
 
     /**
      * This method starts the websockets on a specific port, not working for the moment.
-     * @param port
+     * @param port - port to connect to
      */
     public void startWebSockets(String port){
         session = connect("ws://localhost:" + port + "/websocket");
@@ -78,10 +77,10 @@ public class ServerUtils {
 
     /**
      * Saving the list into database.
+     *
      * @param list to be saved into database
      * @return the list
      */
-
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/lists")
@@ -92,6 +91,7 @@ public class ServerUtils {
 
     /**
      * Sends a post request to the server to update the list.
+     *
      * @param list - the updated list
      * @return list
      */
@@ -105,6 +105,7 @@ public class ServerUtils {
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
+     *
      * @param list - the sent list
      * @return Listing
      */
@@ -130,6 +131,12 @@ public class ServerUtils {
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
 
+    /**
+     * A method that sends a card to the subtask.
+     *
+     * @param card - card to send
+     * @return the sent card
+     */
     public Card sendCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/subtask/setCard")
@@ -166,6 +173,12 @@ public class ServerUtils {
                 });
     }
 
+    /**
+     * Method that fetches a list by its id.
+     *
+     * @param id - list to search for into DB
+     * @return the result of the query
+     */
     public Listing getListingsById(long id) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/lists/" + id) //

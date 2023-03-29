@@ -1,7 +1,6 @@
 package server.api;
 
 import commons.Card;
-import commons.Listing;
 import commons.SubTask;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,14 +18,20 @@ public class SubtaskSavingController {
 
     private Card card;
 
-
+    /**
+     * Constructor for subtask controller.
+     *
+     * @param repo - subtask repository
+     * @param msgs - messages for communication
+     */
     public SubtaskSavingController(SubTaskRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
 
     /**
-     * A method that saves a subtask into the db.
+     * A method that saves a subtask into the DB.
+     *
      * @param subTask - the subtask we are saving
      * @return subtask
      */
@@ -38,6 +43,12 @@ public class SubtaskSavingController {
         return ResponseEntity.ok(save);
     }
 
+    /**
+     * Post method for assigning the subtask to a card.
+     *
+     * @param card - the card to assign subtask to
+     * @return the saved card
+     */
     @PostMapping(path = {"/setCard"})
     public ResponseEntity<Card> getCard(@RequestBody Card card) {
 

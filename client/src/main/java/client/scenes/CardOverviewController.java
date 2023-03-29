@@ -10,18 +10,15 @@ import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -70,6 +67,11 @@ public class CardOverviewController {
         this.fileName = fileName;
     }
 
+    /**
+     * Setter for the server.
+     *
+     * @param server - the server to assign this card to
+     */
     @Inject
     public CardOverviewController(ServerUtils server) {
         this.server = server;
@@ -172,10 +174,13 @@ public class CardOverviewController {
         refreshSubTasks();
     }
 
+
     /**
      * A method that saves the subtask into the database.
      *
      * @param subTask - the subtask that needs saving
+     * @param card - the card that has the subtask
+     * @return - saved subtask
      */
     public SubTask saveSubtaskDB(SubTask subTask, Card card) {
         try {
@@ -191,18 +196,6 @@ public class CardOverviewController {
         return null;
     }
 
-    public void showSubTaskList(SubTask subTask){
-
-        CheckBox checkBox = new CheckBox(subTask.getTitle());
-        Button editST = new Button("Edit");
-        Button deleteST = new Button("Delete");
-
-        HBox hBox = new HBox();
-        hBox.getChildren().addAll(checkBox,editST,deleteST);
-
-        vBox.getChildren().add(hBox);
-
-    }
 
     /**
      * Refreshing a card's details.
@@ -214,13 +207,16 @@ public class CardOverviewController {
         description.setText(card.getDescription());
     }
 
+    /**
+     *  Refreshing the subtasks of current card.
+     */
     public void refreshSubTasks(){
         Card card = server.getCardsById(cardId);
 
         vBox.getChildren().clear();
 
-        for(SubTask subTask : card.getSubTasks()) {
-            showSubTaskList(subTask);
-        }
+//        for(SubTask subTask : card.getSubTasks()) {
+//            showSubTaskList(subTask);
+//        }
     }
 }
