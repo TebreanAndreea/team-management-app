@@ -18,6 +18,7 @@ import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -417,6 +418,7 @@ public class BoardOverviewController {
         setupDeleteListButton(deleteListButton);
         VBox vBox = new VBox();
         vBox.setSpacing(20);
+        vBox.setPadding(new Insets(20, 0, 0, 0));
         vBox.setAlignment(Pos.TOP_CENTER);
         for (Card c : listing.getCards()) {
             addCard(c,vBox,listing);
