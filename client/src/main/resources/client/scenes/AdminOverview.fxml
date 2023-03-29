@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: lightgray;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AdminOverviewController">
+   <children>
+      <ScrollPane layoutX="14.0" layoutY="42.0" prefHeight="334.0" prefWidth="134.0">
+         <content>
+            <VBox fx:id="boardBox" prefHeight="63.0" prefWidth="134.0" spacing="15" />
+         </content>
+      </ScrollPane>
+      <ScrollPane fx:id="previewPane" layoutX="155.0" layoutY="73.0" prefHeight="260.0" prefWidth="350.0" />
+      <Button layoutX="515.0" layoutY="194.0" mnemonicParsing="false" text="Delete" />
+      <TextField layoutX="14.0" layoutY="14.0" onKeyTyped="#findByText" prefHeight="26.0" prefWidth="134.0" promptText="Search..." />
+      <VBox layoutX="152.0" layoutY="72.0" prefHeight="251.0" prefWidth="329.0" />
+   </children>
+</AnchorPane>

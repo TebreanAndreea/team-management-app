@@ -17,8 +17,10 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Scanner;
 
 import client.scenes.*;
 import com.google.inject.Injector;
@@ -37,11 +39,26 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-
+        //If a file doesn't exist or it is not empty, create a new one
+        String adminPassword ="";
+        File file = new File("server/src/adminPass.txt");
+        Scanner scanner = new Scanner(file);
+        adminPassword = scanner.nextLine().trim();
+        scanner.close();
+        File temp = new File("user_files/temp.txt");
+        if (!temp.exists()) {
+            temp.createNewFile();
+        }
+        else if(temp.length() != 0){
+            temp.delete();
+            temp.createNewFile();
+        }
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
+        overview.getKey().setAdminPassword(adminPassword);
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
         var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
+        var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
 
         var mainController = INJECTOR.getInstance(MainController.class);

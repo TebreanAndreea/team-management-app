@@ -4,24 +4,29 @@ import client.MyFXML;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageOverviewController {
     private Stage primaryStage;
     private Scene overview;
-
+    private String adminPassword;
     private ServerUtils server;
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
@@ -35,10 +40,11 @@ public class HomePageOverviewController {
 
     /**
      * Constructor which initialize the server.
+     *
      * @param server the server instance used for communication
      */
     @Inject
-    public HomePageOverviewController (ServerUtils server){
+    public HomePageOverviewController(ServerUtils server) {
         this.server = server;
     }
 
@@ -69,7 +75,7 @@ public class HomePageOverviewController {
 
         // before switching to the board scene, we need to validate the URL
 
-        AnchorPane anchorPane = (AnchorPane) ((Button)actionEvent.getSource()).getParent();
+        AnchorPane anchorPane = (AnchorPane) ((Button) actionEvent.getSource()).getParent();
         String userPort = serverAddress.getText().trim();
         String userUrl = "http://localhost:" + userPort;
 //        if (!userUrl.startsWith("http://")) {
@@ -80,9 +86,9 @@ public class HomePageOverviewController {
 
             server.startWebSockets(userPort);
 
-            String fileName = username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
+            String fileName = "user_files/" + username.getText().trim() + userUrl.substring(userUrl.lastIndexOf(":") + 1) + ".txt";
             File file = new File(fileName);
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.createNewFile();
             }
             var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
@@ -94,7 +100,7 @@ public class HomePageOverviewController {
             primaryStage.show();
         } else {
             // put a message in the text area
-            if(username.getText().trim().length() > 0)
+            if (username.getText().trim().length() > 0)
                 serverAddress.setText("Invalid url");
             else
                 username.setText("Invalid username");
@@ -103,15 +109,62 @@ public class HomePageOverviewController {
 
     /**
      * This method checks if the url entered by the user is a valid one.
+     *
      * @param userUrl the string representing the url
      * @return true if the url is valid, or false otherwise
      */
-    public boolean checkConnection(String userUrl){
+    public boolean checkConnection(String userUrl) {
         try {
             server.checkServer(userUrl);
             return true;
-        } catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    public void setAdminPassword(String adminPassword) {
+        this.adminPassword = adminPassword;
+    }
+
+    public void adminLogin(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Input Dialog");
+        dialog.setHeaderText("Please enter your name and age:");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        TextField serverField = new TextField();
+        serverField.setPromptText("Server");
+        TextField passwordField = new TextField();
+        passwordField.setPromptText("Admin Password");
+
+        grid.add(new Label("Server:"), 0, 0);
+        grid.add(serverField, 1, 0);
+        grid.add(new Label("Admin Password:"), 0, 1);
+        grid.add(passwordField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String server = serverField.getText();
+            String password = passwordField.getText();
+            if (password.equals(adminPassword) && checkConnection(server)) {
+                System.out.println("Admin login successful");
+                var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
+                primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+                overview = new Scene(adminOverview.getValue());
+                primaryStage.setScene(overview);
+                primaryStage.show();
+            } else {
+                if (!password.equals(adminPassword))
+                    System.out.println("Wrong password");
+                else
+                    System.out.println("Invalid server address");
+            }
+        }
+
     }
 }

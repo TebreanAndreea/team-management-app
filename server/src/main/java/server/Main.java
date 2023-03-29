@@ -19,11 +19,42 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Random;
+
 @SpringBootApplication
-@EntityScan(basePackages = { "commons", "server" })
+@EntityScan(basePackages = {"commons", "server"})
 public class Main {
 
     public static void main(String[] args) {
+        generateServerPassword();
         SpringApplication.run(Main.class, args);
+    }
+
+    public static void generateServerPassword() {
+        String result = "";
+        Random random = new Random();
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        while (result.length() < 10) {
+            result += characters.charAt(random.nextInt(characters.length()));
+        }
+        try {
+            FileWriter writer = new FileWriter("server/src/adminPass.txt");
+            writer.write(result);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("No admin password file found, generating it now. Please restart the server.");
+            File file = new File("server/src/adminPass.txt");
+            try {
+                file.delete();
+                file.createNewFile();
+
+            } catch (IOException ex) {
+                System.out.println("Failed to create temp file. Please create a file named temp.txt in the project folder.");
+            }
+        }
     }
 }

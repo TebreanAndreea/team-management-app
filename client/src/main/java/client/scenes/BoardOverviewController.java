@@ -20,6 +20,7 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -466,6 +467,7 @@ public class BoardOverviewController {
         } else newCard = new Button(c.getName());
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
+        newCard.setCursor(Cursor.CLOSED_HAND);
         // make this card draggable
         newCard.setOnMousePressed(event -> {
             target = newCard.getParent(); // this is the hBox that needs to be dropped
