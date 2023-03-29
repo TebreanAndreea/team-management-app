@@ -80,7 +80,7 @@ public class HomePageOverviewController {
 
             server.startWebSockets(userPort);
 
-            String fileName = username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
+            String fileName = "user_files/"+username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
             File file = new File(fileName);
             if(!file.exists()){
                 file.createNewFile();
