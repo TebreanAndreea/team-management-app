@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
-//import server.database.ListingRepository;
 
 
 @RestController
@@ -18,9 +17,13 @@ public class CardSavingController {
 
     private Listing list;
 
-
-
-    public CardSavingController(CardRepository repo, SimpMessageSendingOperations msgs) {
+    /**
+     *Constructor for the card controller.
+     *
+     * @param repo - card repository
+     * @param msgs - messages for communication
+     */
+    public CardSavingController(CardRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
@@ -42,6 +45,12 @@ public class CardSavingController {
         return ResponseEntity.ok(save);
     }
 
+    /**
+     * Post method that sets a list for this card.
+     *
+     * @param list - list to assign to this card
+     * @return the saved list
+     */
     @PostMapping(path = {"/setList"})
     public ResponseEntity<Listing> getList(@RequestBody Listing list) {
 
@@ -49,6 +58,11 @@ public class CardSavingController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * Method that deletes a card by given id.
+     *
+     * @param id - corresponding to the card to be deleted
+     */
     @DeleteMapping(path = {"delete/{id}"})
     public ResponseEntity<Listing> delete(@PathVariable long id) {
         Card card = repo.findById(id).orElse(null);
