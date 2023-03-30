@@ -370,6 +370,7 @@ public class ServerUtils {
             .get(String.class);
         return response;
     }
+    /**
      * Updates the board with the new parameters.
      * @param id The ID of the board to be updated
      * @param newTitle Its new title (more parameters may be added)
