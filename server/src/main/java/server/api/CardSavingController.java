@@ -3,7 +3,7 @@ package server.api;
 import commons.Card;
 import commons.Listing;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
 
@@ -13,7 +13,7 @@ import server.database.CardRepository;
 public class CardSavingController {
 
     private final CardRepository repo;
-    private final SimpMessagingTemplate msgs;
+    private final SimpMessageSendingOperations msgs;
 
     private Listing list;
 
@@ -23,7 +23,7 @@ public class CardSavingController {
      * @param repo - card repository
      * @param msgs - messages for communication
      */
-    public CardSavingController(CardRepository repo, SimpMessagingTemplate msgs) {
+    public CardSavingController(CardRepository repo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
@@ -36,6 +36,7 @@ public class CardSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Card> add(@RequestBody Card card) {
+        if(card == null) return ResponseEntity.badRequest().build();
 
         card.setList(list);
 
@@ -61,15 +62,17 @@ public class CardSavingController {
      * Method that deletes a card by given id.
      *
      * @param id - corresponding to the card to be deleted
+     * @return tag tag corresponding to the operation
      */
     @DeleteMapping(path = {"delete/{id}"})
-    public void delete(@PathVariable long id) {
+    public ResponseEntity<Listing> delete(@PathVariable long id) {
         Card card = repo.findById(id).orElse(null);
         if (card == null) {
-            return;
+            return ResponseEntity.notFound().build();
         }
         msgs.convertAndSend("/topic/card", card);
         repo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /**

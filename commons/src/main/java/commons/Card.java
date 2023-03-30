@@ -65,6 +65,9 @@ public class Card {
     public long getCardId() {
         return cardId;
     }
+    public void setCardId(long cardId) {
+        this.cardId = cardId;
+    }
 
     /**
      * Getter for the description.
