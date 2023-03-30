@@ -56,6 +56,15 @@ public class Board {
     }
 
     /**
+     * Setter for the board's id.
+     *
+     * @param boardId the new Id of a board
+     */
+    public void setBoardId(long boardId) {
+        this.boardId = boardId;
+    }
+
+    /**
      * Getter for the board title.
      *
      * @return - this board's title

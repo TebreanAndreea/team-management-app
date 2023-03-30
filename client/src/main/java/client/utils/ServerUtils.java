@@ -38,7 +38,6 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
@@ -82,10 +81,10 @@ public class ServerUtils {
 
     /**
      * Saving the list into database.
+     *
      * @param list to be saved into database
      * @return the list
      */
-
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/lists")
@@ -96,6 +95,7 @@ public class ServerUtils {
 
     /**
      * Sends a post request to the server to update the list.
+     *
      * @param list - the updated list
      * @return list
      */
@@ -109,6 +109,7 @@ public class ServerUtils {
 
     /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
+     *
      * @param list - the sent list
      * @return Listing
      */
@@ -129,6 +130,20 @@ public class ServerUtils {
     public Card saveCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/card")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+    }
+
+    /**
+     * A method that sends a card to the subtask.
+     *
+     * @param card - card to send
+     * @return the sent card
+     */
+    public Card sendCard(Card card) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/setCard")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
@@ -162,6 +177,12 @@ public class ServerUtils {
                 });
     }
 
+    /**
+     * Method that fetches a list by its id.
+     *
+     * @param id - list to search for into DB
+     * @return the result of the query
+     */
     public Listing getListingsById(long id) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/lists/" + id) //
@@ -348,5 +369,15 @@ public class ServerUtils {
             .accept(APPLICATION_JSON) //
             .get(String.class);
         return response;
+    }
+     * Updates the board with the new parameters.
+     * @param id The ID of the board to be updated
+     * @param newTitle Its new title (more parameters may be added)
+     * @return The updated board, if required
+     */
+    public Board updateBoard(long id, String newTitle) {
+        Board currentBoard = getBoardByID(id);
+        currentBoard.setTitle(newTitle);
+        return addBoard(currentBoard);
     }
 }

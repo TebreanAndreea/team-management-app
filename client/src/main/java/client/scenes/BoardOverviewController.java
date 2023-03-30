@@ -14,7 +14,6 @@ import client.utils.ServerUtils;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
-import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
 import javafx.geometry.Bounds;
@@ -28,6 +27,8 @@ import javafx.scene.layout.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -37,7 +38,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-//import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -47,8 +47,9 @@ public class BoardOverviewController {
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
-    public Label accessKey;
+    public TextField accessKey;
     public Label boardName;
+    public Button renameBoardButton;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -86,16 +87,12 @@ public class BoardOverviewController {
      * Initializes the controller and immediately fetches the lists from the database.
      */
     public void initialize() {
-        server.registerForMessages("/topic/boards", Board.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
-            Platform.runLater(() -> refresh());
+            Platform.runLater(this::refresh);
         });
-        server.registerForMessages("/topic/card", Card.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
         refresh();
     }
 
@@ -126,23 +123,6 @@ public class BoardOverviewController {
         }
         return null;
     }
-
-    /**
-     * A method that saves the subtask.
-     *
-     * @param subTask - the subtask that needs saving
-     */
-    public void saveSubtaskDB(SubTask subTask) {
-        try {
-            server.saveSubtask(subTask);
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-    }
-
 
     /**
      * <h3>Adds a card to its assigned list.</h3>
@@ -302,14 +282,12 @@ public class BoardOverviewController {
         cardOverview.getKey().setFileName(fileName);
         cardOverview.getKey().setBoard(board);
         cardOverview.getKey().setList(list);
-        cardOverview.getKey().refreshCardDetails();
+        cardOverview.getKey().refresh();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(cardOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
     }
-
-
 
     /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
@@ -371,7 +349,7 @@ public class BoardOverviewController {
                         }
                     }
                 }
-                if (foundPlace == false) // add at the end
+                if (!foundPlace) // add at the end
                     vBox.getChildren().add(nrCards, (HBox) target);
 
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
@@ -405,15 +383,11 @@ public class BoardOverviewController {
         addCardButton.setOnAction(this::addCard);
         setupAddCardButton(addCardButton);
         Button editListButton = new Button("Edit");
-        editListButton.setOnAction(event -> {
-            editList(event, listing);
-        });
+        editListButton.setOnAction(event -> editList(event, listing));
         setupAddCardButton(editListButton);
         Button deleteListButton = new Button("delete list");
         // deleteListButton.setOnAction(this::deleteList);
-        deleteListButton.setOnAction(event -> {
-            deleteList(event, listing);
-        });
+        deleteListButton.setOnAction(event -> deleteList(event, listing));
         setupDeleteListButton(deleteListButton);
         VBox vBox = new VBox();
         vBox.setSpacing(20);
@@ -505,7 +479,11 @@ public class BoardOverviewController {
         if (id != 0)
             board = server.getBoardByID(id);
         listController.setBoard(board);
-        boardName.setText(board.getTitle());
+        String boardTitle = board.getTitle();
+        Text boardText = new Text(boardTitle);
+        boardText.setFont(Font.font("System Bold", 19.0));
+        boardName.setText(boardTitle);
+        renameBoardButton.setLayoutX(boardName.getLayoutX() + boardText.getLayoutBounds().getWidth() + 10.0);
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
         hBox.getChildren().clear();
@@ -547,17 +525,17 @@ public class BoardOverviewController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             long id = board.getBoardId();
             File file = new File(fileName);
-            String content = "";
+            StringBuilder content = new StringBuilder();
             try {
                 Scanner scanner = new Scanner(file);
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
                     if (!line.startsWith(Long.toString(id))) {
-                        content = content + line + "\n";
+                        content.append(line).append("\n");
                     }
                 }
                 FileOutputStream outputStream = new FileOutputStream(file);
-                outputStream.write(content.getBytes());
+                outputStream.write(content.toString().getBytes());
                 outputStream.flush();
                 outputStream.close();
                 switchToInitialOverviewScene(actionEvent);
@@ -614,5 +592,40 @@ public class BoardOverviewController {
         button.setMinWidth(Button.USE_PREF_SIZE);
         button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);"));
         button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent;"));
+    }
+
+    /**
+     * Copies the board's access key to the clipboard.
+     * @param mouseEvent the event that triggered this method
+     */
+    public void copyToClipboard(MouseEvent mouseEvent) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(board.getAccessKey());
+        clipboard.setContent(content);
+    }
+
+    /**
+     * Renames the board.
+     *
+     * @param mouseEvent the event that triggered this method
+     */
+    public void renameBoard(MouseEvent mouseEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change the name of the board");
+        dialog.setHeaderText("Please enter a name for the board:");
+        dialog.showAndWait().ifPresent(name -> {
+
+            if(!name.isEmpty()) {
+                board.setTitle(name);
+                server.updateBoard(board.getBoardId(), name);
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                renameBoard(mouseEvent);
+            }
+
+        });
     }
 }
