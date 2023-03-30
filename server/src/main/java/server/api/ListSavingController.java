@@ -5,7 +5,7 @@ import commons.Card;
 import commons.Listing;
 //import commons.Quote;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
 import server.database.ListingRepository;
@@ -19,11 +19,11 @@ public class ListSavingController {
 
     private final ListingRepository repo;
     private final CardRepository cardRepo;
-    private final SimpMessagingTemplate msgs;
+    private final SimpMessageSendingOperations msgs;
 
     private Board board;
 
-    public ListSavingController(ListingRepository repo, CardRepository cardRepo, SimpMessagingTemplate msgs) {
+    public ListSavingController(ListingRepository repo, CardRepository cardRepo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.cardRepo = cardRepo;
         this.msgs = msgs;
@@ -38,6 +38,7 @@ public class ListSavingController {
 
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Listing> add(@RequestBody Listing list) {
+        if(list == null)  return ResponseEntity.badRequest().build();
         list.setBoard(board);
         msgs.convertAndSend("/topic/lists", list);
         Listing saved = repo.save(list);

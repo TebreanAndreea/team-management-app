@@ -17,7 +17,7 @@ package server.api;
 
 import commons.Board;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.BoardRepository;
 
@@ -29,13 +29,14 @@ public class BoardSavingController {
 
 
     private final BoardRepository repo;
-    private SimpMessagingTemplate msgs;
+    private SimpMessageSendingOperations msgs;
 
 
-    public BoardSavingController(BoardRepository repo, SimpMessagingTemplate msgs) {
+    public BoardSavingController(BoardRepository repo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
+
 
     @GetMapping(path = { "", "/" })
     public List<Board> getAll() {
@@ -46,6 +47,7 @@ public class BoardSavingController {
 //        msgs.convertAndSend("/topic/quotes", quote);
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Board> add(@RequestBody Board board) {
+        if(board == null) return ResponseEntity.badRequest().build();
         msgs.convertAndSend("/topic/boards", board);
         Board save = repo.save(board);
         save.setAccessKey();
