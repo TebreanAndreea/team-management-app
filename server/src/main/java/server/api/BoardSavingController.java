@@ -31,19 +31,33 @@ public class BoardSavingController {
     private final BoardRepository repo;
     private SimpMessagingTemplate msgs;
 
-
+    /**
+     * Constructor for Board controller.
+     *
+     * @param repo - board repository
+     * @param msgs - messages for communication
+     */
     public BoardSavingController(BoardRepository repo, SimpMessagingTemplate msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
 
+    /**
+     * Get method for fetching all boards from DB.
+     *
+     * @return - a list of boards from DB
+     */
     @GetMapping(path = { "", "/" })
     public List<Board> getAll() {
         return repo.findAll();
     }
 
-//        THIS TEMPLATE NEEDS TO BE ADDED TO EVERY POSTMAPPING BEFORE REPO.SAVE
-//        msgs.convertAndSend("/topic/quotes", quote);
+    /**
+     * Post method that adds a board into the DB.
+     *
+     * @param board - board to be added into the database
+     * @return the saved board
+     */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Board> add(@RequestBody Board board) {
         msgs.convertAndSend("/topic/boards", board);
@@ -52,6 +66,13 @@ public class BoardSavingController {
         save = repo.save(save);
         return ResponseEntity.ok(save);
     }
+
+    /**
+     * Get method for fetching a board by id.
+     *
+     * @param id - to search for board into DB
+     * @return the query result - board corresponding to id
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Board> getById(@PathVariable("id") long id) {
         if (id < 0 || !repo.existsById(id)) {

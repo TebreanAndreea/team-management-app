@@ -14,7 +14,6 @@ import client.utils.ServerUtils;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
-import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
 import javafx.geometry.Bounds;
@@ -39,7 +38,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-//import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -125,23 +123,6 @@ public class BoardOverviewController {
         }
         return null;
     }
-
-    /**
-     * A method that saves the subtask.
-     *
-     * @param subTask - the subtask that needs saving
-     */
-    public void saveSubtaskDB(SubTask subTask) {
-        try {
-            server.saveSubtask(subTask);
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-    }
-
 
     /**
      * <h3>Adds a card to its assigned list.</h3>
@@ -301,14 +282,12 @@ public class BoardOverviewController {
         cardOverview.getKey().setFileName(fileName);
         cardOverview.getKey().setBoard(board);
         cardOverview.getKey().setList(list);
-        cardOverview.getKey().refreshCardDetails();
+        cardOverview.getKey().refresh();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(cardOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
     }
-
-
 
     /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
