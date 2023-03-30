@@ -69,7 +69,7 @@ class SubTaskTest {
         List<Tag> tags = new ArrayList<>();
         tags.add(new Tag("tag1"));
 
-        Board board = new Board("title","acceskey","password");
+        Board board = new Board("title","accesskey","password");
         Listing listing = new Listing("list",board);
 
         Card card2 = new Card("desc","name",new Date(),tags,new ArrayList<>(),listing);
