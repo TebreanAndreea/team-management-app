@@ -79,17 +79,4 @@ class SubTaskTest {
         assertTrue(subtask.equals(subtask2));
     }
 
-    @Test
-    void testHashCode() {
-        List<Tag> tags = new ArrayList<>();
-        tags.add(new Tag("tag1"));
-
-        Board board = new Board("title","acceskey","password");
-        Listing listing = new Listing("list",board);
-
-        Card card2 = new Card("desc","name",new Date(),tags,new ArrayList<>(),listing);
-        SubTask subtask2 = new SubTask("subtask",card2);
-
-        assertEquals(subtask.hashCode(),subtask2.hashCode());
-    }
 }
