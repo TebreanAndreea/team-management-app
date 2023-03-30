@@ -92,6 +92,7 @@ public class ListSavingController {
         }
         listing.setBoard(board);
         listing = repo.save(listing);
+        msgs.convertAndSend("/topic/lists", listing);
         return ResponseEntity.ok(listing);
     }
 }
