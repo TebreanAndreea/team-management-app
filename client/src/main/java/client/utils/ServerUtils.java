@@ -270,7 +270,7 @@ public class ServerUtils {
                 .delete();
     }
 
-    private StompSession session = connect("ws://localhost:8080/websocket");;
+    private StompSession session = connect("ws://localhost:8080/websocket");
     private StompSession connect(String url) {
         var client = new StandardWebSocketClient();
         var stomp = new WebSocketStompClient(client);
@@ -352,5 +352,17 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<Board>() {
                 });
+    }
+
+    /**
+     * Updates the board with the new parameters.
+     * @param id The ID of the board to be updated
+     * @param newTitle Its new title (more parameters may be added)
+     * @return The updated board, if required
+     */
+    public Board updateBoard(long id, String newTitle) {
+        Board currentBoard = getBoardByID(id);
+        currentBoard.setTitle(newTitle);
+        return addBoard(currentBoard);
     }
 }

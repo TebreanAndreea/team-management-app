@@ -9,17 +9,13 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
-//import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-//import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
-//import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-//import javafx.scene.transform.Scale;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
@@ -73,9 +69,7 @@ public class InitialOverviewController {
         File test = new File("build.gradle");
         if(!test.getAbsolutePath().contains("client"))
             fileName = "client/" + fileName;
-        server.registerForMessages("/topic/boards", Board.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         refresh();
     }
 
@@ -144,7 +138,7 @@ public class InitialOverviewController {
         dialog.setTitle("Access key");
         dialog.setHeaderText("Please enter your access key:");
         dialog.showAndWait().ifPresent(key -> {
-            if (key.length() < 10 || key.length() > 10) {
+            if (key.length() != 10) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
