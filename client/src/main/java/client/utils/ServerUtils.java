@@ -108,6 +108,22 @@ public class ServerUtils {
     }
 
     /**
+     * Editing a subtask in databse.
+     *
+     * @param subTask subtask to be edited
+     * @param name the new name
+     * @return the updated subtask
+     */
+    public SubTask updateSubtask(SubTask subTask, String name) {
+        //     SubTask subTask = getSubtaskById(id);
+        subTask.setTitle(name);
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+    }
+    /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
      *
      * @param list - the sent list
@@ -194,6 +210,21 @@ public class ServerUtils {
     }
 
     /**
+     * Returning a subtask with a given id.
+     *
+     * @param id the id of the subtask
+     * @return the subtask
+     */
+    public SubTask getSubtaskById(long id) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<SubTask>() {
+                });
+
+    }
+    /**
      * Update a list by changing its name.
      *
      * @param id the id of the list to be updated
@@ -256,6 +287,20 @@ public class ServerUtils {
     public void deleteCard(long id) {
         ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/card/delete/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
+    /**
+     * Deleting a subtask from database.
+     *
+     * @param subTask the subtask to be deleted
+     */
+    public void deleteSubtask(SubTask subTask) {
+        long id = subTask.getStId();
+        ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/subtask/delete/" + id) //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .delete();
