@@ -23,7 +23,7 @@ public class CardSavingController {
      * @param repo - card repository
      * @param msgs - messages for communication
      */
-    public CardSavingController(CardRepository repo, SimpMessagingTemplate msgs) {
+    public CardSavingController(CardRepository repo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
@@ -62,6 +62,7 @@ public class CardSavingController {
      * Method that deletes a card by given id.
      *
      * @param id - corresponding to the card to be deleted
+     * @return tag tag corresponding to the operation
      */
     @DeleteMapping(path = {"delete/{id}"})
     public ResponseEntity<Listing> delete(@PathVariable long id) {

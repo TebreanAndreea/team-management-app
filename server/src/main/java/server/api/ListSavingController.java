@@ -29,7 +29,7 @@ public class ListSavingController {
      * @param cardRepo - attribute for card repository
      * @param msgs - messages for communication
      */
-     public ListSavingController(ListingRepository repo, CardRepository cardRepo, SimpMessageSendingOperations msgs) {
+    public ListSavingController(ListingRepository repo, CardRepository cardRepo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.cardRepo = cardRepo;
         this.msgs = msgs;
