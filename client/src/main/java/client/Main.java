@@ -50,12 +50,14 @@ public class Main extends Application {
         }
         file.createNewFile();
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
-        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
-        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
-        var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
-        //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
+//        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+//        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
+//        var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
+//        //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
 
         var mainController = INJECTOR.getInstance(MainController.class);
-        mainController.initialize(primaryStage, overview, boardOverview, cardOverview, initialOverview);
+        mainController.initialize(primaryStage, overview);
+        //mainController.initialize(primaryStage, overview);
+
     }
 }

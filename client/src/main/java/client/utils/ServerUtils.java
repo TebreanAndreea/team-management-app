@@ -43,20 +43,22 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private String SERVER = "http://localhost:8080/";
-    private String PORT = "8080";
+    private static String SERVER = "";
+    private static StompSession session;
+    private String PORT = "";
 
     /**
      * This method creates a get request to the server entered by the user.
      *
      * @param userUrl a string representing the url
+     * @param port the port
      * @return a Response object
      */
-    public Response checkServer(String userUrl) {
+    public Response checkServer(String userUrl,String port) {
         this.SERVER = userUrl;
-        //this.PORT = port;
+        this.PORT = port;
 
-        //session = connect("ws://localhost:" + port + "/websocket");
+        session = connect("ws://localhost:" + PORT + "/websocket");
         Response response =  ClientBuilder.newClient(new ClientConfig())
                 .target(userUrl).path("api/connection")
                 .request(APPLICATION_JSON)
@@ -69,10 +71,12 @@ public class ServerUtils {
 
     /**
      * This method starts the websockets on a specific port, not working for the moment.
-     * @param port - port to connect to
+     * @param port - it returns the session used
+     * @return the session
      */
-    public void startWebSockets(String port){
-        session = connect("ws://localhost:" + port + "/websocket");
+    public StompSession startWebSockets(String port){
+        this.session = connect("ws://localhost:" + port + "/websocket");
+        return session;
     }
 
     /**
@@ -270,7 +274,6 @@ public class ServerUtils {
                 .delete();
     }
 
-    private StompSession session = connect("ws://localhost:8080/websocket");
     private StompSession connect(String url) {
         var client = new StandardWebSocketClient();
         var stomp = new WebSocketStompClient(client);
@@ -354,6 +357,19 @@ public class ServerUtils {
                 });
     }
 
+    /**
+     * Gets the port on which the current application is running.
+     * @return said port
+     */
+    public String getPort()
+    {
+        String response = ClientBuilder.newClient(new ClientConfig()) //
+            .target(SERVER).path("api/connection/getServer") //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .get(String.class);
+        return response;
+    }
     /**
      * Updates the board with the new parameters.
      * @param id The ID of the board to be updated

@@ -24,27 +24,22 @@ public class MainController {
      *
      * @param primaryStage     The main stage of the application
      * @param homePageOverview Homepage
-     * @param boardOverview    Board overview
-     * @param cardOverview     Card overview
-     * @param initialOverview Initial overview
+//     * @param boardOverview    Board overview
+//     * @param cardOverview     Card overview
+//     * @param initialOverview Initial overview
      */
     public void initialize(Stage primaryStage,
-                           Pair<HomePageOverviewController, Parent> homePageOverview,
-                           Pair<BoardOverviewController, Parent> boardOverview,
-                           Pair<CardOverviewController, Parent> cardOverview,
-                           Pair<InitialOverviewController, Parent> initialOverview) {
+                           Pair<HomePageOverviewController, Parent> homePageOverview) {
         this.primaryStage = primaryStage;
 
         this.homePageOverviewController = homePageOverview.getKey();
         this.homePageOverview = new Scene(homePageOverview.getValue());
 
-        this.boardOverviewController = boardOverview.getKey();
-        this.boardOverview = new Scene(boardOverview.getValue());
-
-        this.cardOverviewController = cardOverview.getKey();
-        this.cardOverview = new Scene(cardOverview.getValue());
-
-
+//        this.boardOverviewController = boardOverview.getKey();
+//        this.boardOverview = new Scene(boardOverview.getValue());
+//
+//        this.cardOverviewController = cardOverview.getKey();
+//        this.cardOverview = new Scene(cardOverview.getValue());
 
         showOverview();
         primaryStage.show();
