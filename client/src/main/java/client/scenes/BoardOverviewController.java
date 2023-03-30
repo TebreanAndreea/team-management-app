@@ -1,6 +1,7 @@
 package client.scenes;
 
 
+import commons.SubTask;
 import javafx.application.Platform;
 
 import client.MyFXML;
@@ -426,18 +427,32 @@ public class BoardOverviewController {
      */
     public void addCard (Card c, VBox vBox, Listing listing)
     {
-
         Button newCard;
+        VBox vBox1 = new VBox();
+        int totalSubtaks = c.getSubTasks().size();
+        int doneSubtasks = 0;
+        for(SubTask s : c.getSubTasks()) {
+            if(s.isDone() == true) doneSubtasks++;
+        }
+        vBox1.getChildren().addAll(new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks)));
+        vBox1.setAlignment(Pos.BOTTOM_RIGHT);
+        Label nameCard = new Label(c.getName());
         if(!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
             markDescription.setStyle("-fx-font-size: 5px;");
-            Label nameCard = new Label(c.getName());
             nameCard.setStyle("-fx-font-size: 15x;");
-            HBox hbox = new HBox(markDescription, nameCard);
+            HBox hbox = new HBox(markDescription, nameCard, vBox1);
             hbox.setSpacing(8);
             newCard = new Button();
             newCard.setGraphic(hbox);
-        } else newCard = new Button(c.getName());
+        } else {
+            newCard = new Button();
+            HBox hbox = new HBox(nameCard, vBox1);
+            hbox.setSpacing(8);
+            newCard.setGraphic(hbox);
+        }
+        newCard.setPrefWidth(100);
+        newCard.setPrefHeight(100);
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
         // make this card draggable

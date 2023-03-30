@@ -237,6 +237,20 @@ public class ServerUtils {
         currentList.setTitle(newName);
         return editList(currentList);
     }
+
+    /**
+     * Updating a subtask in the database.
+     *
+     * @param subTask the subtask to be updated
+     * @return the edited subtask
+     */
+    public SubTask editSubTask(SubTask subTask){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+    }
     /**
      * Fetches the card with the provided id from the database.
      * @param id The id of the card to search for

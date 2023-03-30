@@ -63,8 +63,8 @@ public class SubtaskSavingController {
     @PostMapping(path = { "/edit" })
     public ResponseEntity<SubTask> updateSubtask(@RequestBody SubTask subTask) {
         subTask.setCard(card);
-        //  msgs.convertAndSend("/topic/edit", subTask);
         subTask = repo.save(subTask);
+        msgs.convertAndSend("/topic/subtask", subTask);
         return ResponseEntity.ok(subTask);
     }
 

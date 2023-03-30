@@ -245,7 +245,14 @@ public class CardOverviewController {
 
         CheckBox checkBox = new CheckBox(subTask.getTitle());
         checkBox.setStyle("-fx-font-size: 12px;");
+
         checkBox.setSelected(subTask.isDone());
+
+        checkBox.selectedProperty().addListener((obs, old, newVal) -> {
+            subTask.setDone(newVal);
+            server.sendCard(subTask.getCard());
+            server.editSubTask(subTask);
+        });
         //checkBox.setOnAction(this::markDone);
         HBox hBoxCB = new HBox(checkBox);
 
