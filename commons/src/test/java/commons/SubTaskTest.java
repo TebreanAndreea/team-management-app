@@ -73,8 +73,8 @@ class SubTaskTest {
         Board board = new Board("title","acceskey","password");
         Listing listing = new Listing("list",board);
 
-        card = new Card("desc","name",new Date(),tags,new ArrayList<>(),listing);
-        SubTask subtask2 = new SubTask("subtask",card);
+        Card card2 = new Card("desc","name",new Date(),tags,new ArrayList<>(),listing);
+        SubTask subtask2 = new SubTask("subtask",card2);
 
         assertTrue(subtask.equals(subtask2));
     }
