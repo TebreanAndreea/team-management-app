@@ -1,6 +1,7 @@
 package commons;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.*;
 
@@ -13,6 +14,8 @@ public class Listing {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long listId;
     private String title;
+
+    @JsonManagedReference
     @OneToMany(
             mappedBy = "list",
             cascade = CascadeType.ALL,

@@ -1,5 +1,7 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -10,6 +12,7 @@ public class SubTask {
     private long stId;
     private String title;
     private boolean done;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "card_id")
     private Card card;

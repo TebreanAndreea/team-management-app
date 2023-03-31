@@ -1,6 +1,8 @@
 package client.scenes;
 
 
+import jakarta.ws.rs.BadRequestException;
+import commons.SubTask;
 import javafx.application.Platform;
 
 import client.MyFXML;
@@ -14,15 +16,15 @@ import client.utils.ServerUtils;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
-import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
-import javafx.fxml.FXMLLoader;
+import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -30,6 +32,9 @@ import javafx.scene.layout.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -39,7 +44,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-//import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -49,11 +53,13 @@ public class BoardOverviewController {
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
-    public Label accessKey;
+    public TextField accessKey;
     public Label boardName;
+    public Button renameBoardButton;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
+    private boolean adminControl = false;
 
     // A map that will keep track of all dependencies between
     // the lists in the UI and the lists we have in the DB
@@ -88,16 +94,12 @@ public class BoardOverviewController {
      * Initializes the controller and immediately fetches the lists from the database.
      */
     public void initialize() {
-        server.registerForMessages("/topic/boards", Board.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
-            Platform.runLater(() -> refresh());
+            Platform.runLater(this::refresh);
         });
-        server.registerForMessages("/topic/card", Card.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
         refresh();
     }
 
@@ -130,23 +132,6 @@ public class BoardOverviewController {
     }
 
     /**
-     * A method that saves the subtask.
-     *
-     * @param subTask - the subtask that needs saving
-     */
-    public void saveSubtaskDB(SubTask subTask) {
-        try {
-            server.saveSubtask(subTask);
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-    }
-
-
-    /**
      * <h3>Adds a card to its assigned list.</h3>
      * <p>The method gets the button causing the action, and generates another button to place above it.</p>
      *
@@ -162,7 +147,7 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter a name for the card:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
 
 
@@ -225,7 +210,7 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter the new name for the card:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 cardButton.setText(name);
                 server.updateCard(currentCard.getCardId(), name);
             } else {
@@ -245,6 +230,7 @@ public class BoardOverviewController {
      * @param list        the list to be edited
      */
     public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
+        //listController.setBoard(board);
         listController.editList(actionEvent, list);
     }
 
@@ -279,28 +265,39 @@ public class BoardOverviewController {
      * @throws IOException the exemption it might be caused
      */
     public void switchToInitialOverviewScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
-        initialOverview.getKey().setFileName(fileName);
-        initialOverview.getKey().refresh();
-        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(initialOverview.getValue());
-        primaryStage.setScene(overview);
+        if (!adminControl) {
+            var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
+            initialOverview.getKey().setFileName(fileName);
+            initialOverview.getKey().refresh();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(initialOverview.getValue());
+            primaryStage.setScene(overview);
 
-        primaryStage.show();
+            primaryStage.show();
+        }
     }
 
     /**
      * Function that goes to the card details.
      *
      * @param actionEvent the action event on the button
+     * @param cardID      the id of a card
+     * @param list        the list of the card
      * @throws IOException the exception which might be caused
      */
-    public void switchToCardScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("CardOverview.fxml"));
-        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(root);
-        primaryStage.setScene(overview);
-        primaryStage.show();
+    public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
+        if (!adminControl) {
+            var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
+            cardOverview.getKey().setCardId(cardID);
+            cardOverview.getKey().setFileName(fileName);
+            cardOverview.getKey().setBoard(board);
+            cardOverview.getKey().setList(list);
+            cardOverview.getKey().refreshCardDetails();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(cardOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.show();
+        }
     }
 
 
@@ -364,7 +361,7 @@ public class BoardOverviewController {
                         }
                     }
                 }
-                if (foundPlace == false) // add at the end
+                if (!foundPlace) // add at the end
                     vBox.getChildren().add(nrCards, (HBox) target);
 
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
@@ -385,7 +382,6 @@ public class BoardOverviewController {
     }
 
 
-
     /**
      * addList method which accepts a Listing as a parameter.
      * <h5>NOTE: The IDs of the cards are stored within their user data.</h5>
@@ -398,21 +394,18 @@ public class BoardOverviewController {
         addCardButton.setOnAction(this::addCard);
         setupAddCardButton(addCardButton);
         Button editListButton = new Button("Edit");
-        editListButton.setOnAction(event -> {
-            editList(event, listing);
-        });
+        editListButton.setOnAction(event -> editList(event, listing));
         setupAddCardButton(editListButton);
         Button deleteListButton = new Button("delete list");
         // deleteListButton.setOnAction(this::deleteList);
-        deleteListButton.setOnAction(event -> {
-            deleteList(event, listing);
-        });
+        deleteListButton.setOnAction(event -> deleteList(event, listing));
         setupDeleteListButton(deleteListButton);
         VBox vBox = new VBox();
         vBox.setSpacing(20);
+        vBox.setPadding(new Insets(20, 0, 0, 0));
         vBox.setAlignment(Pos.TOP_CENTER);
         for (Card c : listing.getCards()) {
-            addCard(c,vBox);
+            addCard(c, vBox, listing);
         }
         // add the "Add card" button below the cards
         HBox addCardButtonRow = new HBox();
@@ -439,22 +432,62 @@ public class BoardOverviewController {
 
     /**
      * Adds a card to the vBox List.
-     * @param c - the card we add
-     * @param vBox - the vBox which contains the list
+     *
+     * @param c       - the card we add
+     * @param vBox    - the vBox which contains the list
+     * @param listing - the list the card is in
      */
-    public void addCard (Card c, VBox vBox)
+    public void addCard (Card c, VBox vBox, Listing listing)
     {
-        Button newCard = new Button(c.getName());
+        Button newCard;
+        VBox vBox1 = new VBox();
+       // vBox1.setPrefHeight(30);
+        int totalSubtaks = c.getSubTasks().size();
+        int doneSubtasks = 0;
+        for(SubTask s : c.getSubTasks()) {
+            if(s.isDone() == true) doneSubtasks++;
+        }
+        vBox1.getChildren().addAll(new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks)));
+        vBox1.setAlignment(Pos.BOTTOM_RIGHT);
+        Label nameCard = new Label(c.getName());
+        if(!c.getDescription().equals("")) {
+            Label markDescription = new Label("\u2630");
+            markDescription.setStyle("-fx-font-size: 5px;");
+            //nameCard.setStyle("-fx-font-size: 15px;");
+            HBox hbox = new HBox(markDescription, nameCard, vBox1);
+            hbox.setSpacing(8);
+            newCard = new Button();
+            newCard.setGraphic(hbox);
+        } else {
+            newCard = new Button();
+            HBox hbox = new HBox(nameCard, vBox1);
+            hbox.setSpacing(8);
+            newCard.setGraphic(hbox);
+        }
+       // newCard.setPrefWidth(100);
+       // newCard.setPrefHeight(100);
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
+        newCard.setCursor(Cursor.CLOSED_HAND);
         // make this card draggable
         newCard.setOnMousePressed(event -> {
             target = newCard.getParent(); // this is the hBox that needs to be dropped
         });
 
         newCard.setOnMouseReleased(this::handleDropping);
+
         Button edit = new Button("\uD83D\uDD89");
-        edit.setOnAction(this::editCard); // an event happens when the button is clicked
+        //edit.setOnAction(this::editCard); // an event happens when the button is clicked
+        edit.setOnMousePressed(event -> {
+            if (event.getClickCount() == 2) {
+                try {
+                    switchToCardScene(event, c.getCardId(), listing);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         setupButton(edit);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
@@ -472,13 +505,28 @@ public class BoardOverviewController {
      */
     public void refresh() {
         long id = board.getBoardId();
-        if (id != 0)
-            board = server.getBoardByID(id);
+        hBox.getChildren().clear();
+        if (id != 0) {
+            try {
+                board = server.getBoardByID(id);
+            } catch (BadRequestException e) {
+                Label noBoard = new Label("The board you are trying to access may have been deleted or does not exist.");
+                noBoard.setWrapText(true);
+                noBoard.setTextAlignment(TextAlignment.CENTER);
+                noBoard.setPrefWidth(500);
+                noBoard.setFont(new Font(20));
+                hBox.getChildren().add(noBoard);
+                return;
+            }
+        }
         listController.setBoard(board);
-        boardName.setText(board.getTitle());
+        String boardTitle = board.getTitle();
+        Text boardText = new Text(boardTitle);
+        boardText.setFont(Font.font("System Bold", 19.0));
+        boardName.setText(boardTitle);
+        renameBoardButton.setLayoutX(boardName.getLayoutX() + boardText.getLayoutBounds().getWidth() + 10.0);
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
-        hBox.getChildren().clear();
         map = new HashMap<>();
         for (Listing listing : listings)
             addListWithListing(listing);
@@ -509,40 +557,44 @@ public class BoardOverviewController {
      * @param actionEvent the event that triggered this method
      */
     public void leaveBoard(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation Dialog");
-        alert.setHeaderText("Are you sure you want to leave this board?");
-        alert.setContentText("You will not be able to access this board again.");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            long id = board.getBoardId();
-            File file = new File(fileName);
-            String content = "";
-            try {
-                Scanner scanner = new Scanner(file);
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if (!line.startsWith(Long.toString(id))) {
-                        content = content + line + "\n";
+        if (!adminControl) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Are you sure you want to leave this board?");
+            alert.setContentText("You will not be able to access this board again.");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                long id = board.getBoardId();
+                File file = new File(fileName);
+                String content = "";
+                try {
+                    Scanner scanner = new Scanner(file);
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        if (!line.startsWith(Long.toString(id))) {
+                            content = content + line + "\n";
+                        }
                     }
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    outputStream.write(content.getBytes());
+                    outputStream.flush();
+                    outputStream.close();
+                    switchToInitialOverviewScene(actionEvent);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                FileOutputStream outputStream = new FileOutputStream(file);
-                outputStream.write(content.getBytes());
-                outputStream.flush();
-                outputStream.close();
-                switchToInitialOverviewScene(actionEvent);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
+
+            }
         }
     }
 
     /**
      * Sets up the delete list button.
+     *
      * @param button the button to set up
      */
-    private void setupDeleteListButton(Button button){
+    private void setupDeleteListButton(Button button) {
         button.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
         button.setStyle("-fx-background-color: transparent;");
         button.setTextFill(Color.RED);
@@ -558,9 +610,10 @@ public class BoardOverviewController {
 
     /**
      * Sets up the add card button.
+     *
      * @param button the button to set up
      */
-    private void setupAddCardButton(Button button){
+    private void setupAddCardButton(Button button) {
         button.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
         button.setStyle("-fx-background-color: transparent;");
         button.setTextFill(Color.GREEN);
@@ -573,16 +626,60 @@ public class BoardOverviewController {
             button.setTextFill(Color.GREEN);
         });
     }
+
     /**
      * Sets up the buttons contained in the lists.
+     *
      * @param button the button to set up
      */
-    private void setupButton(Button button){
-        HBox.setHgrow(button,Priority.ALWAYS);
+    private void setupButton(Button button) {
+        HBox.setHgrow(button, Priority.ALWAYS);
         button.setStyle("-fx-background-color: transparent");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMinWidth(Button.USE_PREF_SIZE);
         button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);"));
         button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent;"));
+    }
+
+    /**
+     * Setter for the admin control value, which determines whether the app was opened in admin control mode.
+     * @param adminControl the value to set
+     */
+    public void setAdminControl(boolean adminControl) {
+        this.adminControl = adminControl;
+    }
+    /**
+     * Copies the board's access key to the clipboard.
+     * @param mouseEvent the event that triggered this method
+     */
+    public void copyToClipboard(MouseEvent mouseEvent) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(board.getAccessKey());
+        clipboard.setContent(content);
+    }
+
+    /**
+     * Renames the board.
+     *
+     * @param mouseEvent the event that triggered this method
+     */
+    public void renameBoard(MouseEvent mouseEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change the name of the board");
+        dialog.setHeaderText("Please enter a name for the board:");
+        dialog.showAndWait().ifPresent(name -> {
+
+            if(!name.isEmpty()) {
+                board.setTitle(name);
+                server.updateBoard(board.getBoardId(), name);
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                renameBoard(mouseEvent);
+            }
+
+        });
     }
 }

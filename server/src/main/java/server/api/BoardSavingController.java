@@ -17,9 +17,10 @@ package server.api;
 
 import commons.Board;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.BoardRepository;
+import server.services.BoardService;
 
 import java.util.List;
 
@@ -28,35 +29,51 @@ import java.util.List;
 public class BoardSavingController {
 
 
-    private final BoardRepository repo;
-    private SimpMessagingTemplate msgs;
+//    private final BoardRepository repo;
+//    private SimpMessageSendingOperations msgs;
 
+    private BoardService boardService;
 
-    public BoardSavingController(BoardRepository repo, SimpMessagingTemplate msgs) {
-        this.repo = repo;
-        this.msgs = msgs;
+    /**
+     * Constructor for Board controller.
+     *
+     * @param repo - board repository
+     * @param msgs - messages for communication
+     */
+    public BoardSavingController(BoardRepository repo, SimpMessageSendingOperations msgs) {
+        this.boardService = new BoardService(repo, msgs);
     }
 
+    /**
+     * Get method for fetching all boards from DB.
+     *
+     * @return - a list of boards from DB
+     */
     @GetMapping(path = { "", "/" })
     public List<Board> getAll() {
-        return repo.findAll();
+        return boardService.getAll();
     }
 
-//        THIS TEMPLATE NEEDS TO BE ADDED TO EVERY POSTMAPPING BEFORE REPO.SAVE
-//        msgs.convertAndSend("/topic/quotes", quote);
+    /**
+     * Post method that adds a board into the DB.
+     *
+     * @param board - board to be added into the database
+     * @return the saved board
+     */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Board> add(@RequestBody Board board) {
-        msgs.convertAndSend("/topic/boards", board);
-        Board save = repo.save(board);
-        save.setAccessKey();
-        save = repo.save(save);
-        return ResponseEntity.ok(save);
+        return boardService.add(board);
     }
+
+    /**
+     * Get method for fetching a board by id.
+     *
+     * @param id - to search for board into DB
+     * @return the query result - board corresponding to id
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Board> getById(@PathVariable("id") long id) {
-        if (id < 0 || !repo.existsById(id)) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(repo.findById(id).get());
+        return boardService.getById(id);
     }
+
 }

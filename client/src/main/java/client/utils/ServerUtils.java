@@ -38,36 +38,53 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private String SERVER = "http://localhost:8080/";
-
+    private static String SERVER = "";
+    private static StompSession session;
+    private String PORT = "";
 
     /**
      * This method creates a get request to the server entered by the user.
      *
      * @param userUrl a string representing the url
+    // * @param port the port
      * @return a Response object
      */
     public Response checkServer(String userUrl) {
-        this.SERVER = userUrl;
-        return ClientBuilder.newClient(new ClientConfig())
-                .target(userUrl).path("api/connection")
+        this.SERVER = "http://" + userUrl;
+        //this.PORT = port;
+
+        session = connect("ws://" + userUrl + "/websocket");
+        Response response =  ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/connection")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .get();
+
+
+        return response;
+    }
+
+    /**
+     * This method starts the websockets on a specific port, not working for the moment.
+     * @param url - the url of the websocket
+     * @return the session
+     */
+    public StompSession startWebSockets(String url){
+        this.session = connect("ws://" + url +"/websocket");
+        return session;
     }
 
     /**
      * Saving the list into database.
+     *
      * @param list to be saved into database
      * @return the list
      */
-
     public Listing saveList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/lists")
@@ -78,19 +95,37 @@ public class ServerUtils {
 
     /**
      * Sends a post request to the server to update the list.
+     *
      * @param list - the updated list
      * @return list
      */
     public Listing editList(Listing list) {
         return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/lists/edit")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
+                .target(SERVER).path("api/lists/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(list, APPLICATION_JSON), Listing.class);
     }
 
     /**
+     * Editing a subtask in databse.
+     *
+     * @param subTask subtask to be edited
+     * @param name the new name
+     * @return the updated subtask
+     */
+    public SubTask updateSubtask(SubTask subTask, String name) {
+        //     SubTask subTask = getSubtaskById(id);
+        subTask.setTitle(name);
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
+    }
+    /**
      * A method that sends a list to the card, I experimented, it may become redundant later.
+     *
      * @param list - the sent list
      * @return Listing
      */
@@ -111,6 +146,20 @@ public class ServerUtils {
     public Card saveCard(Card card) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/card")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+    }
+
+    /**
+     * A method that sends a card to the subtask.
+     *
+     * @param card - card to send
+     * @return the sent card
+     */
+    public Card sendCard(Card card) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/setCard")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
@@ -144,6 +193,12 @@ public class ServerUtils {
                 });
     }
 
+    /**
+     * Method that fetches a list by its id.
+     *
+     * @param id - list to search for into DB
+     * @return the result of the query
+     */
     public Listing getListingsById(long id) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/lists/" + id) //
@@ -154,6 +209,21 @@ public class ServerUtils {
 //            .getBy(new GenericType<List<Listing>>() {});
     }
 
+    /**
+     * Returning a subtask with a given id.
+     *
+     * @param id the id of the subtask
+     * @return the subtask
+     */
+    public SubTask getSubtaskById(long id) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<SubTask>() {
+                });
+
+    }
     /**
      * Update a list by changing its name.
      *
@@ -166,6 +236,20 @@ public class ServerUtils {
         Listing currentList = getListingsById(id);
         currentList.setTitle(newName);
         return editList(currentList);
+    }
+
+    /**
+     * Updating a subtask in the database.
+     *
+     * @param subTask the subtask to be updated
+     * @return the edited subtask
+     */
+    public SubTask editSubTask(SubTask subTask){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/subtask/edit")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(subTask, APPLICATION_JSON), SubTask.class);
     }
     /**
      * Fetches the card with the provided id from the database.
@@ -195,6 +279,21 @@ public class ServerUtils {
     }
 
     /**
+     * Update a card description.
+     *
+     * @param id id of the card
+     * @param description the new description
+     * @return the card
+     */
+    public Card updateCardDescription(long id, String description) {
+        Card currentCard = getCardsById(id);
+        currentCard.setDescription(description);
+        return saveCard(currentCard);
+    }
+
+
+
+    /**
      * Sends a delete request.
      *
      * @param id - the id of the card we want to delete
@@ -202,6 +301,20 @@ public class ServerUtils {
     public void deleteCard(long id) {
         ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/card/delete/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
+    /**
+     * Deleting a subtask from database.
+     *
+     * @param subTask the subtask to be deleted
+     */
+    public void deleteSubtask(SubTask subTask) {
+        long id = subTask.getStId();
+        ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/subtask/delete/" + id) //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .delete();
@@ -219,8 +332,6 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .delete();
     }
-
-    private StompSession session = connect("ws://localhost:8080/websocket");
 
     private StompSession connect(String url) {
         var client = new StandardWebSocketClient();
@@ -303,5 +414,42 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<Board>() {
                 });
+    }
+
+    public void deleteBoard(Long id) {
+        ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
+    /**
+     * Gets the port on which the current application is running.
+     * @return said port
+     */
+    public String getPort()
+    {
+        String response = ClientBuilder.newClient(new ClientConfig()) //
+            .target(SERVER).path("api/connection/getServer") //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .get(String.class);
+        return response;
+    }
+    /**
+     * Updates the board with the new parameters.
+     * @param id The ID of the board to be updated
+     * @param newTitle Its new title (more parameters may be added)
+     * @return The updated board, if required
+     */
+    public Board updateBoard(long id, String newTitle) {
+        Board currentBoard = getBoardByID(id);
+        currentBoard.setTitle(newTitle);
+        currentBoard = addBoard(currentBoard);
+        sendBoard(currentBoard);
+        for (Listing l : currentBoard.getLists())
+            editList(l);
+        return currentBoard;
     }
 }

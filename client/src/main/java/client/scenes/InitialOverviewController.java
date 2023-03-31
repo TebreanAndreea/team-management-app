@@ -9,23 +9,20 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
-//import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-//import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
-//import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-//import javafx.scene.transform.Scale;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -46,6 +43,7 @@ public class InitialOverviewController {
     @FXML
     public ScrollPane masterScrollPane;
     private ServerUtils server;
+    private MainController maincontroller;
 
     private EventTarget target;
 
@@ -55,11 +53,12 @@ public class InitialOverviewController {
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
     private int curPlacedBoards;
-    private String fileName="temp.txt";
+    private String fileName="user_files/temp.txt";
 
     @Inject
-    public InitialOverviewController(ServerUtils server) {
+    public InitialOverviewController(ServerUtils server, MainController mainController) {
         this.server = server;
+        this.maincontroller = mainController;
         curPlacedBoards = 0;
         boardsMap = new HashMap<>();
     }
@@ -68,9 +67,10 @@ public class InitialOverviewController {
      * The initial method to load up all boards.
      */
     public void initialize() {
-        server.registerForMessages("/topic/boards", Board.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        File test = new File("build.gradle");
+        if(!test.getAbsolutePath().contains("client"))
+            fileName = "client/" + fileName;
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         refresh();
     }
 
@@ -90,6 +90,19 @@ public class InitialOverviewController {
         primaryStage.setScene(overview);
     }
 
+    /**
+     * This method is used for disconnecting a client from the server and switch back to the Connection page.
+     *
+     * @param actionEvent the action event used when pressing the button
+     */
+    public void switchToHomePageScene(ActionEvent actionEvent) {
+        var homePageOverview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(homePageOverview.getValue());
+        primaryStage.setScene(overview);
+        primaryStage.setTitle("Connection");
+    }
+
 
     /**
      * A method that adds a board to the db and UI.
@@ -102,7 +115,7 @@ public class InitialOverviewController {
         dialog.setHeaderText("Please enter a name for the board:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 Board res = server.addBoard(new Board(name, "", ""));
                 res.setAccessKey();
                 server.addBoard(res);
@@ -127,7 +140,7 @@ public class InitialOverviewController {
         dialog.setTitle("Access key");
         dialog.setHeaderText("Please enter your access key:");
         dialog.showAndWait().ifPresent(key -> {
-            if (key.length() < 10 || key.length() > 10) {
+            if (key.length() != 10) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
@@ -141,6 +154,7 @@ public class InitialOverviewController {
                     writeNewBoardToFile(b);
                     var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
                     boardOverview.getKey().setBoard(b);
+                    boardOverview.getKey().setFileName(fileName);
                     boardOverview.getKey().refresh();
                     primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     overview = new Scene(boardOverview.getValue());
@@ -169,16 +183,30 @@ public class InitialOverviewController {
 
 
         List<Board> boards = new ArrayList<>();
+        String availableBoards = "";
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 long id = Long.parseLong(line.split(" ")[0]);
-                boards.add(server.getBoardByID(id));
+                try {
+                    Board board = server.getBoardByID(id);
+                    boards.add(board);
+                    availableBoards += (line + "\n");
+                } catch (Exception ignored) {
+
+                }
+
             }
+            scanner.close();
+            FileOutputStream outputStream = new FileOutputStream(new File(fileName));
+            outputStream.write(availableBoards.getBytes());
+            outputStream.flush();
+            outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("No such file");
         }
+
         HBox hbox = new HBox();
         for (int i = 0; i < boards.size(); i++) {
             if (i % 3 == 0) {
@@ -239,11 +267,13 @@ public class InitialOverviewController {
 
     /**
      * Sets the file name.
+     *
      * @param fileName - the file name
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
     /**
      * A method that writes a new board to the user's stored boards file.
      *

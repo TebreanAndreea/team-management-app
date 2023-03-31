@@ -11,7 +11,7 @@
                 <Font size="29.0" />
             </font>
         </Label>
-        <TextField fx:id="serverAddress" layoutX="200.0" layoutY="128.0" prefHeight="37.0" prefWidth="200.0" />
+        <TextField fx:id="serverAddress" layoutX="200.0" layoutY="128.0" prefHeight="37.0" prefWidth="200.0" promptText="Enter port" />
         <Label layoutX="84.0" layoutY="127.0" prefHeight="40.0" prefWidth="113.0" text="Server Address:">
             <font>
                 <Font size="17.0" />
@@ -28,5 +28,6 @@
                 <Font size="17.0" />
             </font>
         </Label>
+      <Button layoutX="502.0" layoutY="360.0" mnemonicParsing="false" onAction="#adminLogin" style="-fx-background-color: black;" text="Admin Login" textFill="WHITE" />
     </children>
 </AnchorPane>

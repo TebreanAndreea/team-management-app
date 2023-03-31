@@ -1,5 +1,8 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Date;
@@ -16,6 +19,7 @@ public class Card {
     private Date dueDate;
     @ManyToMany(mappedBy = "cards")
     private List<Tag> tags;
+    @JsonManagedReference
     @OneToMany(
         mappedBy = "card",
         cascade = CascadeType.ALL,
@@ -23,6 +27,7 @@ public class Card {
     )
     private List<SubTask> subTasks;
     private boolean complete;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "list_id")
     private Listing list;
@@ -61,6 +66,9 @@ public class Card {
      */
     public long getCardId() {
         return cardId;
+    }
+    public void setCardId(long cardId) {
+        this.cardId = cardId;
     }
 
     /**
@@ -170,6 +178,14 @@ public class Card {
         if (!(o instanceof Card)) return false;
         Card card = (Card) o;
         return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && Objects.equals(dueDate, card.dueDate) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list);
+    }
+
+    /**
+     * Getter for the list of the card.
+     * @return the list of this card
+     */
+    public Listing getList() {
+        return list;
     }
 
     /**

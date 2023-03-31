@@ -8,11 +8,12 @@
 <AnchorPane prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
         <Button layoutX="571.0" layoutY="43.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
-        <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" prefHeight="39.0" prefWidth="154.0" text="Board Name">
+        <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" prefHeight="39.0" minWidth="-Infinity" text="Board Name">
             <font>
                 <Font name="System Bold" size="19.0" />
             </font>
         </Label>
+        <Button fx:id="renameBoardButton" layoutX="204.0" layoutY="23.0" prefHeight="39.0" text="Rename" onMouseClicked="#renameBoard"/>
         <ScrollPane layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
             <content>
                 <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="250.0" prefWidth="635.0" spacing="20.0">
@@ -25,12 +26,13 @@
                 </HBox>
             </content>
         </ScrollPane>
-        <Button layoutX="530.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToInitialOverviewScene" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: IndianRed;" text="Exit board" textFill="WHITE" />
+        <Button layoutX="530.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToInitialOverviewScene" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: IndianRed;" text="Exit to menu" textFill="WHITE" />
         <Button layoutX="530.0" layoutY="53.0" mnemonicParsing="false" onAction="#refresh" prefHeight="39.0" prefWidth="39.0" text="⟳">
          <font>
             <Font size="17.0" />
          </font></Button>
-      <Button layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Leave Board" textFill="RED" />
-      <Label fx:id="accessKey" layoutX="434.0" layoutY="392.0" prefHeight="18.0" prefWidth="187.0" text="Access Key:" />
+      <Button layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Remove Board" textFill="RED" />
+        <TextField fx:id="accessKey" layoutX="410.0" layoutY="392.0" prefHeight="18.0" text="Access Key:" editable="false" />
+        <Button  layoutX="564.0" layoutY="392.0" prefHeight="18.0" text="Copy" onMouseClicked="#copyToClipboard" />
     </children>
 </AnchorPane>
