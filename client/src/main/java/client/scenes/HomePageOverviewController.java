@@ -213,7 +213,7 @@ public class HomePageOverviewController {
             String server = serverField.getText();
             String password = passwordField.getText();
             String port = server.substring(server.lastIndexOf(":") + 1);
-            if (password.equals(adminPassword) && checkConnection(server,port)) {
+            if (password.equals(adminPassword) && checkConnection(server)) {
                 System.out.println("Admin login successful");
                 var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
                 primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
