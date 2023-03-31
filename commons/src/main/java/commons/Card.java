@@ -1,5 +1,6 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -26,6 +27,7 @@ public class Card {
     )
     private List<SubTask> subTasks;
     private boolean complete;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "list_id")
     private Listing list;
