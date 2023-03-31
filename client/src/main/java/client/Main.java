@@ -15,18 +15,16 @@
  */
 package client;
 
-import static com.google.inject.Guice.createInjector;
+import client.scenes.*;
+import com.google.inject.Injector;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Scanner;
 
-import client.scenes.*;
-import com.google.inject.Injector;
-
-import javafx.application.Application;
-import javafx.stage.Stage;
+import static com.google.inject.Guice.createInjector;
 
 public class Main extends Application {
 
@@ -49,10 +47,11 @@ public class Main extends Application {
         var mainController = INJECTOR.getInstance(MainController.class);
         mainController.initialize(primaryStage, overview, boardOverview, cardOverview, initialOverview);
     }
+
     /**
      * This method generates the required files and returns the admin password.
      * <p>NOTE: the pathing of the files changes depending of where the projects is run from.</p>
-     * @return the admin password
+     *
      * @throws IOException if the file is not found
      */
     private void fileGeneration() throws IOException {

@@ -287,15 +287,15 @@ public class BoardOverviewController {
      * @throws IOException the exemption it might be caused
      */
     public void switchToInitialOverviewScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        if(!adminControl){
-        var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
-        initialOverview.getKey().setFileName(fileName);
-        initialOverview.getKey().refresh();
-        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(initialOverview.getValue());
-        primaryStage.setScene(overview);
+        if (!adminControl) {
+            var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
+            initialOverview.getKey().setFileName(fileName);
+            initialOverview.getKey().refresh();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(initialOverview.getValue());
+            primaryStage.setScene(overview);
 
-        primaryStage.show();
+            primaryStage.show();
         }
     }
 
@@ -308,17 +308,17 @@ public class BoardOverviewController {
      * @throws IOException the exception which might be caused
      */
     public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
-        if(!adminControl){
-        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
-        cardOverview.getKey().setCardId(cardID);
-        cardOverview.getKey().setFileName(fileName);
-        cardOverview.getKey().setBoard(board);
-        cardOverview.getKey().setList(list);
-        cardOverview.getKey().refreshCardDetails();
-        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        overview = new Scene(cardOverview.getValue());
-        primaryStage.setScene(overview);
-        primaryStage.show();
+        if (!adminControl) {
+            var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
+            cardOverview.getKey().setCardId(cardID);
+            cardOverview.getKey().setFileName(fileName);
+            cardOverview.getKey().setBoard(board);
+            cardOverview.getKey().setList(list);
+            cardOverview.getKey().refreshCardDetails();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(cardOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.show();
         }
     }
 
@@ -562,34 +562,34 @@ public class BoardOverviewController {
      * @param actionEvent the event that triggered this method
      */
     public void leaveBoard(ActionEvent actionEvent) {
-        if(!adminControl){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation Dialog");
-        alert.setHeaderText("Are you sure you want to leave this board?");
-        alert.setContentText("You will not be able to access this board again.");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            long id = board.getBoardId();
-            File file = new File(fileName);
-            String content = "";
-            try {
-                Scanner scanner = new Scanner(file);
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if (!line.startsWith(Long.toString(id))) {
-                        content = content + line + "\n";
+        if (!adminControl) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Are you sure you want to leave this board?");
+            alert.setContentText("You will not be able to access this board again.");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                long id = board.getBoardId();
+                File file = new File(fileName);
+                String content = "";
+                try {
+                    Scanner scanner = new Scanner(file);
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        if (!line.startsWith(Long.toString(id))) {
+                            content = content + line + "\n";
+                        }
                     }
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    outputStream.write(content.getBytes());
+                    outputStream.flush();
+                    outputStream.close();
+                    switchToInitialOverviewScene(actionEvent);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                FileOutputStream outputStream = new FileOutputStream(file);
-                outputStream.write(content.getBytes());
-                outputStream.flush();
-                outputStream.close();
-                switchToInitialOverviewScene(actionEvent);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-        }
+            }
         }
     }
 
@@ -644,8 +644,10 @@ public class BoardOverviewController {
         button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);"));
         button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent;"));
     }
+
     /**
      * Setter for the admin control value, which determines whether the app was opened in admin control mode.
+     * @param adminControl the value to set
      */
     public void setAdminControl(boolean adminControl) {
         this.adminControl = adminControl;

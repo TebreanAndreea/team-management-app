@@ -75,15 +75,15 @@ public class HomePageOverviewController {
      */
     private void setAdminPassword() {
         adminPassword = "";
-        try{
-        File test = new File("build.gradle");
-        File file = new File("server/src/adminPass.txt");
-        if (test.getAbsolutePath().contains("client")) {
-            file = new File("../server/src/adminPass.txt");
-        }
-        Scanner scanner = new Scanner(file);
-        adminPassword = scanner.nextLine().trim();
-        scanner.close();
+        try {
+            File test = new File("build.gradle");
+            File file = new File("server/src/adminPass.txt");
+            if (test.getAbsolutePath().contains("client")) {
+                file = new File("../server/src/adminPass.txt");
+            }
+            Scanner scanner = new Scanner(file);
+            adminPassword = scanner.nextLine().trim();
+            scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.out.println("Error with scanner or with file.");
@@ -152,13 +152,16 @@ public class HomePageOverviewController {
 
     /**
      * This method sets the admin password.
+     *
      * @param adminPassword the password
      */
     public void setAdminPassword(String adminPassword) {
         this.adminPassword = adminPassword;
     }
+
     /**
      * This method opens the admin login dialog.
+     *
      * @param actionEvent the action event on the button
      */
     public void adminLogin(ActionEvent actionEvent) {

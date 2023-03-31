@@ -18,11 +18,9 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 
 import javax.inject.Inject;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
