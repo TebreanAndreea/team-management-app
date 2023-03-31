@@ -26,7 +26,7 @@
                 </HBox>
             </content>
         </ScrollPane>
-        <Button layoutX="530.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToInitialOverviewScene" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: IndianRed;" text="Exit board" textFill="WHITE" />
+        <Button layoutX="530.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToInitialOverviewScene" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: IndianRed;" text="Exit to menu" textFill="WHITE" />
         <Button layoutX="530.0" layoutY="53.0" mnemonicParsing="false" onAction="#refresh" prefHeight="39.0" prefWidth="39.0" text="⟳">
          <font>
             <Font size="17.0" />
