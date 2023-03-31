@@ -51,16 +51,16 @@ public class ServerUtils {
      * This method creates a get request to the server entered by the user.
      *
      * @param userUrl a string representing the url
-     * @param port the port
+    // * @param port the port
      * @return a Response object
      */
-    public Response checkServer(String userUrl,String port) {
-        this.SERVER = userUrl;
-        this.PORT = port;
+    public Response checkServer(String userUrl) {
+        this.SERVER = "http://" + userUrl;
+        //this.PORT = port;
 
-        session = connect("ws://localhost:" + PORT + "/websocket");
+        session = connect("ws://" + userUrl + "/websocket");
         Response response =  ClientBuilder.newClient(new ClientConfig())
-                .target(userUrl).path("api/connection")
+                .target(SERVER).path("api/connection")
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .get();
@@ -71,11 +71,11 @@ public class ServerUtils {
 
     /**
      * This method starts the websockets on a specific port, not working for the moment.
-     * @param port - it returns the session used
+     * @param url - the url of the websocket
      * @return the session
      */
-    public StompSession startWebSockets(String port){
-        this.session = connect("ws://localhost:" + port + "/websocket");
+    public StompSession startWebSockets(String url){
+        this.session = connect("ws://" + url +"/websocket");
         return session;
     }
 
@@ -438,6 +438,10 @@ public class ServerUtils {
     public Board updateBoard(long id, String newTitle) {
         Board currentBoard = getBoardByID(id);
         currentBoard.setTitle(newTitle);
-        return addBoard(currentBoard);
+        currentBoard = addBoard(currentBoard);
+        sendBoard(currentBoard);
+        for (Listing l : currentBoard.getLists())
+            editList(l);
+        return currentBoard;
     }
 }

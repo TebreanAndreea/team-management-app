@@ -1,13 +1,13 @@
 package server.api;
 
 import commons.Board;
-import commons.Card;
 import commons.Listing;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
 import server.database.ListingRepository;
+import server.services.ListService;
 
 import java.util.List;
 
@@ -16,11 +16,12 @@ import java.util.List;
 @RequestMapping("api/lists")
 public class ListSavingController {
 
-    private final ListingRepository repo;
-    private final CardRepository cardRepo;
-    private final SimpMessageSendingOperations msgs;
-
-    private Board board;
+//    private final ListingRepository repo;
+//    private final CardRepository cardRepo;
+//    private final SimpMessageSendingOperations msgs;
+//
+//    private Board board;
+    private ListService listService;
 
     /**
      * Constructor for the list controller.
@@ -30,9 +31,7 @@ public class ListSavingController {
      * @param msgs - messages for communication
      */
     public ListSavingController(ListingRepository repo, CardRepository cardRepo, SimpMessageSendingOperations msgs) {
-        this.repo = repo;
-        this.cardRepo = cardRepo;
-        this.msgs = msgs;
+        this.listService = new ListService(repo, cardRepo, msgs);
     }
 
     /**
@@ -43,10 +42,11 @@ public class ListSavingController {
      */
     @PutMapping (path = { "", "/" })
     public ResponseEntity<Listing> update(@RequestBody Listing list) {
-        list.setBoard(board);
-        msgs.convertAndSend("/topic/lists", list);
-        Listing saved = repo.save(list);
-        return ResponseEntity.ok(saved);
+//        list.setBoard(board);
+//        msgs.convertAndSend("/topic/lists", list);
+//        Listing saved = repo.save(list);
+//        return ResponseEntity.ok(saved);
+        return listService.update(list);
     }
 
     /**
@@ -57,11 +57,12 @@ public class ListSavingController {
      */
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Listing> add(@RequestBody Listing list) {
-        if(list == null)  return ResponseEntity.badRequest().build();
-        list.setBoard(board);
-        msgs.convertAndSend("/topic/lists", list);
-        Listing saved = repo.save(list);
-        return ResponseEntity.ok(saved);
+//        if(list == null)  return ResponseEntity.badRequest().build();
+//        list.setBoard(board);
+//        msgs.convertAndSend("/topic/lists", list);
+//        Listing saved = repo.save(list);
+//        return ResponseEntity.ok(saved);
+        return listService.add(list);
     }
 
     /**
@@ -71,7 +72,8 @@ public class ListSavingController {
      */
     @GetMapping(path = { "", "/" })
     public List<Listing> getAll() {
-        return repo.findAll();
+//        return repo.findAll();
+        return listService.getAll();
     }
 
     /**
@@ -82,10 +84,11 @@ public class ListSavingController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Listing> getById(@PathVariable("id") long id) {
-        if (id < 0 || !repo.existsById(id)) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(repo.findById(id).get());
+//        if (id < 0 || !repo.existsById(id)) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//        return ResponseEntity.ok(repo.findById(id).get());
+        return listService.getById(id);
     }
 
     /**
@@ -96,15 +99,7 @@ public class ListSavingController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Listing> delete(@PathVariable("id") Long id) {
-        Listing list = repo.findById(id).orElse(null);
-        if (list == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        msgs.convertAndSend("/topic/lists", list);
-
-        repo.deleteById(id);
-        return ResponseEntity.ok().build();
+        return listService.delete(id);
     }
 
     /**
@@ -114,8 +109,7 @@ public class ListSavingController {
      */
     @PostMapping(path = {"/setBoard"})
     public ResponseEntity<Board> getBoard(@RequestBody Board board) {
-        this.board = board;
-        return ResponseEntity.ok(board);
+        return listService.getBoard(board);
     }
 
     /**
@@ -126,14 +120,6 @@ public class ListSavingController {
      */
     @PostMapping(path = {"/edit"})
     public ResponseEntity<Listing> editList(@RequestBody Listing listing) {
-        for (Card c : listing.getCards())
-        {
-            c.setList(listing);
-            cardRepo.save(c);
-        }
-        listing.setBoard(board);
-        listing = repo.save(listing);
-        msgs.convertAndSend("/topic/lists", listing);
-        return ResponseEntity.ok(listing);
+        return listService.editList(listing);
     }
 }

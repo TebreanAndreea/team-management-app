@@ -78,15 +78,21 @@ public class HomePageOverviewController {
         // before switching to the board scene, we need to validate the URL
 
         AnchorPane anchorPane = (AnchorPane) ((Button)actionEvent.getSource()).getParent();
-        String userPort = serverAddress.getText().trim();
-        String userUrl = "http://localhost:" + userPort;
+        String userUrl = serverAddress.getText().trim();
+        String http  = "http://";
+
+        if (userUrl.contains(http))
+            userUrl = userUrl.substring(6);
+
+
+       // String userUrl = "http://localhost:" + userPort;
 //        if (!userUrl.startsWith("http://")) {
 //            userUrl = "http://" + userUrl;
 //        }
 
-        if (checkConnection(userUrl, userPort) && username.getText().trim().length() > 0) {
+        if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
 
-            StompSession session = server.startWebSockets(userPort);
+            StompSession session = server.startWebSockets(userUrl);
 
             String fileName = "user_files/"+username.getText().trim()+userUrl.substring(userUrl.lastIndexOf(":")+1)+".txt";
             File test = new File("build.gradle");
@@ -123,12 +129,12 @@ public class HomePageOverviewController {
     /**
      * This method checks if the url entered by the user is a valid one.
      * @param userUrl the string representing the url
-     * @param port the port of the application
+     //* @param port the port of the application
      * @return true if the url is valid, or false otherwise
      */
-    public boolean checkConnection(String userUrl, String port){
+    public boolean checkConnection(String userUrl){
         try {
-            server.checkServer(userUrl, port);
+            server.checkServer(userUrl);
             return true;
         } catch(Exception e){
             return false;

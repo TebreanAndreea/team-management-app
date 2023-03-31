@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.BoardRepository;
+import server.services.BoardService;
 
 import java.util.List;
 
@@ -28,8 +29,10 @@ import java.util.List;
 public class BoardSavingController {
 
 
-    private final BoardRepository repo;
-    private SimpMessageSendingOperations msgs;
+//    private final BoardRepository repo;
+//    private SimpMessageSendingOperations msgs;
+
+    private BoardService boardService;
 
     /**
      * Constructor for Board controller.
@@ -38,8 +41,7 @@ public class BoardSavingController {
      * @param msgs - messages for communication
      */
     public BoardSavingController(BoardRepository repo, SimpMessageSendingOperations msgs) {
-        this.repo = repo;
-        this.msgs = msgs;
+        this.boardService = new BoardService(repo, msgs);
     }
 
     /**
@@ -49,7 +51,7 @@ public class BoardSavingController {
      */
     @GetMapping(path = { "", "/" })
     public List<Board> getAll() {
-        return repo.findAll();
+        return boardService.getAll();
     }
 
     /**
@@ -60,12 +62,7 @@ public class BoardSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Board> add(@RequestBody Board board) {
-        if(board == null) return ResponseEntity.badRequest().build();
-        msgs.convertAndSend("/topic/boards", board);
-        Board save = repo.save(board);
-        save.setAccessKey();
-        save = repo.save(save);
-        return ResponseEntity.ok(save);
+        return boardService.add(board);
     }
 
     /**
@@ -76,9 +73,6 @@ public class BoardSavingController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Board> getById(@PathVariable("id") long id) {
-        if (id < 0 || !repo.existsById(id)) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(repo.findById(id).get());
+        return boardService.getById(id);
     }
 }
