@@ -416,6 +416,14 @@ public class ServerUtils {
                 });
     }
 
+    public void deleteBoard(Long id) {
+        ClientBuilder.newClient(new ClientConfig()) //
+                .target(SERVER).path("api/boards/" + id) //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .delete();
+    }
+
     /**
      * Gets the port on which the current application is running.
      * @return said port

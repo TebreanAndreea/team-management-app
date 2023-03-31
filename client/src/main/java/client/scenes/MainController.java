@@ -19,6 +19,7 @@ public class MainController {
     private CardOverviewController cardOverviewController;
     private Scene cardOverview;
 
+
     /**
      * Initializes the application.
      *

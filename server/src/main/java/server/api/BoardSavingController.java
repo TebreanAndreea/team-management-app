@@ -75,4 +75,5 @@ public class BoardSavingController {
     public ResponseEntity<Board> getById(@PathVariable("id") long id) {
         return boardService.getById(id);
     }
+
 }

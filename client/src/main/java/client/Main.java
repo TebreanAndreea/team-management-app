@@ -15,17 +15,17 @@
  */
 package client;
 
-import static com.google.inject.Guice.createInjector;
+import client.scenes.HomePageOverviewController;
+import client.scenes.MainController;
+import com.google.inject.Injector;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import client.scenes.*;
-import com.google.inject.Injector;
-
-import javafx.application.Application;
-import javafx.stage.Stage;
+import static com.google.inject.Guice.createInjector;
 
 public class Main extends Application {
 
@@ -59,5 +59,24 @@ public class Main extends Application {
         mainController.initialize(primaryStage, overview);
         //mainController.initialize(primaryStage, overview);
 
+    }
+
+    /**
+     * This method generates the required files and returns the admin password.
+     * <p>NOTE: the pathing of the files changes depending of where the projects is run from.</p>
+     *
+     * @throws IOException if the file is not found
+     */
+    private void fileGeneration() throws IOException {
+        File test = new File("build.gradle");
+        String pathname = "";
+        if (!test.getAbsolutePath().contains("client"))
+            pathname += "client/";
+        pathname += "user_files/temp.txt";
+        File file = new File(pathname);
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
     }
 }

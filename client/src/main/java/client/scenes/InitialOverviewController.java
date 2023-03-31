@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -91,9 +92,10 @@ public class InitialOverviewController {
 
     /**
      * This method is used for disconnecting a client from the server and switch back to the Connection page.
+     *
      * @param actionEvent the action event used when pressing the button
      */
-    public void switchToHomePageScene(ActionEvent actionEvent){
+    public void switchToHomePageScene(ActionEvent actionEvent) {
         var homePageOverview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(homePageOverview.getValue());
@@ -113,7 +115,7 @@ public class InitialOverviewController {
         dialog.setHeaderText("Please enter a name for the board:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 Board res = server.addBoard(new Board(name, "", ""));
                 res.setAccessKey();
                 server.addBoard(res);
@@ -181,16 +183,30 @@ public class InitialOverviewController {
 
 
         List<Board> boards = new ArrayList<>();
+        String availableBoards = "";
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 long id = Long.parseLong(line.split(" ")[0]);
-                boards.add(server.getBoardByID(id));
+                try {
+                    Board board = server.getBoardByID(id);
+                    boards.add(board);
+                    availableBoards += (line + "\n");
+                } catch (Exception ignored) {
+
+                }
+
             }
+            scanner.close();
+            FileOutputStream outputStream = new FileOutputStream(new File(fileName));
+            outputStream.write(availableBoards.getBytes());
+            outputStream.flush();
+            outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("No such file");
         }
+
         HBox hbox = new HBox();
         for (int i = 0; i < boards.size(); i++) {
             if (i % 3 == 0) {
@@ -251,11 +267,13 @@ public class InitialOverviewController {
 
     /**
      * Sets the file name.
+     *
      * @param fileName - the file name
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
     /**
      * A method that writes a new board to the user's stored boards file.
      *
