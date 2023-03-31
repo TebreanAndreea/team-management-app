@@ -1,5 +1,7 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Date;
@@ -16,6 +18,7 @@ public class Card {
     private Date dueDate;
     @ManyToMany(mappedBy = "cards")
     private List<Tag> tags;
+    @JsonManagedReference
     @OneToMany(
         mappedBy = "card",
         cascade = CascadeType.ALL,
@@ -61,6 +64,9 @@ public class Card {
      */
     public long getCardId() {
         return cardId;
+    }
+    public void setCardId(long cardId) {
+        this.cardId = cardId;
     }
 
     /**

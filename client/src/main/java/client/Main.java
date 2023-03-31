@@ -15,6 +15,12 @@
  */
 package client;
 
+import static com.google.inject.Guice.createInjector;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import client.scenes.*;
 import com.google.inject.Injector;
 import javafx.application.Application;
@@ -37,15 +43,27 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        String pathname ="";
+        File test = new File("build.gradle");
+        if(!test.getAbsolutePath().contains("client"))
+            pathname+="client/";
+        pathname+="user_files/temp.txt";
+
+        File file = new File(pathname);
+        if(file.exists()){
+            file.delete();
+        }
+        file.createNewFile();
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
-        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
-        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
-        var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
-        var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
-        //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
+//        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+//        var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
+//        var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
+//        //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
 
         var mainController = INJECTOR.getInstance(MainController.class);
-        mainController.initialize(primaryStage, overview, boardOverview, cardOverview, initialOverview);
+        mainController.initialize(primaryStage, overview);
+        //mainController.initialize(primaryStage, overview);
+
     }
 
     /**

@@ -15,7 +15,6 @@ import client.utils.ServerUtils;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
-import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
 
 import javafx.fxml.FXML;
@@ -33,6 +32,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -42,7 +42,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-//import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -51,12 +50,10 @@ public class BoardOverviewController {
 
     private Stage primaryStage;
     private Scene overview;
-    @FXML
-    private HBox hBox;
-    @FXML
-    private Label accessKey;
-    @FXML
-    private Label boardName;
+    public HBox hBox;
+    public TextField accessKey;
+    public Label boardName;
+    public Button renameBoardButton;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -95,16 +92,12 @@ public class BoardOverviewController {
      * Initializes the controller and immediately fetches the lists from the database.
      */
     public void initialize() {
-        server.registerForMessages("/topic/boards", Board.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
-            Platform.runLater(() -> refresh());
+            Platform.runLater(this::refresh);
         });
-        server.registerForMessages("/topic/card", Card.class, q -> {
-            Platform.runLater(() -> refresh());
-        });
+        server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
         refresh();
     }
 
@@ -135,23 +128,6 @@ public class BoardOverviewController {
         }
         return null;
     }
-
-    /**
-     * A method that saves the subtask.
-     *
-     * @param subTask - the subtask that needs saving
-     */
-    public void saveSubtaskDB(SubTask subTask) {
-        try {
-            server.saveSubtask(subTask);
-        } catch (WebApplicationException e) {
-            var alert = new Alert(Alert.AlertType.ERROR);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-        }
-    }
-
 
     /**
      * <h3>Adds a card to its assigned list.</h3>
@@ -383,7 +359,7 @@ public class BoardOverviewController {
                         }
                     }
                 }
-                if (foundPlace == false) // add at the end
+                if (!foundPlace) // add at the end
                     vBox.getChildren().add(nrCards, (HBox) target);
 
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
@@ -416,15 +392,11 @@ public class BoardOverviewController {
         addCardButton.setOnAction(this::addCard);
         setupAddCardButton(addCardButton);
         Button editListButton = new Button("Edit");
-        editListButton.setOnAction(event -> {
-            editList(event, listing);
-        });
+        editListButton.setOnAction(event -> editList(event, listing));
         setupAddCardButton(editListButton);
         Button deleteListButton = new Button("delete list");
         // deleteListButton.setOnAction(this::deleteList);
-        deleteListButton.setOnAction(event -> {
-            deleteList(event, listing);
-        });
+        deleteListButton.setOnAction(event -> deleteList(event, listing));
         setupDeleteListButton(deleteListButton);
         VBox vBox = new VBox();
         vBox.setSpacing(20);
@@ -529,7 +501,11 @@ public class BoardOverviewController {
             }
         }
         listController.setBoard(board);
-        boardName.setText(board.getTitle());
+        String boardTitle = board.getTitle();
+        Text boardText = new Text(boardTitle);
+        boardText.setFont(Font.font("System Bold", 19.0));
+        boardName.setText(boardTitle);
+        renameBoardButton.setLayoutX(boardName.getLayoutX() + boardText.getLayoutBounds().getWidth() + 10.0);
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
         map = new HashMap<>();
@@ -588,6 +564,7 @@ public class BoardOverviewController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
 
             }
         }
@@ -651,5 +628,39 @@ public class BoardOverviewController {
      */
     public void setAdminControl(boolean adminControl) {
         this.adminControl = adminControl;
+    }
+    /**
+     * Copies the board's access key to the clipboard.
+     * @param mouseEvent the event that triggered this method
+     */
+    public void copyToClipboard(MouseEvent mouseEvent) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(board.getAccessKey());
+        clipboard.setContent(content);
+    }
+
+    /**
+     * Renames the board.
+     *
+     * @param mouseEvent the event that triggered this method
+     */
+    public void renameBoard(MouseEvent mouseEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change the name of the board");
+        dialog.setHeaderText("Please enter a name for the board:");
+        dialog.showAndWait().ifPresent(name -> {
+
+            if(!name.isEmpty()) {
+                board.setTitle(name);
+                server.updateBoard(board.getBoardId(), name);
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                renameBoard(mouseEvent);
+            }
+
+        });
     }
 }

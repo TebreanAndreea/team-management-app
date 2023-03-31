@@ -13,6 +13,7 @@ public class Listing {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long listId;
     private String title;
+
     @OneToMany(
             mappedBy = "list",
             cascade = CascadeType.ALL,

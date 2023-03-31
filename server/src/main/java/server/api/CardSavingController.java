@@ -3,10 +3,9 @@ package server.api;
 import commons.Card;
 import commons.Listing;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.CardRepository;
-//import server.database.ListingRepository;
 
 
 @RestController
@@ -14,11 +13,17 @@ import server.database.CardRepository;
 public class CardSavingController {
 
     private final CardRepository repo;
-    private final SimpMessagingTemplate msgs;
+    private final SimpMessageSendingOperations msgs;
 
     private Listing list;
 
-    public CardSavingController(CardRepository repo, SimpMessagingTemplate msgs) {
+    /**
+     *Constructor for the card controller.
+     *
+     * @param repo - card repository
+     * @param msgs - messages for communication
+     */
+    public CardSavingController(CardRepository repo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
@@ -31,6 +36,7 @@ public class CardSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Card> add(@RequestBody Card card) {
+        if(card == null) return ResponseEntity.badRequest().build();
 
         card.setList(list);
 
@@ -39,6 +45,12 @@ public class CardSavingController {
         return ResponseEntity.ok(save);
     }
 
+    /**
+     * Post method that sets a list for this card.
+     *
+     * @param list - list to assign to this card
+     * @return the saved list
+     */
     @PostMapping(path = {"/setList"})
     public ResponseEntity<Listing> getList(@RequestBody Listing list) {
 
@@ -46,14 +58,21 @@ public class CardSavingController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * Method that deletes a card by given id.
+     *
+     * @param id - corresponding to the card to be deleted
+     * @return tag tag corresponding to the operation
+     */
     @DeleteMapping(path = {"delete/{id}"})
-    public void delete(@PathVariable long id) {
+    public ResponseEntity<Listing> delete(@PathVariable long id) {
         Card card = repo.findById(id).orElse(null);
         if (card == null) {
-            return;
+            return ResponseEntity.notFound().build();
         }
         msgs.convertAndSend("/topic/card", card);
         repo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /**
