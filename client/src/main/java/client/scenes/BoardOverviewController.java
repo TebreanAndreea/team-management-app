@@ -429,6 +429,7 @@ public class BoardOverviewController {
     {
         Button newCard;
         VBox vBox1 = new VBox();
+       // vBox1.setPrefHeight(30);
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for(SubTask s : c.getSubTasks()) {
@@ -440,7 +441,7 @@ public class BoardOverviewController {
         if(!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
             markDescription.setStyle("-fx-font-size: 5px;");
-            nameCard.setStyle("-fx-font-size: 15x;");
+            //nameCard.setStyle("-fx-font-size: 15px;");
             HBox hbox = new HBox(markDescription, nameCard, vBox1);
             hbox.setSpacing(8);
             newCard = new Button();
@@ -451,8 +452,8 @@ public class BoardOverviewController {
             hbox.setSpacing(8);
             newCard.setGraphic(hbox);
         }
-        newCard.setPrefWidth(100);
-        newCard.setPrefHeight(100);
+       // newCard.setPrefWidth(100);
+       // newCard.setPrefHeight(100);
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
         // make this card draggable
