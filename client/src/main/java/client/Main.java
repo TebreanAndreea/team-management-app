@@ -15,13 +15,8 @@
  */
 package client;
 
-import static com.google.inject.Guice.createInjector;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import client.scenes.*;
+import client.scenes.HomePageOverviewController;
+import client.scenes.MainController;
 import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.stage.Stage;

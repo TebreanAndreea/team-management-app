@@ -363,6 +363,7 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .delete();
+    }
 
     /**
      * Gets the port on which the current application is running.
