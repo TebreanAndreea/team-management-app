@@ -60,6 +60,7 @@ public class BoardOverviewController {
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
+    private boolean adminControl = false;
 
     // A map that will keep track of all dependencies between
     // the lists in the UI and the lists we have in the DB
@@ -286,6 +287,7 @@ public class BoardOverviewController {
      * @throws IOException the exemption it might be caused
      */
     public void switchToInitialOverviewScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        if(!adminControl){
         var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
         initialOverview.getKey().setFileName(fileName);
         initialOverview.getKey().refresh();
@@ -294,6 +296,7 @@ public class BoardOverviewController {
         primaryStage.setScene(overview);
 
         primaryStage.show();
+        }
     }
 
     /**
@@ -305,6 +308,7 @@ public class BoardOverviewController {
      * @throws IOException the exception which might be caused
      */
     public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
+        if(!adminControl){
         var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
         cardOverview.getKey().setCardId(cardID);
         cardOverview.getKey().setFileName(fileName);
@@ -315,6 +319,7 @@ public class BoardOverviewController {
         overview = new Scene(cardOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
+        }
     }
 
 
@@ -557,6 +562,7 @@ public class BoardOverviewController {
      * @param actionEvent the event that triggered this method
      */
     public void leaveBoard(ActionEvent actionEvent) {
+        if(!adminControl){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation Dialog");
         alert.setHeaderText("Are you sure you want to leave this board?");
@@ -583,6 +589,7 @@ public class BoardOverviewController {
                 e.printStackTrace();
             }
 
+        }
         }
     }
 
@@ -636,5 +643,11 @@ public class BoardOverviewController {
         button.setMinWidth(Button.USE_PREF_SIZE);
         button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);"));
         button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent;"));
+    }
+    /**
+     * Setter for the admin control value, which determines whether the app was opened in admin control mode.
+     */
+    public void setAdminControl(boolean adminControl) {
+        this.adminControl = adminControl;
     }
 }

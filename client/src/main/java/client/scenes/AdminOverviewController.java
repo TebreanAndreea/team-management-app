@@ -81,7 +81,6 @@ public class AdminOverviewController {
      * @param keyEvent the event that triggered the method
      */
     public void findByText(KeyEvent keyEvent) {
-        System.out.println(keyEvent.getSource().getClass());
         search(((javafx.scene.control.TextField) keyEvent.getSource()).getText().trim());
     }
 
@@ -125,13 +124,14 @@ public class AdminOverviewController {
     private void seePreview(ActionEvent actionEvent) {
         var root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         root.getKey().setBoard(buttonBoardMap.get(actionEvent.getSource()));
+        root.getKey().setAdminControl(true);
         root.getKey().refresh();
         SubScene subScene = new SubScene(root.getValue(), 600, 400);
         previewPane.setContent(subScene);
-        double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
-        Scale scale = new Scale(scaleFactor, scaleFactor);
-        subScene.getTransforms().clear();
-        subScene.getTransforms().add(scale);
+        //double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
+        //Scale scale = new Scale(scaleFactor, scaleFactor);
+        //subScene.getTransforms().clear();
+        //subScene.getTransforms().add(scale);
         deleteButton.setVisible(true);
         selectedBoard = buttonBoardMap.get(actionEvent.getSource());
     }

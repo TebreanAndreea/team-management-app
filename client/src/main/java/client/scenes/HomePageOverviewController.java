@@ -18,8 +18,10 @@ import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Scanner;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -63,6 +65,29 @@ public class HomePageOverviewController {
                 connect.fire();
             }
         });
+        setAdminPassword();
+
+    }
+
+    /**
+     * Fetches and sets the admin password from the server files.
+     * <p>NOTE: the pathing of the files changes depending on where the project is run from.</p>
+     */
+    private void setAdminPassword() {
+        adminPassword = "";
+        try{
+        File test = new File("build.gradle");
+        File file = new File("server/src/adminPass.txt");
+        if (test.getAbsolutePath().contains("client")) {
+            file = new File("../server/src/adminPass.txt");
+        }
+        Scanner scanner = new Scanner(file);
+        adminPassword = scanner.nextLine().trim();
+        scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("Error with scanner or with file.");
+        }
     }
 
     /**
@@ -134,7 +159,6 @@ public class HomePageOverviewController {
     }
     /**
      * This method opens the admin login dialog.
-     * TODO: fix the issue where admin password is not stored if the admin first logged in as a user.
      * @param actionEvent the action event on the button
      */
     public void adminLogin(ActionEvent actionEvent) {

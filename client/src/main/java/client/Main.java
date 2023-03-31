@@ -39,9 +39,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        String pass = fileGeneration();
         var overview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
-        overview.getKey().setAdminPassword(pass);
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
         var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
@@ -57,27 +55,16 @@ public class Main extends Application {
      * @return the admin password
      * @throws IOException if the file is not found
      */
-    private String fileGeneration() throws IOException {
-        String adminPassword = "";
+    private void fileGeneration() throws IOException {
         File test = new File("build.gradle");
-        File file = new File("server/src/adminPass.txt");
-        if (test.getAbsolutePath().contains("client")) {
-            file = new File("../server/src/adminPass.txt");
-        }
-        Scanner scanner = new Scanner(file);
-        adminPassword = scanner.nextLine().trim();
-        System.out.println(adminPassword);
-        scanner.close();
         String pathname = "";
-
         if (!test.getAbsolutePath().contains("client"))
             pathname += "client/";
         pathname += "user_files/temp.txt";
-        file = new File(pathname);
+        File file = new File(pathname);
         if (file.exists()) {
             file.delete();
         }
         file.createNewFile();
-        return adminPassword;
     }
 }
