@@ -2,6 +2,7 @@ package client.scenes;
 
 
 import jakarta.ws.rs.BadRequestException;
+import commons.SubTask;
 import javafx.application.Platform;
 
 import client.MyFXML;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.WebApplicationException;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -400,6 +402,7 @@ public class BoardOverviewController {
         setupDeleteListButton(deleteListButton);
         VBox vBox = new VBox();
         vBox.setSpacing(20);
+        vBox.setPadding(new Insets(20, 0, 0, 0));
         vBox.setAlignment(Pos.TOP_CENTER);
         for (Card c : listing.getCards()) {
             addCard(c, vBox, listing);
@@ -434,19 +437,35 @@ public class BoardOverviewController {
      * @param vBox    - the vBox which contains the list
      * @param listing - the list the card is in
      */
-    public void addCard(Card c, VBox vBox, Listing listing) {
-
+    public void addCard (Card c, VBox vBox, Listing listing)
+    {
         Button newCard;
-        if (!c.getDescription().equals("")) {
+        VBox vBox1 = new VBox();
+       // vBox1.setPrefHeight(30);
+        int totalSubtaks = c.getSubTasks().size();
+        int doneSubtasks = 0;
+        for(SubTask s : c.getSubTasks()) {
+            if(s.isDone() == true) doneSubtasks++;
+        }
+        vBox1.getChildren().addAll(new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks)));
+        vBox1.setAlignment(Pos.BOTTOM_RIGHT);
+        Label nameCard = new Label(c.getName());
+        if(!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
             markDescription.setStyle("-fx-font-size: 5px;");
-            Label nameCard = new Label(c.getName());
-            nameCard.setStyle("-fx-font-size: 15px;");
-            HBox hbox = new HBox(markDescription, nameCard);
+            //nameCard.setStyle("-fx-font-size: 15px;");
+            HBox hbox = new HBox(markDescription, nameCard, vBox1);
             hbox.setSpacing(8);
             newCard = new Button();
             newCard.setGraphic(hbox);
-        } else newCard = new Button(c.getName());
+        } else {
+            newCard = new Button();
+            HBox hbox = new HBox(nameCard, vBox1);
+            hbox.setSpacing(8);
+            newCard.setGraphic(hbox);
+        }
+       // newCard.setPrefWidth(100);
+       // newCard.setPrefHeight(100);
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
         newCard.setCursor(Cursor.CLOSED_HAND);

@@ -1,13 +1,11 @@
 package server.api;
 
 import commons.Card;
+import commons.Listing;
 import commons.SubTask;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.SubTaskRepository;
 
 @RestController
@@ -54,5 +52,50 @@ public class SubtaskSavingController {
 
         this.card = card;
         return ResponseEntity.ok(card);
+    }
+
+    /**
+     * Editing a subtask.
+     *
+     * @param subTask the subtask to be edited
+     * @return the updated subtask
+     */
+    @PostMapping(path = { "/edit" })
+    public ResponseEntity<SubTask> updateSubtask(@RequestBody SubTask subTask) {
+        subTask.setCard(card);
+        subTask = repo.save(subTask);
+        msgs.convertAndSend("/topic/subtask", subTask);
+        return ResponseEntity.ok(subTask);
+    }
+
+    /**
+     * Deleting a subtask.
+     *
+     * @param id the id of the subtask
+     * @return tag corresponding to the operation
+     */
+    @DeleteMapping(path = {"delete/{id}"})
+    public ResponseEntity<Listing> delete(@PathVariable long id) {
+        SubTask subTask = repo.findById(id).orElse(null);
+        if (subTask == null) {
+            return ResponseEntity.notFound().build();
+        }
+        msgs.convertAndSend("/topic/subtask", subTask);
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Getting a subtask with a given id.
+     *
+     * @param id of the subtask
+     * @return tag corresponding to the operation
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<SubTask> getById(@PathVariable("id") long id) {
+        if (id < 0 || !repo.existsById(id)) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(repo.findById(id).get());
     }
 }
