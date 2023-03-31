@@ -432,7 +432,7 @@ public class BoardOverviewController {
             Label markDescription = new Label("\u2630");
             markDescription.setStyle("-fx-font-size: 5px;");
             Label nameCard = new Label(c.getName());
-            nameCard.setStyle("-fx-font-size: 15x;");
+            nameCard.setStyle("-fx-font-size: 15px;");
             HBox hbox = new HBox(markDescription, nameCard);
             hbox.setSpacing(8);
             newCard = new Button();
