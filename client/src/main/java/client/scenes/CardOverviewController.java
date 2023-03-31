@@ -9,6 +9,7 @@ import commons.Card;
 import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -176,6 +177,41 @@ public class CardOverviewController {
         refresh();
     }
 
+    /**
+     * Editing a subtask.
+     *
+     * @param actionEvent the action event
+     * @param subTask the subtask to be edited
+     */
+    private void editSubTask(ActionEvent actionEvent, SubTask subTask) {
+        Card card = server.getCardsById(cardId);
+        //   SubTask subTask = server.getSubtaskById(subtaskId);
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("SubTask new name");
+        dialog.setHeaderText("Please enter the new name of the subtask");
+        dialog.showAndWait().ifPresent(name -> {
+            if(!name.isEmpty()) {
+                try {
+                    server.sendCard(subTask.getCard());
+                    subTask.setTitle(name);
+                    server.updateSubtask(subTask, name);
+                }catch (WebApplicationException e) {
+                    var alert = new Alert(Alert.AlertType.ERROR);
+                    alert.initModality(Modality.APPLICATION_MODAL);
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
+                }
+
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                editSubTask(actionEvent, subTask);
+            }
+        });
+        refresh();
+    }
+
 
     /**
      * A method that saves the subtask into the database.
@@ -198,6 +234,8 @@ public class CardOverviewController {
         return null;
     }
 
+
+
     /**
      * Method that displays the subtask of current card.
      *
@@ -207,16 +245,27 @@ public class CardOverviewController {
 
         CheckBox checkBox = new CheckBox(subTask.getTitle());
         checkBox.setStyle("-fx-font-size: 12px;");
+
         checkBox.setSelected(subTask.isDone());
+
+        checkBox.selectedProperty().addListener((obs, old, newVal) -> {
+            subTask.setDone(newVal);
+            server.sendCard(subTask.getCard());
+            server.editSubTask(subTask);
+        });
         //checkBox.setOnAction(this::markDone);
         HBox hBoxCB = new HBox(checkBox);
 
         Button editST = new Button("\uD83D\uDD89");
         editST.setStyle("-fx-font-size: 10px;");
-        //editST.setOnAction(this::editSubTask);
+        editST.setOnAction(event -> {
+            editSubTask(event, subTask);
+        });
         Button deleteST = new Button("\uD83D\uDDD9");
         deleteST.setStyle("-fx-font-size: 10px;");
-        //deleteST.setOnAction(this::deleteSubTask);
+        deleteST.setOnAction(event -> {
+            deleteSubTask(event, subTask);
+        });
         HBox hBoxButtons = new HBox(editST,deleteST);
 
         HBox hBox = new HBox();
@@ -225,6 +274,31 @@ public class CardOverviewController {
 
         vBox.getChildren().add(hBox);
     }
+
+    /**
+     * Deleting a subtask from database.
+     *
+     * @param actionEvent the action event
+     * @param subtask the subtask to be deleted
+     */
+
+    private void deleteSubTask(ActionEvent actionEvent, SubTask subtask) {
+        HBox clicked = (HBox)((Button) actionEvent.getSource()).getParent();
+        HBox subtsk = (HBox) clicked.getParent();
+        VBox vbox = (VBox) subtsk.getParent();
+
+
+        vbox.getChildren().remove(subtsk);
+        try {
+            server.deleteSubtask(subtask);
+        } catch (WebApplicationException e) {
+            var alert = new Alert(Alert.AlertType.ERROR);
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
 
     /**
      * Method that refreshes all card components.
@@ -255,6 +329,7 @@ public class CardOverviewController {
         vBox.setAlignment(Pos.TOP_CENTER);
 
         for(SubTask subTask : card.getSubTasks()) {
+            subTask.setCard(card);
             showSubTaskList(subTask);
         }
     }
