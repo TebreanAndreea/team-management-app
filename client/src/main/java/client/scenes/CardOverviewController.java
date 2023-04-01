@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -242,6 +244,17 @@ public class CardOverviewController {
      * @param subTask - subtask to be displayed
      */
     public void showSubTaskList(SubTask subTask){
+        Button up = new Button("\u2191");
+        up.setStyle("-fx-font-size: 10px;");
+        up.setOnAction(event ->{
+            moveUp(event, subTask, this.cardId);
+        });
+
+        Button down = new Button("\u2193");
+        down.setStyle("-fx-font-size: 10px;");
+        down.setOnAction(event -> {
+            moveDown(event, subTask, this.cardId);
+        });
 
         CheckBox checkBox = new CheckBox(subTask.getTitle());
         checkBox.setStyle("-fx-font-size: 12px;");
@@ -266,7 +279,7 @@ public class CardOverviewController {
         deleteST.setOnAction(event -> {
             deleteSubTask(event, subTask);
         });
-        HBox hBoxButtons = new HBox(editST,deleteST);
+        HBox hBoxButtons = new HBox(editST,deleteST, up, down);
 
         HBox hBox = new HBox();
         hBox.setSpacing(100);
@@ -274,6 +287,82 @@ public class CardOverviewController {
 
         vBox.getChildren().add(hBox);
     }
+    /**
+     * Moving a subtask down to mark lower priority.
+     *
+     * @param event the event
+     * @param subTask the subtask
+     * @param cardid the card of the subtask
+     */
+    private void moveDown(ActionEvent event, SubTask subTask, long cardid) {
+        List<SubTask> sbtask = new ArrayList<>();
+        Card card = server.getCardsById(cardId);
+        int idx = card.getSubTasks().indexOf(subTask);
+        System.out.println(idx);
+        if (idx < card.getSubTasks().size()-1) {
+            for (int i = 0; i < card.getSubTasks().size(); i++) {
+                sbtask.add(card.getSubTasks().get(i));
+                server.deleteSubtask(card.getSubTasks().get(i));
+            }
+            vBox.getChildren().clear();
+            sbtask.set(idx, card.getSubTasks().get(idx + 1));
+            sbtask.set(idx + 1, subTask);
+            for (int i = 0; i < sbtask.size(); i++) {
+                try {
+                    server.sendCard(card);
+                    server.saveSubtask(sbtask.get(i));
+                } catch (WebApplicationException e) {
+                    var alert = new Alert(Alert.AlertType.ERROR);
+                    alert.initModality(Modality.APPLICATION_MODAL);
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
+                }
+            }
+//             server.sendList(this.list);
+//            server.saveCard(card);
+            refresh();
+        }
+    }
+
+    /**
+     * Moving a subtask up to mark higher priority.
+     *
+     * @param event the event
+     * @param subTask the subtask
+     * @param cardid the card of the subtask
+     */
+
+    private void moveUp(ActionEvent event, SubTask subTask, long cardid) {
+        List<SubTask> sbtask = new ArrayList<>();
+        Card card = server.getCardsById(cardId);
+       // sbtask = card.getSubTasks();
+        int idx = card.getSubTasks().indexOf(subTask);
+        System.out.println(idx);
+        if(idx > 0) {
+            for(int i = 0; i < card.getSubTasks().size(); i++) {
+                sbtask.add(card.getSubTasks().get(i));
+                server.deleteSubtask(card.getSubTasks().get(i));
+            }
+            vBox.getChildren().clear();
+            sbtask.set(idx, card.getSubTasks().get(idx-1));
+            sbtask.set(idx-1, subTask);
+            for(int i = 0; i < sbtask.size(); i++) {
+                try {
+                    server.sendCard(card);
+                    server.saveSubtask(sbtask.get(i));
+                } catch (WebApplicationException e) {
+                    var alert = new Alert(Alert.AlertType.ERROR);
+                    alert.initModality(Modality.APPLICATION_MODAL);
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
+                }
+            }
+//             server.sendList(this.list);
+//            server.saveCard(card);
+            refresh();
+        }
+    }
+    //}
 
     /**
      * Deleting a subtask from database.
