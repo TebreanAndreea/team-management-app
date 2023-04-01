@@ -18,7 +18,6 @@ import commons.Card;
 import commons.Listing;
 import jakarta.ws.rs.WebApplicationException;
 
-import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -681,5 +680,21 @@ public class BoardOverviewController {
             }
 
         });
+    }
+
+    /**
+     * Method which switches to tag scene.
+     * @param actionEvent the action events
+     */
+    public void switchToTagScene(javafx.event.ActionEvent actionEvent){
+        if (!adminControl) {
+            var tagOverview = FXML.load(TagController.class, "client", "scenes", "TagOverview.fxml");
+            tagOverview.getKey().setBoard(board);
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(tagOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.setTitle("Tag Overview");
+            primaryStage.show();
+        }
     }
 }

@@ -1,5 +1,7 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,11 @@ public class Tag {
     )
     private List<Card> cards;
 
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "board_id")
+    private Board board;
+
     /**
      * Constructor for the Tags class.
      * @param title - the title to the class
@@ -34,6 +41,24 @@ public class Tag {
     @SuppressWarnings("unused")
     public Tag() {
 
+    }
+
+    /**
+     * Constructor for the tag which sets the title and board.
+     * @param title the title of the tag
+     * @param board the board of the tag
+     */
+    public Tag(String title, Board board){
+        this.title = title;
+        this.board = board;
+    }
+
+    /**
+     * Setter for the board.
+     * @param board the board
+     */
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     /**

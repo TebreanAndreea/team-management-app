@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
+<AnchorPane prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
         <Button layoutX="571.0" layoutY="43.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
-        <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" prefHeight="39.0" minWidth="-Infinity" text="Board Name">
+        <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" minWidth="-Infinity" prefHeight="39.0" text="Board Name">
             <font>
                 <Font name="System Bold" size="19.0" />
             </font>
         </Label>
-        <Button fx:id="renameBoardButton" layoutX="204.0" layoutY="23.0" prefHeight="39.0" text="Rename" onMouseClicked="#renameBoard"/>
+        <Button fx:id="renameBoardButton" layoutX="204.0" layoutY="23.0" onMouseClicked="#renameBoard" prefHeight="39.0" text="Rename" />
         <ScrollPane layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
             <content>
                 <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="250.0" prefWidth="635.0" spacing="20.0">
@@ -32,7 +36,8 @@
             <Font size="17.0" />
          </font></Button>
       <Button layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Remove Board" textFill="RED" />
-        <TextField fx:id="accessKey" layoutX="410.0" layoutY="392.0" prefHeight="18.0" text="Access Key:" editable="false" />
-        <Button  layoutX="564.0" layoutY="392.0" prefHeight="18.0" text="Copy" onMouseClicked="#copyToClipboard" />
+        <TextField fx:id="accessKey" editable="false" layoutX="410.0" layoutY="392.0" prefHeight="18.0" text="Access Key:" />
+        <Button layoutX="564.0" layoutY="392.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
+      <Button layoutX="445.0" layoutY="60.0" mnemonicParsing="false" onAction="#switchToTagScene" text="Tags" />
     </children>
 </AnchorPane>
