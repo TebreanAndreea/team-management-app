@@ -498,7 +498,7 @@ public class ServerUtils {
             }
         });
     }
-
+    	
     public boolean checkCard (Card card)
     {
         return ClientBuilder.newClient(new ClientConfig())
@@ -513,5 +513,29 @@ public class ServerUtils {
     {
         EXEC.shutdownNow();
         EXECII.shutdownNow();
+    /**
+     * Saves a card in the database.
+     * @param tag the tag
+     * @return a Tag object
+     */
+    public Tag saveTag(Tag tag){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/tag")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(tag, APPLICATION_JSON), Tag.class);
+    }
+
+    /**
+     * Sets a board to a tag.
+     * @param board the board
+     * @return a Board object
+     */
+    public Board sendBoardToTag(Board board){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/tag/setBoard")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(board, APPLICATION_JSON), Board.class);
     }
 }
