@@ -292,7 +292,7 @@ public class BoardOverviewController {
             cardOverview.getKey().setFileName(fileName);
             cardOverview.getKey().setBoard(board);
             cardOverview.getKey().setList(list);
-            cardOverview.getKey().refreshCardDetails();
+            cardOverview.getKey().refresh();
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(cardOverview.getValue());
             primaryStage.setScene(overview);
