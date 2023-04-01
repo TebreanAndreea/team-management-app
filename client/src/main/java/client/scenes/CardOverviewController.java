@@ -9,6 +9,7 @@ import commons.Card;
 import commons.Listing;
 import commons.SubTask;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -43,6 +44,34 @@ public class CardOverviewController {
     Board board = new Board("test", "", "");
     private String fileName = "user_files/temp.txt";
 
+    public void initialize()
+    {
+        server.registerForUpdatesSubtask(subTask -> {
+            Platform.runLater(this::refresh);
+        });
+        server.registerForUpdatesCard(card -> {
+
+
+            Platform.runLater(() -> {
+                boolean check = server.checkCard(card);
+                System.out.println("First: " + check);
+
+                if (check)
+                {
+                    System.out.println(check);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Card has been deleted.");
+                    alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
+                    alert.showAndWait();
+                    switchBoard((Stage) cardLabel.getScene().getWindow());
+                    server.stop();
+                }
+                else {
+                    refresh();
+                }
+            });
+        });
+    }
     /**
      * Setter for the list.
      *
@@ -51,6 +80,7 @@ public class CardOverviewController {
     public void setList(Listing list) {
         this.list = list;
     }
+
 
     /**
      * Setter for the board.
@@ -100,14 +130,20 @@ public class CardOverviewController {
      */
 
     public void switchToBoardScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        switchBoard((Stage) ((Node) actionEvent.getSource()).getScene().getWindow());
+    }
+
+    public void switchBoard (Stage stage)
+    {
         var cardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         cardOverview.getKey().setFileName(fileName);
         cardOverview.getKey().setBoard(board);
         cardOverview.getKey().refresh();
-        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        primaryStage = stage;
         overview = new Scene(cardOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
+        server.stop();
     }
 
     /**

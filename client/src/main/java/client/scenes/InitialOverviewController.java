@@ -52,14 +52,12 @@ public class InitialOverviewController {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-    private int curPlacedBoards;
     private String fileName="user_files/temp.txt";
 
     @Inject
     public InitialOverviewController(ServerUtils server, MainController mainController) {
         this.server = server;
         this.maincontroller = mainController;
-        curPlacedBoards = 0;
         boardsMap = new HashMap<>();
     }
 
