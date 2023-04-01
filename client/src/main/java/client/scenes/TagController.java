@@ -4,6 +4,8 @@ import client.utils.ServerUtils;
 import commons.Board;
 import commons.Card;
 
+import commons.Tag;
+import jakarta.ws.rs.WebApplicationException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -11,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 
 import javax.inject.Inject;
 
@@ -43,7 +46,7 @@ public class TagController {
 
     /**
      * Sets the board for these tags.
-     * @param board
+     * @param board the board of this tag
      */
     public void setBoard(Board board){
         this.board = board;
@@ -63,8 +66,8 @@ public class TagController {
             if(!name.isEmpty()) {
 
                 //saving the tag into the database
-                //Tag tag = new Tag(name,board);
-                //saveTagDB(tag);
+                Tag tag = new Tag(name,board);
+                saveTagDB(tag,board);
 
                 // construct the vbox from frontend, just to see the layout
                 Button tagButton = new Button(name);
@@ -75,7 +78,8 @@ public class TagController {
                 Button deleteButton = new Button("delete");
 
                 HBox hbox = new HBox(tagButton,editButton,deleteButton);
-                hbox.setSpacing(100);
+                hbox.setSpacing(10);
+                vBox.setSpacing(10);
 
                 vBox.getChildren().add(hbox);
 
@@ -91,10 +95,11 @@ public class TagController {
     /**
      * This method saves a tag in the database.
      * @param tag the tag
+     * @param board the board of this tag
      */
-    /*public void saveTagDB(Tag tag){
+    public void saveTagDB(Tag tag, Board board){
         try {
-            //server.sendBoard(board);
+            server.sendBoardToTag(board);
             server.saveTag(tag);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
@@ -104,7 +109,7 @@ public class TagController {
         }
     }
 
-     */
+
 
     /**
      * Method which opens a dialog box for changing the tag name.
@@ -117,14 +122,14 @@ public class TagController {
         dialog.showAndWait().ifPresent(name -> {
 
             //verifies if the input field was submitted empty or not
-            if(!name.isEmpty()) {
-
-            } else {
-                //sends alert and return to the input dialog after
-                Alert emptyField = new Alert(Alert.AlertType.ERROR);
-                emptyField.setContentText("Name field was submitted empty, please enter a name");
-                emptyField.showAndWait();
-            }
+//            if(!name.isEmpty()) {
+//
+//            } else {
+//                //sends alert and return to the input dialog after
+//                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+//                emptyField.setContentText("Name field was submitted empty, please enter a name");
+//                emptyField.showAndWait();
+//            }
         });
     }
 

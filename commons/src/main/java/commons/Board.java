@@ -24,6 +24,15 @@ public class Board {
     private String accessKey;
     private String password;
 
+    //private List<Tag> tags;
+    @JsonManagedReference
+    @OneToMany(
+            mappedBy = "board",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Tag> tags;
+
     /**
      * Constructor for a Board item.
      *
@@ -36,6 +45,7 @@ public class Board {
         this.accessKey = accessKey;
         this.password = password;
         this.lists = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     /**
@@ -141,6 +151,23 @@ public class Board {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    /**
+     * Getter for the tags
+     * @return a list of tags for this board
+     */
+   /* public List<Tag> getTags(){
+        return this.tags;
+    }
+
+    /**
+     * Setter for the tags
+     * @param tags - the list of tags
+     */
+   /* public void setTags(List<Tag> tags){
+        this.tags = tags;
     }
 
     /**

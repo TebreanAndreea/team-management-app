@@ -13,7 +13,7 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Button layoutX="37.0" layoutY="78.0" mnemonicParsing="false" onAction="#addTag" prefHeight="37.0" prefWidth="112.0" text="Create new tag" />
+      <Button layoutX="37.0" layoutY="78.0" mnemonicParsing="false" onAction="#addTag" prefHeight="37.0" prefWidth="112.0" style="-fx-background-color: white; -fx-border-color: #48b23c; -fx-border-radius: stroke;" text="Create new tag" textFill="#48b23c" />
       <VBox fx:id="vBox" layoutX="37.0" layoutY="129.0" prefHeight="232.0" prefWidth="190.0" />
    </children>
 </AnchorPane>
