@@ -158,7 +158,7 @@ public class Board {
      * Getter for the tags.
      * @return a list of tags for this board
      */
-   /* public List<Tag> getTags(){
+    public List<Tag> getTags(){
         return this.tags;
     }
 
@@ -166,7 +166,7 @@ public class Board {
      * Setter for the tags.
      * @param tags - the list of tags
      */
-   /* public void setTags(List<Tag> tags){
+    public void setTags(List<Tag> tags){
         this.tags = tags;
     }
 

@@ -690,6 +690,8 @@ public class BoardOverviewController {
         if (!adminControl) {
             var tagOverview = FXML.load(TagController.class, "client", "scenes", "TagOverview.fxml");
             tagOverview.getKey().setBoard(board);
+            tagOverview.getKey().setFileName(fileName);
+            tagOverview.getKey().refresh();
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(tagOverview.getValue());
             primaryStage.setScene(overview);

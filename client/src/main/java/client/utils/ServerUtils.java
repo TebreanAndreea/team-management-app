@@ -416,6 +416,12 @@ public class ServerUtils {
                 });
     }
 
+    /**
+     * Deleting a board.
+     *
+     * @param id the id of the board
+     */
+
     public void deleteBoard(Long id) {
         ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/boards/" + id) //
@@ -466,6 +472,18 @@ public class ServerUtils {
                 .post(Entity.entity(tag, APPLICATION_JSON), Tag.class);
     }
 
+    /**
+     * Deleting a task from database.
+     *
+     * @param tagId the id of the tag
+     */
+    public void deleteTag(long tagId) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/tag/delete/" + tagId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+    }
     /**
      * Sets a board to a tag.
      * @param board the board

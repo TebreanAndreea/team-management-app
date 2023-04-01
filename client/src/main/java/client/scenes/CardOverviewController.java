@@ -40,7 +40,7 @@ public class CardOverviewController {
     @FXML
     public TextArea description;
 
-    Board board = new Board("test", "", "");
+    private Board board = new Board("test", "", "");
     private String fileName = "user_files/temp.txt";
 
     /**
