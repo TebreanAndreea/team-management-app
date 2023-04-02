@@ -75,5 +75,15 @@ public class BoardSavingController {
     public ResponseEntity<Board> getById(@PathVariable("id") long id) {
         return boardService.getById(id);
     }
+    /**
+     * Method that deletes a board from DB.
+     *
+     * @param id - id corresponding to the board to be deleted
+     * @return status of query
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Board> delete(@PathVariable("id") long id) {
+        return boardService.delete(id);
+    }
 
 }
