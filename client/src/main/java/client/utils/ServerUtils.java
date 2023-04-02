@@ -152,6 +152,27 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
     }
+    /**
+     * Adding a tag to a card.
+     *
+     * @param card the card
+     * @param tag the tag added
+     */
+    public void addTag(Card card, Tag tag) {
+        card.getTags().add(tag);
+        saveCard(card);
+    }
+
+    /**
+     * Removing a tag from a card.
+     *
+     * @param card the card
+     * @param tag the tag removed
+     */
+    public void removeTag(Card card, Tag tag) {
+        card.getTags().remove(tag);
+        saveCard(card);
+    }
 
     /**
      * A method that sends a card to the subtask.
@@ -537,8 +558,9 @@ public class ServerUtils {
      * Deleting a task from database.
      *
      * @param tagId the id of the tag
+     * @param tag the tag to be deletd(tried somt things with this)
      */
-    public void deleteTag(long tagId) {
+    public void deleteTag(long tagId, Tag tag) {
         ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/tag/delete/" + tagId)
                 .request(APPLICATION_JSON)

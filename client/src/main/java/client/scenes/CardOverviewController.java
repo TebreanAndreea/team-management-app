@@ -4,10 +4,7 @@ import client.MyFXML;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
-import commons.Board;
-import commons.Card;
-import commons.Listing;
-import commons.SubTask;
+import commons.*;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,8 +13,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -37,6 +37,7 @@ public class CardOverviewController {
     private ServerUtils server;
 
     public VBox vBox;
+    public HBox hbox;
     public Listing list;
     @FXML
     public Label cardLabel;
@@ -425,12 +426,30 @@ public class CardOverviewController {
     }
 
 
+
     /**
      * Method that refreshes all card components.
      */
     public void refresh() {
         refreshSubTasks();
         refreshCardDetails();
+        refreshTags();
+    }
+
+    private void refreshTags() {
+        Card card = server.getCardsById(cardId);
+        hbox.getChildren().clear();
+        for(Tag tag: card.getTags()) {
+            Label tagLabel = new Label(tag.getTitle());
+            Color color = Color.web(tag.getColor());
+            Background background = new Background(new BackgroundFill(color, null, null));
+            tagLabel.setBackground(background);
+            tagLabel.setAlignment(Pos.CENTER);
+          //  tagLabel.setStyle("-fx-background-radius: 20;");
+            tagLabel.setMinSize(100,40);
+            hbox.getChildren().add(tagLabel);
+            hbox.setSpacing(10);
+        }
     }
 
     /**
@@ -457,5 +476,24 @@ public class CardOverviewController {
             subTask.setCard(card);
             showSubTaskList(subTask);
         }
+    }
+
+    /**
+     * Switching to the scene to choose your tags.
+     *
+     * @param actionEvent the action event
+     * @throws IOException possible error
+     */
+    public void switchToChooseTagScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        var chooseTagOverview = FXML.load(ChooseTagController.class, "client", "scenes", "ChooseTag.fxml");
+        chooseTagOverview.getKey().setFileName(fileName);
+        chooseTagOverview.getKey().setBoard(board);
+        chooseTagOverview.getKey().setCardId(cardId);
+        chooseTagOverview.getKey().setList(list);
+        chooseTagOverview.getKey().refresh();
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(chooseTagOverview.getValue());
+        primaryStage.setScene(overview);
+        primaryStage.show();
     }
 }
