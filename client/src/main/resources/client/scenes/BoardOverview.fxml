@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
+<AnchorPane fx:id="mainPane" prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
         <Button layoutX="571.0" layoutY="43.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
         <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" minWidth="-Infinity" prefHeight="39.0" text="Board Name">
@@ -20,7 +17,7 @@
         <Button fx:id="renameBoardButton" layoutX="204.0" layoutY="23.0" onMouseClicked="#renameBoard" prefHeight="39.0" text="Rename" />
         <ScrollPane layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
             <content>
-                <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="250.0" prefWidth="635.0" spacing="20.0">
+                <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="265.0" prefWidth="635.0" spacing="20.0">
                     <children>
 
                     </children>
@@ -39,5 +36,43 @@
         <TextField fx:id="accessKey" editable="false" layoutX="410.0" layoutY="392.0" prefHeight="18.0" text="Access Key:" />
         <Button layoutX="564.0" layoutY="392.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
       <Button layoutX="445.0" layoutY="60.0" mnemonicParsing="false" onAction="#switchToTagScene" text="Tags" />
+      <Button layoutX="4.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToCustomizationScene" style="-fx-background-color: white;" text="Customize">
+         <textFill>
+            <LinearGradient endY="0.011363607464414656" startY="1.0">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.4000000059604645" green="0.20888888835906982" blue="0.20888888835906982" />
+                     </color>
+                  </Stop>
+                  <Stop offset="0.17035921068179138">
+                     <color>
+                        <Color />
+                     </color>
+                  </Stop>
+                  <Stop offset="0.4211863405411793">
+                     <color>
+                        <Color red="1.0" green="0.009999999776482582" blue="0.009999999776482582" />
+                     </color>
+                  </Stop>
+                  <Stop offset="0.6934006853361694">
+                     <color>
+                        <Color red="1.0" green="1.1102230246251565E-16" blue="1.1102230246251565E-16" />
+                     </color>
+                  </Stop>
+                  <Stop offset="0.8571428571428571">
+                     <color>
+                        <Color red="0.03999999910593033" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="0.04210526496171951" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill>
+      </Button>
     </children>
 </AnchorPane>

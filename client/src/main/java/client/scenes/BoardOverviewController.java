@@ -55,6 +55,7 @@ public class BoardOverviewController {
     public TextField accessKey;
     public Label boardName;
     public Button renameBoardButton;
+    public AnchorPane mainPane;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -304,6 +305,27 @@ public class BoardOverviewController {
 
 
     /**
+     * Function that goes to the customization details.
+     *
+     * @param actionEvent the action event on the button
+     * @throws IOException the exception which might be caused
+     */
+    public void switchToCustomizationScene(ActionEvent actionEvent) throws IOException {
+        if (!adminControl) {
+            var customizationOverview = FXML.load(CustomizationOverviewController.class, "client", "scenes", "CustomizationOverview.fxml");
+            customizationOverview.getKey().setBoard(board);
+            customizationOverview.getKey().setFileName(fileName);
+            customizationOverview.getKey().refresh();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(customizationOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.show();
+            primaryStage.setOnCloseRequest(event -> {
+                server.stop();
+            });
+        }
+    }
+    /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
      *
      * @param mouseEvent the mouse event
@@ -425,6 +447,9 @@ public class BoardOverviewController {
         map.put(vBox, listing);
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
+        titledPane.setStyle("-fx-text-fill: "+board.getListTextColor()+";");
+        titledPane.getContent().setStyle("-fx-background-color:"+board.getListBackgroundColor()+";");
+        // Wait for the TitledPane to be displayed and fully initialized
         titledPane.setUserData(listing.getListId());
         titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
         titledPane.setMinWidth(135);
@@ -521,11 +546,14 @@ public class BoardOverviewController {
                 return;
             }
         }
+        mainPane.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
+        hBox.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";" + "-fx-border-color: " + board.getTextColor() + ";");
         listController.setBoard(board);
         String boardTitle = board.getTitle();
         Text boardText = new Text(boardTitle);
         boardText.setFont(Font.font("System Bold", 19.0));
         boardName.setText(boardTitle);
+        boardName.setTextFill(Color.web(board.getTextColor()));
         renameBoardButton.setLayoutX(boardName.getLayoutX() + boardText.getLayoutBounds().getWidth() + 10.0);
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
