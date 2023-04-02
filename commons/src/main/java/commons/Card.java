@@ -17,7 +17,12 @@ public class Card {
     private String description;
     private String name;
     private Date dueDate;
-    @ManyToMany(mappedBy = "cards")
+    @ManyToMany()
+    @JoinTable(
+            name = "tagged_cards",
+            joinColumns = @JoinColumn(name = "card_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
     private List<Tag> tags;
     @JsonManagedReference
     @OneToMany(
@@ -25,6 +30,7 @@ public class Card {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+
     private List<SubTask> subTasks;
     private boolean complete;
     @JsonBackReference

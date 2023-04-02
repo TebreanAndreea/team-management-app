@@ -1,6 +1,7 @@
 package commons;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,13 +14,11 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long tagId;
     private String title;
-    @ManyToMany
-    @JoinTable(
-        name = "tagged_cards",
-        joinColumns = @JoinColumn(name = "card_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private List<Card> cards;
+    private String color;
+
+    @ManyToMany(mappedBy = "tags")
+    @JsonIgnore
+    private List<Card> cards = new ArrayList<>();
 
     @JsonBackReference
     @ManyToOne
@@ -41,6 +40,13 @@ public class Tag {
     @SuppressWarnings("unused")
     public Tag() {
 
+    }
+
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        this.color = color;
     }
 
     /**
@@ -109,7 +115,8 @@ public class Tag {
         if (this == o) return true;
         if (!(o instanceof Tag)) return false;
         Tag tags = (Tag) o;
-        return tagId == tags.tagId && title.equals(tags.title) && cards.equals(tags.cards);
+        return tagId == tags.tagId && title.equals(tags.title);
+        //cards.equals(tags.cards);
     }
 
     /**

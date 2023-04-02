@@ -17,8 +17,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
@@ -96,21 +101,44 @@ public class TagController {
                 Tag tag = new Tag(name,board);
                 saveTagDB(tag,board);
 
-                // construct the vbox from frontend, just to see the layout
-                Button tagButton = new Button(name);
+                Button tagButton = new Button(tag.getTitle());
+                tagButton.setMinSize(200, 50);
 
                 Button editButton = new Button("edit");
-              //  editButton.setOnAction(this::editTagName);
+                editButton.setOnAction(event -> {
+                    editTagName(event, tag);
+                });
+                // editButton.setOnAction(this::editTagName);
 
                 Button deleteButton = new Button("delete");
+                deleteButton.setOnAction(event -> {
+                    deleteTag(event, tag);
+                });
 
-                HBox hbox = new HBox(tagButton,editButton,deleteButton);
+                ColorPicker colorPicker = new ColorPicker();
+                colorPicker.setMaxSize(10, 10);
+                HBox hbox = new HBox(tagButton,editButton,deleteButton, colorPicker);
+                colorPicker.setOnAction(event -> {
+                    Color color = colorPicker.getValue();
+                    tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
+                    tag.setColor(color.toString());
+                    saveTagDB(tag, this.board);
+                    //  refresh();
+                });
+
+                if(tag.getColor() != null) {
+                    colorPicker.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
+                    Color color = Color.web(tag.getColor());
+                    tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
+                }
+
                 hbox.setSpacing(10);
                 vBox.setSpacing(10);
 
                 vBox.getChildren().add(hbox);
-
-            } else {
+            }
+            else
+            {
                 //sends alert and return to the input dialog after
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
                 emptyField.setContentText("Name field was submitted empty, please enter a name");
@@ -209,6 +237,7 @@ public class TagController {
         {
             // construct the vbox from frontend, just to see the layout
             Button tagButton = new Button(tag.getTitle());
+            tagButton.setMinSize(200, 50);
 
             Button editButton = new Button("edit");
             editButton.setOnAction(event -> {
@@ -221,7 +250,23 @@ public class TagController {
                 deleteTag(event, tag);
             });
 
-            HBox hbox = new HBox(tagButton,editButton,deleteButton);
+            ColorPicker colorPicker = new ColorPicker();
+            colorPicker.setMaxSize(10, 10);
+            HBox hbox = new HBox(tagButton,editButton,deleteButton, colorPicker);
+            colorPicker.setOnAction(event -> {
+                Color color = colorPicker.getValue();
+                tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
+                tag.setColor(color.toString());
+                saveTagDB(tag, this.board);
+              //  refresh();
+            });
+
+            if(tag.getColor() != null) {
+                colorPicker.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
+                Color color = Color.web(tag.getColor());
+                tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
+            }
+
             hbox.setSpacing(10);
             vBox.setSpacing(10);
 
@@ -241,7 +286,8 @@ public class TagController {
         VBox vbox = (VBox)clicked.getParent();
         vbox.getChildren().remove(clicked);
         try {
-            server.deleteTag(tag.getTagId());
+            server.sendBoard(board);
+            server.deleteTag(tag.getTagId(), tag);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
             alert.initModality(Modality.APPLICATION_MODAL);
