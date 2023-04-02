@@ -4,10 +4,7 @@ import commons.Board;
 import commons.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import server.database.TagRepository;
 
 @RestController
@@ -51,5 +48,22 @@ public class TagSavingController {
     public ResponseEntity<Board> setBoardToTag(@RequestBody Board board){
         this.board = board;
         return ResponseEntity.ok(board);
+    }
+
+    /**
+     * Method that deletes a tag from DB.
+     *
+     * @param id - id corresponding to the tag to be deleted
+     * @return status of query
+     */
+    @DeleteMapping(path = {"delete/{id}"})
+    public ResponseEntity<Tag> delete(@PathVariable long id) {
+        Tag tag = repo.findById(id).orElse(null);
+        if (tag == null) {
+            return ResponseEntity.notFound().build();
+        }
+        msgs.convertAndSend("/topic/tag", tag);
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
