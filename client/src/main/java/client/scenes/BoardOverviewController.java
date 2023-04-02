@@ -296,6 +296,9 @@ public class BoardOverviewController {
             overview = new Scene(cardOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
+            primaryStage.setOnCloseRequest(event -> {
+                server.stop();
+            });
         }
     }
 

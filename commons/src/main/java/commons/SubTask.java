@@ -102,7 +102,7 @@ public class SubTask {
         if (this == o) return true;
         if (!(o instanceof SubTask)) return false;
         SubTask subTask = (SubTask) o;
-        return stId == subTask.stId && done == subTask.done && title.equals(subTask.title) && card.getCardId()==subTask.card.getCardId();
+        return stId == subTask.stId && done == subTask.done && title.equals(subTask.title);
     }
 
     /**

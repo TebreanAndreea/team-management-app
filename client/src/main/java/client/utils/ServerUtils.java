@@ -26,6 +26,8 @@ import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -453,6 +455,65 @@ public class ServerUtils {
         return currentBoard;
     }
 
+    private static ExecutorService EXEC = Executors.newSingleThreadExecutor();
+    public void registerForUpdatesSubtask(Consumer<SubTask> consumer)
+    {
+        EXEC = Executors.newSingleThreadExecutor();
+        EXEC.submit(() -> {
+            while (!Thread.interrupted())
+            {
+                //System.out.println("Long Polling");
+                var response = ClientBuilder.newClient(new ClientConfig()) //
+                    .target(SERVER).path("api/subtask/updates") //
+                    .request(APPLICATION_JSON) //
+                    .accept(APPLICATION_JSON) //
+                    .get(Response.class);
+
+                if (response.getStatus() == 204)
+                    continue;
+                var subTask = response.readEntity(SubTask.class);
+                consumer.accept(subTask);
+            }
+        });
+    }
+
+    private static ExecutorService EXECII = Executors.newSingleThreadExecutor();
+    public void registerForUpdatesCard(Consumer<Card> consumer)
+    {
+        EXECII = Executors.newSingleThreadExecutor();
+        EXECII.submit(() -> {
+            while (!Thread.interrupted())
+            {
+//                System.out.println("Long Polling");
+                var response = ClientBuilder.newClient(new ClientConfig()) //
+                    .target(SERVER).path("api/card/updates") //
+                    .request(APPLICATION_JSON) //
+                    .accept(APPLICATION_JSON) //
+                    .get(Response.class);
+
+                if (response.getStatus() == 204)
+                    continue;
+                var card = response.readEntity(Card.class);
+                consumer.accept(card);
+            }
+        });
+    }
+    	
+    public boolean checkCard (Card card)
+    {
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/card/check")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(card, APPLICATION_JSON), Boolean.class);
+
+    }
+
+    public void stop()
+    {
+        EXEC.shutdownNow();
+        EXECII.shutdownNow();
+    }
     /**
      * Saves a card in the database.
      * @param tag the tag
