@@ -62,6 +62,22 @@ public class BoardService {
         return ResponseEntity.ok(repo.findById(id).get());
     }
 
+    /**
+     * Method that deletes a board from DB.
+     *
+     * @param id - id corresponding to the board to be deleted
+     * @return status of query
+     */
+    public ResponseEntity<Board> delete(Long id) {
+        Board board = repo.findById(id).orElse(null);
+        if (board == null) {
+            return ResponseEntity.notFound().build();
+        }
 
+        msgs.convertAndSend("/topic/boards", board);
+
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 
 }
