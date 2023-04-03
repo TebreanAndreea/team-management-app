@@ -3,7 +3,7 @@ package server.api;
 import commons.Board;
 import commons.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.TagRepository;
 
@@ -11,7 +11,7 @@ import server.database.TagRepository;
 @RequestMapping("api/tag")
 public class TagSavingController {
     private final TagRepository repo;
-    private final SimpMessagingTemplate msgs;
+    private final SimpMessageSendingOperations msgs;
 
     private Board board;
 
@@ -21,7 +21,7 @@ public class TagSavingController {
      * @param repo - tag repository
      * @param msgs - messages for communication
      */
-    public TagSavingController(TagRepository repo, SimpMessagingTemplate msgs) {
+    public TagSavingController(TagRepository repo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
@@ -33,6 +33,7 @@ public class TagSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Tag> addTag(@RequestBody Tag tag) {
+        if(tag == null)  return ResponseEntity.badRequest().build();
         tag.setBoard(board);
         msgs.convertAndSend("/topic/tag", tag);
         Tag save = repo.save(tag);
