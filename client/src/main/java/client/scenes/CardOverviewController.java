@@ -52,6 +52,9 @@ public class CardOverviewController {
         server.registerForUpdatesSubtask(subTask -> {
             Platform.runLater(this::refresh);
         });
+        server.registerForUpdatesTag(tag -> {
+            Platform.runLater(this::refresh);
+        });
         server.registerForUpdatesCard(card -> {
 
 
@@ -445,7 +448,6 @@ public class CardOverviewController {
             Background background = new Background(new BackgroundFill(color, null, null));
             tagLabel.setBackground(background);
             tagLabel.setAlignment(Pos.CENTER);
-          //  tagLabel.setStyle("-fx-background-radius: 20;");
             tagLabel.setMinSize(100,40);
             hbox.getChildren().add(tagLabel);
             hbox.setSpacing(10);

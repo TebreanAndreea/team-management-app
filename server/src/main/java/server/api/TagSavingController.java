@@ -2,10 +2,16 @@ package server.api;
 
 import commons.Board;
 import commons.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import server.database.TagRepository;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("api/tag")
@@ -14,6 +20,7 @@ public class TagSavingController {
     private final SimpMessagingTemplate msgs;
 
     private Board board;
+    private Map<Object, Consumer<Tag>> listenings = new HashMap<>();
 
     /**
      * Constructor for tag controller.
@@ -36,6 +43,9 @@ public class TagSavingController {
         tag.setBoard(board);
         msgs.convertAndSend("/topic/tag", tag);
         Tag save = repo.save(tag);
+        listenings.forEach((k,s) -> {
+            s.accept(save);
+        });
         return ResponseEntity.ok(save);
     }
 
@@ -64,6 +74,27 @@ public class TagSavingController {
         }
         msgs.convertAndSend("/topic/tag", tag);
         repo.deleteById(id);
+        listenings.forEach((k,s) -> {
+            s.accept(tag);
+        });
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/updates")
+    public DeferredResult<ResponseEntity<Tag>> getUpdatesTag ()
+    {
+        var noContent = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        var result = new DeferredResult<ResponseEntity<Tag>>(1000L, noContent);
+        var key = new Object();
+
+        listenings.put(key, s ->{
+            System.out.println("Reached");
+            result.setResult(ResponseEntity.ok(s));
+        });
+
+        result.onCompletion(() -> {
+            listenings.remove(key);
+        });
+        return result;
     }
 }
