@@ -14,7 +14,7 @@
             </font>
         </Label>
         <Button fx:id="renameBoardButton" layoutX="204.0" layoutY="23.0" onMouseClicked="#renameBoard" prefHeight="39.0" text="Rename" />
-        <ScrollPane layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
+        <ScrollPane fx:id="scrollPaneBoard" layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
             <content>
                 <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="265.0" prefWidth="635.0" spacing="20.0">
                     <children>
