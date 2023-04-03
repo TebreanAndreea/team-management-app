@@ -558,6 +558,7 @@ public class BoardOverviewController {
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
         map = new HashMap<>();
+        setUpButtonColors();
         for (Listing listing : listings)
             addListWithListing(listing);
     }
@@ -730,4 +731,30 @@ public class BoardOverviewController {
             primaryStage.show();
         }
     }
+
+    public Button addListButton;
+    public Button tagButton;
+
+    public Button copyKeyButton;
+
+    public Button customizeButton;
+    public Button refreshButton;
+
+    private void setUpButtonColors(){
+        colorButton(addListButton);
+        colorButton(tagButton);
+        colorButton(copyKeyButton);
+        colorButton(customizeButton);
+        colorButton(renameBoardButton);
+        colorButton(refreshButton);
+        accessKey.setStyle("-fx-background-color:"+board.getBackgroundColor()+"; -fx-text-fill:"+board.getTextColor()+";");
+        accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+    }
+
+    private void colorButton(Button button){
+        button.setStyle("-fx-background-color:"+board.getBackgroundColor());
+        button.setTextFill(Color.web(board.getTextColor()));
+        button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+    }
+
 }
