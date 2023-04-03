@@ -33,6 +33,17 @@ public class Board {
     )
     private List<Tag> tags;
 
+    private String backgroundColorDefault="#ffffff";
+    private String backgroundColor="#ffffff";
+    private String textColorDefault="#000000";
+    private String textColor="#000000";
+
+    private String listBackgroundColorDefault="#ffffff";
+    private String listBackgroundColor="#ffffff";
+    private String listTextColorDefault="#000000";
+    private String listTextColor="#000000";
+
+
     /**
      * Constructor for a Board item.
      *
@@ -192,5 +203,54 @@ public class Board {
     @Override
     public int hashCode() {
         return Objects.hash(boardId, title, lists, accessKey, password);
+    }
+
+
+    public String getBackgroundColorDefault() {
+        return backgroundColorDefault;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public String getTextColorDefault() {
+        return textColorDefault;
+    }
+
+    public String getTextColor() {
+        return textColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
+    }
+
+    public String getListBackgroundColorDefault() {
+        return listBackgroundColorDefault;
+    }
+
+    public String getListBackgroundColor() {
+        return listBackgroundColor;
+    }
+
+    public String getListTextColorDefault() {
+        return listTextColorDefault;
+    }
+
+    public String getListTextColor() {
+        return listTextColor;
+    }
+
+    public void setListBackgroundColor(String listBackgroundColor) {
+        this.listBackgroundColor = listBackgroundColor;
+    }
+
+    public void setListTextColor(String listTextColor) {
+        this.listTextColor = listTextColor;
     }
 }
