@@ -1,23 +1,20 @@
 package client.scenes;
 
 
-import jakarta.ws.rs.BadRequestException;
-import commons.SubTask;
-import javafx.application.Platform;
-
 import client.MyFXML;
 import client.MyModule;
-import com.google.inject.Injector;
-import javafx.event.ActionEvent;
-
-import javafx.event.EventTarget;
-
 import client.utils.ServerUtils;
+import com.google.inject.Injector;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
+import commons.SubTask;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.WebApplicationException;
-
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -26,19 +23,19 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import javax.inject.Inject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,6 +53,8 @@ public class BoardOverviewController {
     public Label boardName;
     public Button renameBoardButton;
     public AnchorPane mainPane;
+
+    public ScrollPane scrollPaneBoard;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -149,40 +148,10 @@ public class BoardOverviewController {
 
             if (!name.isEmpty()) {
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
-
-
-                Button newCard = new Button(name);
-
-                // make this card draggable
-                newCard.setOnMousePressed(event -> {
-                    target = newCard.getParent(); // this is the hbox that needs to be dropped
-                });
-
-                newCard.setOnMouseReleased(this::handleDropping);
-                setupButton(newCard);
-                Button edit = new Button("\uD83D\uDD89");
-                edit.setOnAction(this::editCard); // an event happens when the button is clicked
-                setupButton(edit);
-                Button delete = new Button("\uD83D\uDDD9");
-                delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-                setupButton(delete);
-                HBox buttonList = new HBox();
-                buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
-                buttonList.setAlignment(Pos.CENTER);
-                buttonList.getChildren().addAll(newCard, edit, delete);
-
-
-                HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
-                HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
-
-                vBox.getChildren().addAll(buttonList, plusBox, deleteListBox);
-
                 Listing curList = map.get(vBox);
                 Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
                 Card updatedCard = saveCardDB(curCard, curList);
-                curList.getCards().add(updatedCard);
-                cardMap.put(buttonList, updatedCard);
-
+                refresh();
             } else {
 
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
@@ -468,7 +437,7 @@ public class BoardOverviewController {
     {
         Button newCard;
         VBox vBox1 = new VBox();
-       // vBox1.setPrefHeight(30);
+        // vBox1.setPrefHeight(30);
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for(SubTask s : c.getSubTasks()) {
@@ -491,8 +460,8 @@ public class BoardOverviewController {
             hbox.setSpacing(8);
             newCard.setGraphic(hbox);
         }
-       // newCard.setPrefWidth(100);
-       // newCard.setPrefHeight(100);
+        // newCard.setPrefWidth(100);
+        // newCard.setPrefHeight(100);
         newCard.setUserData(c.getCardId());
         setupButton(newCard);
         newCard.setCursor(Cursor.CLOSED_HAND);
@@ -547,7 +516,10 @@ public class BoardOverviewController {
             }
         }
         mainPane.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
-        hBox.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";" + "-fx-border-color: " + board.getTextColor() + ";");
+        hBox.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
+        scrollPaneSetup();
+
+
         listController.setBoard(board);
         String boardTitle = board.getTitle();
         Text boardText = new Text(boardTitle);
@@ -561,6 +533,27 @@ public class BoardOverviewController {
         setUpButtonColors();
         for (Listing listing : listings)
             addListWithListing(listing);
+    }
+
+    /**
+     * Sets up the scroll pane in the board colors.
+     */
+    private void scrollPaneSetup() {
+        scrollPaneBoard.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
+        scrollPaneBoard.getStylesheets().clear();
+        String scrollbarStyle = ".scroll-bar:vertical .thumb {" +
+                "-fx-background-color:" + board.getTextColor() + ";" +
+                "}" +
+                ".scroll-bar:vertical .track {" +
+                "-fx-background-color: " +board.getBackgroundColor()  + ";" +
+                "}"+
+                ".scroll-bar:horizontal .track {" +
+                "-fx-background-color: " +board.getBackgroundColor()  + ";" +
+                "}"+
+                ".scroll-bar:horizontal .thumb {" +
+                "-fx-background-color: " +board.getTextColor()  + ";" +
+                "}";
+        scrollPaneBoard.getStylesheets().add("data:text/css," + scrollbarStyle);
     }
 
     /**
@@ -688,6 +681,10 @@ public class BoardOverviewController {
         ClipboardContent content = new ClipboardContent();
         content.putString(board.getAccessKey());
         clipboard.setContent(content);
+        copyKeyButton.setText("Copied!");
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(event -> copyKeyButton.setText("Copy"));
+        delay.play();
     }
 
     /**
@@ -740,6 +737,9 @@ public class BoardOverviewController {
     public Button customizeButton;
     public Button refreshButton;
 
+    /**
+     * Sets up the FXML objects within the board to match the board's colors.
+     */
     private void setUpButtonColors(){
         colorButton(addListButton);
         colorButton(tagButton);
@@ -750,11 +750,22 @@ public class BoardOverviewController {
         accessKey.setStyle("-fx-background-color:"+board.getBackgroundColor()+"; -fx-text-fill:"+board.getTextColor()+";");
         accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
     }
-
+    /**
+     * Colors the button in the board's selected colors.
+     * @param button the button to color
+     */
     private void colorButton(Button button){
         button.setStyle("-fx-background-color:"+board.getBackgroundColor());
         button.setTextFill(Color.web(board.getTextColor()));
         button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:"+board.getTextColor());
+            button.setTextFill(Color.web(board.getBackgroundColor()));
+        });
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color:"+board.getBackgroundColor());
+            button.setTextFill(Color.web(board.getTextColor()));
+        });
     }
 
 }
