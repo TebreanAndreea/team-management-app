@@ -322,7 +322,6 @@ public class BoardOverviewController {
                 Card card = cardMap.get((HBox) target);
                 server.deleteCard(card.getCardId()); // delete the card from its initial list
                 vBox.getChildren().remove((HBox) target); // this is for duplicate children
-
                 Listing list = map.get(vBox);
                 Card updatedCard = saveCardDB(card, list);  // add this card to this list
                 list.getCards().add(updatedCard);
@@ -349,7 +348,8 @@ public class BoardOverviewController {
                         foundPlace = true;
                     } else {
                         if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
-                            vBox.getChildren().add(j + 1, (HBox) target);
+                            if(!vBox.getChildren().contains(target))
+                                vBox.getChildren().add(j + 1, (HBox) target);
                             foundPlace = true;
                         }
                     }
