@@ -127,7 +127,6 @@ public class ChooseTagController {
                 checkBox.setBackground(background);
             }
             checkBox.setMinSize(200,50);
-            checkBox.setStyle("-fx-border-radius: 20;");
             checkBox.setAlignment(Pos.CENTER);
             vbox.setAlignment(Pos.CENTER);
             vbox.setSpacing(20);
