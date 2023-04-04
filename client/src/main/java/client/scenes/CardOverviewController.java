@@ -54,6 +54,9 @@ public class CardOverviewController {
         server.registerForUpdatesSubtask(subTask -> {
             Platform.runLater(this::refresh);
         });
+        server.registerForUpdatesTag(tag -> {
+            Platform.runLater(this::refresh);
+        });
         server.registerForUpdatesCard(card -> {
 
 

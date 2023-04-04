@@ -504,6 +504,28 @@ public class ServerUtils {
         });
     }
 
+    private static ExecutorService EXEC1 = Executors.newSingleThreadExecutor();
+    public void registerForUpdatesTag(Consumer<Tag> consumer)
+    {
+        EXEC1 = Executors.newSingleThreadExecutor();
+        EXEC1.submit(() -> {
+            while (!Thread.interrupted())
+            {
+                //System.out.println("Long Polling");
+                var response = ClientBuilder.newClient(new ClientConfig()) //
+                        .target(SERVER).path("api/tag/updates") //
+                        .request(APPLICATION_JSON) //
+                        .accept(APPLICATION_JSON) //
+                        .get(Response.class);
+
+                if (response.getStatus() == 204)
+                    continue;
+                var tag = response.readEntity(Tag.class);
+                consumer.accept(tag);
+            }
+        });
+    }
+
     private static ExecutorService EXECII = Executors.newSingleThreadExecutor();
     public void registerForUpdatesCard(Consumer<Card> consumer)
     {
@@ -540,6 +562,7 @@ public class ServerUtils {
     {
         EXEC.shutdownNow();
         EXECII.shutdownNow();
+        EXEC1.shutdownNow();
     }
     /**
      * Saves a card in the database.

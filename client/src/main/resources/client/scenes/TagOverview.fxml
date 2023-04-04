@@ -14,7 +14,7 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Button layoutX="37.0" layoutY="78.0" mnemonicParsing="false" onAction="#addTag" prefHeight="37.0" prefWidth="112.0" style="-fx-background-color: white; -fx-border-color: #48b23c; -fx-border-radius: stroke;" text="Create new tag" textFill="#48b23c" />
+      <Button layoutX="37.0" layoutY="78.0" mnemonicParsing="false" onAction="#addTag" prefHeight="37.0" prefWidth="112.0" style="-fx-background-color: white; -fx-border-color: #48b23c;" text="Create new tag" textFill="#48b23c" />
       <Button layoutX="507.0" layoutY="348.0" mnemonicParsing="false" onAction="#switchToBoardScene" text="Go back" />
       <ScrollPane layoutX="5.0" layoutY="124.0" prefHeight="223.0" prefWidth="589.0">
          <content>
