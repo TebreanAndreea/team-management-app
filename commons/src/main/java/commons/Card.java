@@ -38,6 +38,9 @@ public class Card {
     @JoinColumn(name = "list_id")
     private Listing list;
 
+    private String fontColor;
+    private String backgroundColor;
+
     /**
      *
      * Constructor for the card class.
@@ -47,8 +50,10 @@ public class Card {
      * @param tags - List with tags assigned to card (can be empty)
      * @param subTasks - List of smaller simple subtasks of this card (can be empty)
      * @param list - the list in which the card is
+     * @param fontColor - the font color
+     * @param backgroundColor - the background color
      */
-    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list) {
+    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list, String fontColor, String backgroundColor) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
@@ -56,6 +61,8 @@ public class Card {
         this.subTasks = subTasks;
         this.complete = false;
         this.list = list;
+        this.backgroundColor = backgroundColor;
+        this.fontColor = fontColor;
     }
 
     /**
@@ -200,6 +207,22 @@ public class Card {
      */
     public void setList(Listing list) {
         this.list = list;
+    }
+
+    public String getFontColor() {
+        return fontColor;
+    }
+
+    public void setFontColor(String fontColor) {
+        this.fontColor = fontColor;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 
     /**

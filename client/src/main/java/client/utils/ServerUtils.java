@@ -579,4 +579,44 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(board, APPLICATION_JSON), Board.class);
     }
+
+    /**
+     * Sets a board to a scheme.
+     * @param board the board
+     * @return a Board object
+     */
+    public Board sendBoardToScheme(Board board){
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/color/setBoard")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Saves a color scheme.
+     * @param colorScheme the color scheme
+     * @return a ColorScheme object
+     */
+    public ColorScheme saveColorScheme(ColorScheme colorScheme){
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/color")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(colorScheme, APPLICATION_JSON), ColorScheme.class);
+    }
+
+    /**
+     * Deleting a scheme.
+     *
+     * @param id the id of the scheme
+     */
+
+    public void deleteScheme(Long id) {
+        ClientBuilder.newClient(new ClientConfig()) //
+            .target(SERVER).path("api/color/delete/" + id) //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .delete();
+    }
 }

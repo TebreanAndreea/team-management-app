@@ -22,7 +22,7 @@ class SubTaskTest {
         Board board = new Board("title","acceskey","password");
         Listing listing = new Listing("list",board);
 
-        card = new Card("desc","name",new Date(),tags,new ArrayList<>(),listing);
+        card = new Card("desc","name",new Date(),tags,new ArrayList<>(),listing,"","");
         subtask = new SubTask("subtask",card);
     }
 
@@ -59,7 +59,7 @@ class SubTaskTest {
 
     @Test
     void setCard() {
-        Card card2 = new Card("desc","name2",new Date(),null,null,null);
+        Card card2 = new Card("desc","name2",new Date(),null,null,null,"","");
         subtask.setCard(card2);
         assertEquals(card2, subtask.getCard());
     }

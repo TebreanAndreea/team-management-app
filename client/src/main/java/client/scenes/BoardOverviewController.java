@@ -5,10 +5,7 @@ import client.MyFXML;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
-import commons.Board;
-import commons.Card;
-import commons.Listing;
-import commons.SubTask;
+import commons.*;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.animation.PauseTransition;
@@ -149,7 +146,7 @@ public class BoardOverviewController {
             if (!name.isEmpty()) {
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
                 Listing curList = map.get(vBox);
-                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
+                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList, board.getCardFontColor(), board.getCardBackgroundColor());
                 Card updatedCard = saveCardDB(curCard, curList);
                 refresh();
             } else {
@@ -426,6 +423,15 @@ public class BoardOverviewController {
         hBox.getChildren().add(titledPane);
     }
 
+
+//    public void paintCard(HBox hBox, Card card)
+//    {
+//
+//        hBox.setStyle("-fx-background-color: " + card.getBackgroundColor() + "; -fx-border-radius: 10");
+//        for (Node n : hBox.getChildren())
+//            n.setStyle(n.getStyle()+ ";-fx-text-fill: " + card.getFontColor()+";");
+//
+//    }
     /**
      * Adds a card to the vBox List.
      *
@@ -443,12 +449,16 @@ public class BoardOverviewController {
         for(SubTask s : c.getSubTasks()) {
             if(s.isDone() == true) doneSubtasks++;
         }
-        vBox1.getChildren().addAll(new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks)));
+        Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks));
+        done.setStyle("  -fx-text-fill: " + c.getFontColor()+";");
+        vBox1.getChildren().addAll(done);
         vBox1.setAlignment(Pos.BOTTOM_RIGHT);
         Label nameCard = new Label(c.getName());
+        nameCard.setStyle( "-fx-text-fill: " + c.getFontColor()+";");
         if(!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
-            markDescription.setStyle("-fx-font-size: 5px;");
+
+            markDescription.setStyle("-fx-font-size: 5px;" +  "  -fx-text-fill: " + c.getFontColor()+";");
             //nameCard.setStyle("-fx-font-size: 15px;");
             HBox hbox = new HBox(markDescription, nameCard, vBox1);
             hbox.setSpacing(8);
@@ -463,7 +473,7 @@ public class BoardOverviewController {
         // newCard.setPrefWidth(100);
         // newCard.setPrefHeight(100);
         newCard.setUserData(c.getCardId());
-        setupButton(newCard);
+        setupButton(newCard,c);
         newCard.setCursor(Cursor.CLOSED_HAND);
         // make this card draggable
         newCard.setOnMousePressed(event -> {
@@ -484,14 +494,17 @@ public class BoardOverviewController {
             }
         });
 
-        setupButton(edit);
+        setupButton(edit,c);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-        setupButton(delete);
+        setupButton(delete,c);
         HBox buttonList = new HBox();
         buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
         buttonList.getChildren().addAll(newCard, edit, delete);
         buttonList.setAlignment(Pos.CENTER);
+       //buttonList.setStyle("-fx-background-color: " + c.getBackgroundColor() +";");
+        buttonList.setBackground(new Background(new BackgroundFill(Color.web(c.getBackgroundColor()), new CornerRadii(10), Insets.EMPTY)));
+        //      paintCard(buttonList, c);
         vBox.getChildren().add(buttonList);
         cardMap.put(buttonList, c);
     }
@@ -653,16 +666,18 @@ public class BoardOverviewController {
 
     /**
      * Sets up the buttons contained in the lists.
-     *
+     * @param card - the card associated with the button
      * @param button the button to set up
      */
-    private void setupButton(Button button) {
+    private void setupButton(Button button, Card card) {
         HBox.setHgrow(button, Priority.ALWAYS);
-        button.setStyle("-fx-background-color: transparent");
+        String style = "-fx-background-color: transparent; " +
+            "-fx-text-fill: " + card.getFontColor()+";";
+        button.setStyle(style);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMinWidth(Button.USE_PREF_SIZE);
-        button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);"));
-        button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent;"));
+        button.setOnMouseEntered(event -> button.setStyle( "-fx-background-color: rgba(0,0,0,0.1);" +  "-fx-text-fill: " + card.getFontColor()+";"));
+        button.setOnMouseExited(event -> button.setStyle(style));
     }
 
     /**

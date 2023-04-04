@@ -43,6 +43,17 @@ public class Board {
     private String listTextColorDefault="#000000";
     private String listTextColor="#000000";
 
+    private String cardFontColor;
+    private String cardBackgroundColor;
+
+    @JsonManagedReference
+    @OneToMany(
+        mappedBy = "board",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<ColorScheme> schemes;
+
 
     /**
      * Constructor for a Board item.
@@ -57,6 +68,20 @@ public class Board {
         this.password = password;
         this.lists = new ArrayList<>();
         this.tags = new ArrayList<>();
+        this.schemes = new ArrayList<>();
+
+        backgroundColorDefault="#ffffff";
+        backgroundColor="#ffffff";
+        textColorDefault="#000000";
+        textColor="#000000";
+
+        listBackgroundColorDefault="#ffffff";
+        listBackgroundColor="#ffffff";
+        listTextColorDefault="#000000";
+        listTextColor="#000000";
+
+        cardFontColor = "#000000";
+        cardBackgroundColor = "#ffffff";
     }
 
     /**
@@ -244,6 +269,26 @@ public class Board {
 
     public String getListTextColor() {
         return listTextColor;
+    }
+
+    public String getCardFontColor() {
+        return cardFontColor;
+    }
+
+    public void setCardFontColor(String cardFontColor) {
+        this.cardFontColor = cardFontColor;
+    }
+
+    public String getCardBackgroundColor() {
+        return cardBackgroundColor;
+    }
+
+    public void setCardBackgroundColor(String cardBackgroundColor) {
+        this.cardBackgroundColor = cardBackgroundColor;
+    }
+
+    public List<ColorScheme> getSchemes() {
+        return schemes;
     }
 
     public void setListBackgroundColor(String listBackgroundColor) {
