@@ -8,6 +8,7 @@ import commons.Board;
 import commons.Card;
 import commons.Listing;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.SubScene;
@@ -18,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 
 import javax.inject.Inject;
@@ -31,7 +33,7 @@ import static com.google.inject.Guice.createInjector;
 public class AdminOverviewController {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
-    private ServerUtils server;
+    private final ServerUtils server;
     private Map<Button, Board> buttonBoardMap = new HashMap<>();
     private Board selectedBoard;
     @FXML
@@ -56,6 +58,7 @@ public class AdminOverviewController {
      * Initializes the controller.
      */
     public void initialize() {
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         refresh();
         deleteButton.setVisible(false);
     }
@@ -121,26 +124,28 @@ public class AdminOverviewController {
      */
     private void seePreview(ActionEvent actionEvent) {
         var root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
-        root.getKey().setBoard(buttonBoardMap.get(actionEvent.getSource()));
+        root.getKey().setBoard(buttonBoardMap.get((Button) actionEvent.getSource()));
         root.getKey().setAdminControl(true);
         root.getKey().refresh();
         SubScene subScene = new SubScene(root.getValue(), 600, 400);
         previewPane.setContent(subScene);
-        //double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
-        //Scale scale = new Scale(scaleFactor, scaleFactor);
-        //subScene.getTransforms().clear();
-        //subScene.getTransforms().add(scale);
+        double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
+        Scale scale = new Scale(scaleFactor, scaleFactor);
+        subScene.getTransforms().clear();
+        subScene.getTransforms().add(scale);
+        previewPane.setFitToHeight(true);
+        previewPane.setFitToWidth(true);
+        previewPane.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
+        previewPane.setVbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
         deleteButton.setVisible(true);
-        selectedBoard = buttonBoardMap.get(actionEvent.getSource());
+        selectedBoard = buttonBoardMap.get((Button) actionEvent.getSource());
     }
 
     /**
      * Deletes the selected board from the database.
      * If a user is using the board, the user will be shown a message that the board has been deleted.
-     *
-     * @param actionEvent the event that triggered the method
      */
-    public void delete(ActionEvent actionEvent) {
+    public void delete() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete board");
         alert.setHeaderText("Are you sure you want to delete this board?");
@@ -181,6 +186,7 @@ public class AdminOverviewController {
                 alertError.setContentText(e.getMessage());
                 alertError.showAndWait();
             }
+            deleteButton.setVisible(false);
             refresh();
         }
     }

@@ -190,7 +190,7 @@ public class HomePageOverviewController {
     public void adminLogin(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Input Dialog");
-        dialog.setHeaderText("Please enter your name and age:");
+        dialog.setHeaderText("Please enter the admin details below:");
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -205,16 +205,16 @@ public class HomePageOverviewController {
         grid.add(serverField, 1, 0);
         grid.add(new Label("Admin Password:"), 0, 1);
         grid.add(passwordField, 1, 1);
-
         dialog.getDialogPane().setContent(grid);
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
-            String server = serverField.getText();
+            String serverLink = serverField.getText();
             String password = passwordField.getText();
-            String port = server.substring(server.lastIndexOf(":") + 1);
-            if (password.equals(adminPassword) && checkConnection(server)) {
+            String port = serverLink.substring(serverLink.lastIndexOf(":") + 1);
+            if (password.equals(adminPassword) && checkConnection(serverLink)) {
                 System.out.println("Admin login successful");
+                StompSession session = server.startWebSockets(serverLink);
                 var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
                 primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                 overview = new Scene(adminOverview.getValue());
