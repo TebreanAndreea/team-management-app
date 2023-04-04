@@ -61,5 +61,10 @@ public class CardSavingControllerTest {
         assertEquals(ResponseEntity.ok(list), controller.getList(list));
 
     }
+    @Test
+    public void getCardTest() {
+        Card card = new Card();
+        assertEquals(ResponseEntity.ok(true), controller.getCard(card));
+    }
 
 }

@@ -42,9 +42,20 @@ public class Tag {
 
     }
 
+    /**
+     * Getter for the color code of a tag.
+     *
+     * @return the color of a tag
+     */
     public String getColor() {
         return color;
     }
+
+    /**
+     * Setting the color code for a tag.
+     *
+     * @param color (code) the color of the card.
+     */
     public void setColor(String color) {
         this.color = color;
     }
@@ -57,6 +68,15 @@ public class Tag {
     public Tag(String title, Board board){
         this.title = title;
         this.board = board;
+    }
+
+    /**
+     * Setter for the tag id.
+     *
+     * @param id the new id
+     */
+    public void setTagId(long id) {
+        this.tagId = id;
     }
 
     /**
