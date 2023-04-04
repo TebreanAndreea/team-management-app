@@ -489,6 +489,7 @@ public class BoardOverviewController {
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
         setupButton(delete);
         HBox buttonList = new HBox();
+        buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
         buttonList.getChildren().addAll(newCard, edit, delete);
         buttonList.setAlignment(Pos.CENTER);
 
