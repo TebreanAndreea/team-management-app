@@ -286,6 +286,7 @@ public class TagController {
         VBox vbox = (VBox)clicked.getParent();
         vbox.getChildren().remove(clicked);
         try {
+            tag.removeTagFromCards();
             server.sendBoard(board);
             server.deleteTag(tag.getTagId(), tag);
         } catch (WebApplicationException e) {
