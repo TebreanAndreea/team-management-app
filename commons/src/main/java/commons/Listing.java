@@ -116,7 +116,7 @@ public class Listing {
                 return false;
         }
 
-        return listId == listing.listId && title.equals(listing.title) && board.equals(listing.board);
+        return listId == listing.listId && title.equals(listing.title);
     }
 
     /**

@@ -45,9 +45,13 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private static String SERVER = "";
+    private String SERVER = "";
     private static StompSession session;
     private String PORT = "";
+
+    public void setSERVER(String SERVER) {
+        this.SERVER = SERVER;
+    }
 
     /**
      * This method creates a get request to the server entered by the user.
@@ -408,7 +412,7 @@ public class ServerUtils {
                 .target(SERVER).path("api/boards") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Board>>() {
+                .get(new GenericType<>() {
                 });
     }
 
