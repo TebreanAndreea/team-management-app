@@ -145,14 +145,14 @@ class CardTest {
     void testEquals() {
         Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
         Card card2 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
-        assertTrue(card1.equals(card2));
+        assertTrue(card1.equals(card2, false));
     }
 
     @Test
     void testNotEquals(){
         Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
         Card card2 = new Card(null, "card", new Date(), tags, subtasks, listing,"","");
-        assertTrue(card1.equals(card2) == false);
+        assertTrue(card1.equals(card2, false) == false);
     }
 
     @Test
