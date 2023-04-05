@@ -443,7 +443,6 @@ public class BoardOverviewController {
     {
         Button newCard;
         VBox vBox1 = new VBox();
-        // vBox1.setPrefHeight(30);
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for(SubTask s : c.getSubTasks()) {
@@ -455,23 +454,36 @@ public class BoardOverviewController {
         vBox1.setAlignment(Pos.BOTTOM_RIGHT);
         Label nameCard = new Label(c.getName());
         nameCard.setStyle( "-fx-text-fill: " + c.getFontColor()+";");
+
+        //Create hbox with all the tags attributed to card
+        HBox tags = new HBox();
+        tags.setSpacing(3);
+        for(Tag tag : c.getTags()){
+            Label labelTag = new Label(" ");
+            labelTag.setStyle("-fx-font-size: 1px");
+            labelTag.setPrefWidth(25);
+            labelTag.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
+            tags.getChildren().add(labelTag);
+        }
+
         if(!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
-
             markDescription.setStyle("-fx-font-size: 5px;" +  "  -fx-text-fill: " + c.getFontColor()+";");
-            //nameCard.setStyle("-fx-font-size: 15px;");
-            HBox hbox = new HBox(markDescription, nameCard, vBox1);
+            VBox vBoxTag = new VBox(nameCard, tags); //put tag hbox below card name
+            vBoxTag.setSpacing(3);
+            HBox hbox = new HBox(markDescription, vBoxTag);
             hbox.setSpacing(8);
             newCard = new Button();
             newCard.setGraphic(hbox);
         } else {
             newCard = new Button();
             HBox hbox = new HBox(nameCard, vBox1);
+            VBox vBoxTag = new VBox(hbox, tags);  //put tag hbox below card name
+            vBoxTag.setSpacing(3);
             hbox.setSpacing(8);
-            newCard.setGraphic(hbox);
+            newCard.setGraphic(vBoxTag);
         }
-        // newCard.setPrefWidth(100);
-        // newCard.setPrefHeight(100);
+
         newCard.setUserData(c.getCardId());
         setupButton(newCard,c);
         newCard.setCursor(Cursor.CLOSED_HAND);
@@ -502,9 +514,7 @@ public class BoardOverviewController {
         buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
         buttonList.getChildren().addAll(newCard, edit, delete);
         buttonList.setAlignment(Pos.CENTER);
-       //buttonList.setStyle("-fx-background-color: " + c.getBackgroundColor() +";");
         buttonList.setBackground(new Background(new BackgroundFill(Color.web(c.getBackgroundColor()), new CornerRadii(10), Insets.EMPTY)));
-        //      paintCard(buttonList, c);
         vBox.getChildren().add(buttonList);
         cardMap.put(buttonList, c);
     }
