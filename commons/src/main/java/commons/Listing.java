@@ -108,7 +108,15 @@ public class Listing {
         if (this == o) return true;
         if (!(o instanceof Listing)) return false;
         Listing listing = (Listing) o;
-        return listId == listing.listId && title.equals(listing.title) && cards.equals(listing.cards) && board.equals(listing.board);
+        if (cards.size()!=listing.getCards().size())
+            return false;
+        for (int i = 0; i < cards.size(); i++)
+        {
+            if (!cards.get(i).equals(listing.getCards().get(i), true))
+                return false;
+        }
+
+        return listId == listing.listId && title.equals(listing.title) && board.equals(listing.board);
     }
 
     /**

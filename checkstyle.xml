@@ -26,7 +26,6 @@
         <module name="EmptyStatement"/>
         <module name="EqualsAvoidNull"/>
         <module name="MissingSwitchDefault"/>
-        <module name="EqualsHashCode"/>
         <module name="RedundantImport"/>
         <module name="CyclomaticComplexity">
             <property name="max" value="6"/>

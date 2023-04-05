@@ -183,14 +183,16 @@ public class Card {
     /**
      * Equals method for the Card class.
      * @param o - the object with which we check for equality
+     * @param listss - checks wether the method has been called from a list and doesn't check if the lists are equal as this makes the code go in a loop
      * @return - a boolean based on the outcome
      */
-    @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o, boolean listss) {
         if (this == o) return true;
         if (!(o instanceof Card)) return false;
         Card card = (Card) o;
-        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && Objects.equals(dueDate, card.dueDate) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list);
+        if (listss)
+            return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor));
+        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor));
     }
 
     /**
@@ -231,6 +233,6 @@ public class Card {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(cardId, description, name, dueDate, tags, subTasks, complete, list);
+        return Objects.hash(cardId, description, name, dueDate, tags, subTasks, complete);
     }
 }
