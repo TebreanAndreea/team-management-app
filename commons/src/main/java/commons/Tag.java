@@ -126,6 +126,16 @@ public class Tag {
     public void setCards(List<Card> cards){this.cards = cards;}
 
     /**
+     * Method that removes the tag to be deleted from all cards.
+     */
+    @PreRemove
+    public void removeTagFromCards(){
+        for(Card card : cards){
+            card.getTags().remove(this);
+        }
+    }
+
+    /**
      * Equals method for comparing two tags.
      * @param o - the tag compared to this object
      * @return - true if the tags are equal, false otherwise
