@@ -451,7 +451,7 @@ public class BoardOverviewController {
         Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks));
         done.setStyle("  -fx-text-fill: " + c.getFontColor()+";");
         vBox1.getChildren().addAll(done);
-        vBox1.setAlignment(Pos.BOTTOM_RIGHT);
+        vBox1.setAlignment(Pos.CENTER);
         Label nameCard = new Label(c.getName());
         nameCard.setStyle( "-fx-text-fill: " + c.getFontColor()+";");
 
@@ -471,7 +471,7 @@ public class BoardOverviewController {
             markDescription.setStyle("-fx-font-size: 5px;" +  "  -fx-text-fill: " + c.getFontColor()+";");
             VBox vBoxTag = new VBox(nameCard, tags); //put tag hbox below card name
             vBoxTag.setSpacing(3);
-            HBox hbox = new HBox(markDescription, vBoxTag);
+            HBox hbox = new HBox(markDescription, vBoxTag, vBox1);
             hbox.setSpacing(8);
             newCard = new Button();
             newCard.setGraphic(hbox);
