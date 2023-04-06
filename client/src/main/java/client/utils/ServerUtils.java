@@ -45,7 +45,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 public class ServerUtils {
 
-    private String SERVER = "";
+    private static String SERVER = "";
     private static StompSession session;
     private String PORT = "";
 
