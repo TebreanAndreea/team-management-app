@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Board;
 import commons.Card;
 import commons.Listing;
+import commons.SubTask;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import static org.mockserver.verify.VerificationTimes.once;
 
 public class ServerUtilsTest {
     private static final int MOCK_SERVER_PORT = 8080;
@@ -46,6 +48,7 @@ public class ServerUtilsTest {
 
     /**
      * Test for the getBoardsFromDB method.
+     *
      * @throws JsonProcessingException - if the object cannot be converted to JSON
      */
     @Test
@@ -66,6 +69,7 @@ public class ServerUtilsTest {
 
     /**
      * Test for the getBoardByID method.
+     *
      * @throws JsonProcessingException - if the object cannot be converted to JSON
      */
     @Test
@@ -80,10 +84,15 @@ public class ServerUtilsTest {
         assertEquals(expectedBoard, actualBoard);
     }
 
+    /**
+     * Test for the getCardsById method.
+     *
+     * @throws JsonProcessingException - if the object cannot be converted to JSON
+     */
     @Test
-    public void testGetCardByID() throws  JsonProcessingException{
+    public void testGetCardByID() throws JsonProcessingException {
         Card card = new Card("description", "name", Date.from(Instant.EPOCH),
-                new ArrayList<>(), new ArrayList<>(), null,"","");
+                new ArrayList<>(), new ArrayList<>(), null, "", "");
         mockServer.when(request().withMethod("GET").withPath("/api/card/1"))
                 .respond(response()
                         .withStatusCode(200)
@@ -93,9 +102,14 @@ public class ServerUtilsTest {
         assertEquals(card, actualCard);
     }
 
+    /**
+     * Test for the getListingsById method.
+     *
+     * @throws JsonProcessingException - if the object cannot be converted to JSON
+     */
     @Test
-    public void testGetListingsByID() throws  JsonProcessingException{
-        Listing listing = new Listing("title",null);
+    public void testGetListingsByID() throws JsonProcessingException {
+        Listing listing = new Listing("title", null);
         mockServer.when(request().withMethod("GET").withPath("/api/lists/1"))
                 .respond(response()
                         .withStatusCode(200)
@@ -103,6 +117,84 @@ public class ServerUtilsTest {
                         .withBody(objectMapper.writeValueAsString(listing)));
         Listing actualListing = serverUtils.getListingsById(1);
         assertEquals(listing, actualListing);
+    }
+
+    @Test
+    public void testDeleteBoard() {
+        // Setup
+        mockServer.when(request()
+                        .withMethod("DELETE")
+                        .withPath("/api/boards/123"))
+                .respond(response()
+                        .withStatusCode(200));
+
+        // Method call
+        serverUtils.deleteBoard(123L);
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("DELETE")
+                .withPath("/api/boards/123"), once());
+    }
+
+    @Test
+    public void testDeleteListing() {
+        // Setup
+        mockServer.when(request()
+                        .withMethod("DELETE")
+                        .withPath("/api/lists/123"))
+                .respond(response()
+                        .withStatusCode(200));
+
+        // Method call
+        serverUtils.deleteList(123L);
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("DELETE")
+                .withPath("/api/lists/123"), once());
+    }
+
+    /**
+     * Test for the deleteCard method.
+     * <p> This test verifies that the deleteCard method makes a DELETE request to the correct path. </p>
+     */
+    @Test
+    public void testDeleteCard() {
+        // Setup
+        mockServer.when(request()
+                        .withMethod("DELETE")
+                        .withPath("/api/card/delete/123"))
+                .respond(response()
+                        .withStatusCode(200));
+
+        // Method call
+        serverUtils.deleteCard(123);
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("DELETE")
+                .withPath("/api/card/delete/123"), once());
+    }
+
+    @Test
+    public void deleteSubtask() {
+        // Setup
+        mockServer.when(request()
+                        .withMethod("DELETE")
+                        .withPath("/api/subtask/delete/123"))
+                .respond(response()
+                        .withStatusCode(200));
+
+        // Method call
+        SubTask subTask = new SubTask();
+        subTask.setStId(123);
+        serverUtils.deleteSubtask(subTask);
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("DELETE")
+                .withPath("/api/subtask/delete/123"), once());
     }
 
 }

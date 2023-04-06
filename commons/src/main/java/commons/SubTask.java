@@ -113,4 +113,12 @@ public class SubTask {
     public int hashCode() {
         return Objects.hash(stId, title, done, card);
     }
+
+    /**
+     * Setter for the id (TESTING ONLY).
+     * @param stId - the new id
+     */
+    public void setStId(long stId) {
+        this.stId = stId;
+    }
 }
