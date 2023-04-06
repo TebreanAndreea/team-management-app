@@ -72,7 +72,7 @@ public class TagController {
      * This method initializes the websockets.
      */
     public void initialize(){
-        server.registerForMessages("/topic/tag", Card.class, q -> Platform.runLater(this::refresh));
+      server.registerForMessages("/topic/tag", Card.class, q -> Platform.runLater(this::refresh));
     }
 
 
@@ -201,6 +201,16 @@ public class TagController {
      * @throws IOException the exception
      */
     public void switchToBoardScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        for (Tag t : board.getTags())
+        {
+            if (t.getColor() == null)
+            {
+                Alert emptyColor = new Alert(Alert.AlertType.ERROR);
+                emptyColor.setContentText("You forgot to set a color to tag: " + t.getTitle() +". Please choose a colour!");
+                emptyColor.showAndWait();
+                return;
+            }
+        }
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         boardOverview.getKey().setFileName(fileName);
         boardOverview.getKey().setBoard(board);

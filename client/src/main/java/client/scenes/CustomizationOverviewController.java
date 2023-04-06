@@ -5,7 +5,10 @@ import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Board;
+import commons.Card;
 import commons.ColorScheme;
+import commons.Listing;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -58,14 +61,28 @@ public class CustomizationOverviewController {
      * Initializes the controller.
      */
     public void initialize() {
-        // refresh();
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater( ()->{
+            refresh();
+        }));
+        server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater( ()->{
+            refresh();
+        }));
+
+        server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
+
+        //refresh();
     }
 
+
+    public void print( ColorScheme scheme){
+        System.out.println(scheme);
+    }
     /**
      * refreshes the overview.
      */
     public void refresh() {
         System.out.println(board.getBoardId());
+        board = server.getBoardByID(board.getBoardId());
         boardBackground.setValue(Color.valueOf(board.getBackgroundColor()));
         boardFont.setValue(Color.valueOf(board.getTextColor()));
         listBackground.setValue(Color.valueOf(board.getListBackgroundColor()));
@@ -186,6 +203,7 @@ public class CustomizationOverviewController {
         colorPicker.setOnAction(event -> {
             HBox hBox = (HBox) colorPicker.getParent();
             ColorScheme scheme = map.get(hBox);
+            ColorScheme oldScheme = new ColorScheme(scheme.getName(), scheme.getBackgroundColor(), scheme.getFontColor(), board);
             ColorPicker back = (ColorPicker) hBox.getChildren().get(2);
             ColorPicker font = (ColorPicker) hBox.getChildren().get(4);
             String backString = String.format("#%02X%02X%02X",
@@ -199,18 +217,47 @@ public class CustomizationOverviewController {
 
 
             if (scheme.getBackgroundColor().equals(backString) && scheme.getFontColor().equals(fontString)) {
-                hBox.getChildren().get(hBox.getChildren().size() - 1).setVisible(false);
                 return;
             }
-            if (!scheme.getBackgroundColor().equals(backString))
+            if (!scheme.getBackgroundColor().equals(backString)) {
                 scheme.setBackgroundColor(backString);
-            if (!scheme.getFontColor().equals(fontString))
+                if (scheme.isDef())
+                {
+                    board.setCardBackgroundColor(backString);
+                    server.addBoard(board);
+                }
+            }
+            if (!scheme.getFontColor().equals(fontString)){
                 scheme.setFontColor(fontString);
+                if (scheme.isDef())
+                {
+                    board.setCardFontColor(fontString);
+                    server.addBoard(board);
+                }
+            }
 
+            updateCardColors(scheme, oldScheme);
             server.sendBoardToScheme(board);
             server.saveColorScheme(scheme);
             refresh();
         });
+    }
+
+    private void updateCardColors(ColorScheme newScheme, ColorScheme oldScheme) {
+        for (Listing l : board.getLists())
+        {
+            for(Card c :l.getCards())
+            {
+                if(c.getSchemeName().equals(oldScheme.getName()))
+                {
+                    c.setSchemeName(newScheme.getName());
+                    c.setBackgroundColor(newScheme.getBackgroundColor());
+                    c.setFontColor(newScheme.getFontColor());
+                    server.sendList(l);
+                    server.saveCard(c);
+                }
+            }
+        }
     }
 
     private void updateName(javafx.scene.input.MouseEvent event, Label name) {
@@ -252,11 +299,12 @@ public class CustomizationOverviewController {
                 }
             }
             newDef.setDef(true);
-            server.sendBoard(board);
-            server.saveColorScheme(newDef);
             board.setCardBackgroundColor(newDef.getBackgroundColor());
             board.setCardFontColor(newDef.getFontColor());
             server.addBoard(board);
+            server.sendBoard(board);
+            server.saveColorScheme(newDef);
+
             refresh();
         }
 
@@ -288,6 +336,15 @@ public class CustomizationOverviewController {
             defaultScheme.showAndWait();
             return;
         }
+        ColorScheme def = scheme;
+        for (ColorScheme s : board.getSchemes())
+        {
+            if(s.isDef()) {
+                def = s;
+                break;
+            }
+        }
+        updateCardColors(def, scheme);
         map.remove((HBox) ((Button) event.getSource()).getParent());
         server.deleteScheme(scheme.getSchemeId());
         board.getSchemes().remove(scheme);

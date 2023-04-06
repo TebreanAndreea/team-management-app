@@ -54,6 +54,10 @@ public class CardOverviewController {
         server.registerForUpdatesSubtask(subTask -> {
             Platform.runLater(this::refresh);
         });
+        server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater( ()->{
+            System.out.println("I am here");
+            refresh();
+        }));
         server.registerForUpdatesTag(tag -> {
             Platform.runLater(this::refresh);
         });
@@ -434,6 +438,8 @@ public class CardOverviewController {
      * Method that refreshes all card components.
      */
     public void refresh() {
+        board = server.getBoardByID(board.getBoardId());
+        System.out.println(board.getSchemes().get(0).getBackgroundColor());
         refreshSubTasks();
         refreshCardDetails();
         refreshTags();
@@ -443,7 +449,7 @@ public class CardOverviewController {
     public void refreshSchemes() {
         colorSchemes.getChildren().clear();
         Card card = server.getCardsById(cardId);
-        List<ColorScheme> schemes = list.getBoard().getSchemes();
+        List<ColorScheme> schemes = board.getSchemes();
         for (ColorScheme s : schemes) {
             HBox hBox = new HBox(10);
             hBox.setMinSize(150, 20);

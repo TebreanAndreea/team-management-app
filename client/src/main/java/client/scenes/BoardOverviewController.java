@@ -91,6 +91,7 @@ public class BoardOverviewController {
      */
     public void initialize() {
         server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
+        server.registerForMessages("/topic/subtask", Board.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
             Platform.runLater(this::refresh);
@@ -144,9 +145,16 @@ public class BoardOverviewController {
         dialog.showAndWait().ifPresent(name -> {
 
             if (!name.isEmpty()) {
+                ColorScheme scheme = new ColorScheme();
+                for (ColorScheme s :board.getSchemes()) {
+                    if (s.isDef()) {
+                        scheme = s;
+                        break;
+                    }
+                }
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
                 Listing curList = map.get(vBox);
-                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList, board.getCardFontColor(), board.getCardBackgroundColor());
+                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList, board.getCardFontColor(), board.getCardBackgroundColor(), scheme.getName());
                 Card updatedCard = saveCardDB(curCard, curList);
                 refresh();
             } else {
