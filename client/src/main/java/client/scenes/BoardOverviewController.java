@@ -1,24 +1,17 @@
 package client.scenes;
 
 
-import jakarta.ws.rs.BadRequestException;
-import commons.SubTask;
-import javafx.application.Platform;
-
 import client.MyFXML;
 import client.MyModule;
-import com.google.inject.Injector;
-import javafx.event.ActionEvent;
-
-import javafx.event.EventTarget;
-
 import client.utils.ServerUtils;
-import commons.Board;
-import commons.Card;
-import commons.Listing;
+import com.google.inject.Injector;
+import commons.*;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.WebApplicationException;
-
-import javafx.fxml.FXML;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -27,19 +20,19 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import javax.inject.Inject;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,6 +49,9 @@ public class BoardOverviewController {
     public TextField accessKey;
     public Label boardName;
     public Button renameBoardButton;
+    public AnchorPane mainPane;
+
+    public ScrollPane scrollPaneBoard;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -95,6 +91,7 @@ public class BoardOverviewController {
      */
     public void initialize() {
         server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
+        server.registerForMessages("/topic/subtask", Board.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/lists", Listing.class, q -> {
             System.out.println("listing");
             Platform.runLater(this::refresh);
@@ -148,41 +145,18 @@ public class BoardOverviewController {
         dialog.showAndWait().ifPresent(name -> {
 
             if (!name.isEmpty()) {
+                ColorScheme scheme = new ColorScheme();
+                for (ColorScheme s :board.getSchemes()) {
+                    if (s.isDef()) {
+                        scheme = s;
+                        break;
+                    }
+                }
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
-
-
-                Button newCard = new Button(name);
-
-                // make this card draggable
-                newCard.setOnMousePressed(event -> {
-                    target = newCard.getParent(); // this is the hbox that needs to be dropped
-                });
-
-                newCard.setOnMouseReleased(this::handleDropping);
-                setupButton(newCard);
-                Button edit = new Button("\uD83D\uDD89");
-                edit.setOnAction(this::editCard); // an event happens when the button is clicked
-                setupButton(edit);
-                Button delete = new Button("\uD83D\uDDD9");
-                delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-                setupButton(delete);
-                HBox buttonList = new HBox();
-                buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
-                buttonList.setAlignment(Pos.CENTER);
-                buttonList.getChildren().addAll(newCard, edit, delete);
-
-
-                HBox deleteListBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
-                HBox plusBox = (HBox) vBox.getChildren().remove(vBox.getChildren().size() - 1);
-
-                vBox.getChildren().addAll(buttonList, plusBox, deleteListBox);
-
                 Listing curList = map.get(vBox);
-                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList);
+                Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList, board.getCardFontColor(), board.getCardBackgroundColor(), scheme.getName());
                 Card updatedCard = saveCardDB(curCard, curList);
-                curList.getCards().add(updatedCard);
-                cardMap.put(buttonList, updatedCard);
-
+                refresh();
             } else {
 
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
@@ -292,15 +266,39 @@ public class BoardOverviewController {
             cardOverview.getKey().setFileName(fileName);
             cardOverview.getKey().setBoard(board);
             cardOverview.getKey().setList(list);
-            cardOverview.getKey().refreshCardDetails();
+            cardOverview.getKey().refresh();
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(cardOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
+            primaryStage.setOnCloseRequest(event -> {
+                server.stop();
+            });
         }
     }
 
 
+    /**
+     * Function that goes to the customization details.
+     *
+     * @param actionEvent the action event on the button
+     * @throws IOException the exception which might be caused
+     */
+    public void switchToCustomizationScene(ActionEvent actionEvent) throws IOException {
+        if (!adminControl) {
+            var customizationOverview = FXML.load(CustomizationOverviewController.class, "client", "scenes", "CustomizationOverview.fxml");
+            customizationOverview.getKey().setBoard(board);
+            customizationOverview.getKey().setFileName(fileName);
+            customizationOverview.getKey().refresh();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(customizationOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.show();
+            primaryStage.setOnCloseRequest(event -> {
+                server.stop();
+            });
+        }
+    }
     /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
      *
@@ -329,7 +327,6 @@ public class BoardOverviewController {
                 Card card = cardMap.get((HBox) target);
                 server.deleteCard(card.getCardId()); // delete the card from its initial list
                 vBox.getChildren().remove((HBox) target); // this is for duplicate children
-
                 Listing list = map.get(vBox);
                 Card updatedCard = saveCardDB(card, list);  // add this card to this list
                 list.getCards().add(updatedCard);
@@ -356,7 +353,8 @@ public class BoardOverviewController {
                         foundPlace = true;
                     } else {
                         if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
-                            vBox.getChildren().add(j + 1, (HBox) target);
+                            if(!vBox.getChildren().contains(target))
+                                vBox.getChildren().add(j + 1, (HBox) target);
                             foundPlace = true;
                         }
                     }
@@ -423,6 +421,9 @@ public class BoardOverviewController {
         map.put(vBox, listing);
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
+        titledPane.setStyle("-fx-text-fill: "+board.getListTextColor()+";");
+        titledPane.getContent().setStyle("-fx-background-color:"+board.getListBackgroundColor()+";");
+        // Wait for the TitledPane to be displayed and fully initialized
         titledPane.setUserData(listing.getListId());
         titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
         titledPane.setMinWidth(135);
@@ -430,6 +431,15 @@ public class BoardOverviewController {
         hBox.getChildren().add(titledPane);
     }
 
+
+//    public void paintCard(HBox hBox, Card card)
+//    {
+//
+//        hBox.setStyle("-fx-background-color: " + card.getBackgroundColor() + "; -fx-border-radius: 10");
+//        for (Node n : hBox.getChildren())
+//            n.setStyle(n.getStyle()+ ";-fx-text-fill: " + card.getFontColor()+";");
+//
+//    }
     /**
      * Adds a card to the vBox List.
      *
@@ -441,33 +451,49 @@ public class BoardOverviewController {
     {
         Button newCard;
         VBox vBox1 = new VBox();
-       // vBox1.setPrefHeight(30);
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for(SubTask s : c.getSubTasks()) {
             if(s.isDone() == true) doneSubtasks++;
         }
-        vBox1.getChildren().addAll(new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks)));
-        vBox1.setAlignment(Pos.BOTTOM_RIGHT);
+        Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks));
+        done.setStyle("  -fx-text-fill: " + c.getFontColor()+";");
+        vBox1.getChildren().addAll(done);
+        vBox1.setAlignment(Pos.CENTER);
         Label nameCard = new Label(c.getName());
+        nameCard.setStyle( "-fx-text-fill: " + c.getFontColor()+";");
+
+        //Create hbox with all the tags attributed to card
+        HBox tags = new HBox();
+        tags.setSpacing(3);
+        for(Tag tag : c.getTags()){
+            Label labelTag = new Label(" ");
+            labelTag.setStyle("-fx-font-size: 1px");
+            labelTag.setPrefWidth(25);
+            labelTag.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
+            tags.getChildren().add(labelTag);
+        }
+
         if(!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
-            markDescription.setStyle("-fx-font-size: 5px;");
-            //nameCard.setStyle("-fx-font-size: 15px;");
-            HBox hbox = new HBox(markDescription, nameCard, vBox1);
+            markDescription.setStyle("-fx-font-size: 5px;" +  "  -fx-text-fill: " + c.getFontColor()+";");
+            VBox vBoxTag = new VBox(nameCard, tags); //put tag hbox below card name
+            vBoxTag.setSpacing(3);
+            HBox hbox = new HBox(markDescription, vBoxTag, vBox1);
             hbox.setSpacing(8);
             newCard = new Button();
             newCard.setGraphic(hbox);
         } else {
             newCard = new Button();
             HBox hbox = new HBox(nameCard, vBox1);
+            VBox vBoxTag = new VBox(hbox, tags);  //put tag hbox below card name
+            vBoxTag.setSpacing(3);
             hbox.setSpacing(8);
-            newCard.setGraphic(hbox);
+            newCard.setGraphic(vBoxTag);
         }
-       // newCard.setPrefWidth(100);
-       // newCard.setPrefHeight(100);
+
         newCard.setUserData(c.getCardId());
-        setupButton(newCard);
+        setupButton(newCard,c);
         newCard.setCursor(Cursor.CLOSED_HAND);
         // make this card draggable
         newCard.setOnMousePressed(event -> {
@@ -488,14 +514,15 @@ public class BoardOverviewController {
             }
         });
 
-        setupButton(edit);
+        setupButton(edit,c);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-        setupButton(delete);
+        setupButton(delete,c);
         HBox buttonList = new HBox();
         buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
         buttonList.getChildren().addAll(newCard, edit, delete);
         buttonList.setAlignment(Pos.CENTER);
+        buttonList.setBackground(new Background(new BackgroundFill(Color.web(c.getBackgroundColor()), new CornerRadii(10), Insets.EMPTY)));
         vBox.getChildren().add(buttonList);
         cardMap.put(buttonList, c);
     }
@@ -519,17 +546,45 @@ public class BoardOverviewController {
                 return;
             }
         }
+        mainPane.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
+        hBox.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
+        scrollPaneSetup();
+
+
         listController.setBoard(board);
         String boardTitle = board.getTitle();
         Text boardText = new Text(boardTitle);
         boardText.setFont(Font.font("System Bold", 19.0));
         boardName.setText(boardTitle);
+        boardName.setTextFill(Color.web(board.getTextColor()));
         renameBoardButton.setLayoutX(boardName.getLayoutX() + boardText.getLayoutBounds().getWidth() + 10.0);
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
         map = new HashMap<>();
+        setUpButtonColors();
         for (Listing listing : listings)
             addListWithListing(listing);
+    }
+
+    /**
+     * Sets up the scroll pane in the board colors.
+     */
+    private void scrollPaneSetup() {
+        scrollPaneBoard.setStyle("-fx-background-color: " + board.getBackgroundColor() + ";");
+        scrollPaneBoard.getStylesheets().clear();
+        String scrollbarStyle = ".scroll-bar:vertical .thumb {" +
+                "-fx-background-color:" + board.getTextColor() + ";" +
+                "}" +
+                ".scroll-bar:vertical .track {" +
+                "-fx-background-color: " +board.getBackgroundColor()  + ";" +
+                "}"+
+                ".scroll-bar:horizontal .track {" +
+                "-fx-background-color: " +board.getBackgroundColor()  + ";" +
+                "}"+
+                ".scroll-bar:horizontal .thumb {" +
+                "-fx-background-color: " +board.getTextColor()  + ";" +
+                "}";
+        scrollPaneBoard.getStylesheets().add("data:text/css," + scrollbarStyle);
     }
 
     /**
@@ -629,16 +684,18 @@ public class BoardOverviewController {
 
     /**
      * Sets up the buttons contained in the lists.
-     *
+     * @param card - the card associated with the button
      * @param button the button to set up
      */
-    private void setupButton(Button button) {
+    private void setupButton(Button button, Card card) {
         HBox.setHgrow(button, Priority.ALWAYS);
-        button.setStyle("-fx-background-color: transparent");
+        String style = "-fx-background-color: transparent; " +
+            "-fx-text-fill: " + card.getFontColor()+";";
+        button.setStyle(style);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMinWidth(Button.USE_PREF_SIZE);
-        button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);"));
-        button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent;"));
+        button.setOnMouseEntered(event -> button.setStyle( "-fx-background-color: rgba(0,0,0,0.1);" +  "-fx-text-fill: " + card.getFontColor()+";"));
+        button.setOnMouseExited(event -> button.setStyle(style));
     }
 
     /**
@@ -657,6 +714,10 @@ public class BoardOverviewController {
         ClipboardContent content = new ClipboardContent();
         content.putString(board.getAccessKey());
         clipboard.setContent(content);
+        copyKeyButton.setText("Copied!");
+        PauseTransition delay = new PauseTransition(Duration.seconds(2));
+        delay.setOnFinished(event -> copyKeyButton.setText("Copy"));
+        delay.play();
     }
 
     /**
@@ -682,4 +743,62 @@ public class BoardOverviewController {
 
         });
     }
+
+    /**
+     * Method which switches to tag scene.
+     * @param actionEvent the action events
+     */
+    public void switchToTagScene(javafx.event.ActionEvent actionEvent){
+        if (!adminControl) {
+            var tagOverview = FXML.load(TagController.class, "client", "scenes", "TagOverview.fxml");
+            tagOverview.getKey().setBoard(board);
+            tagOverview.getKey().setFileName(fileName);
+            tagOverview.getKey().refresh();
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(tagOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.setTitle("Tag Overview");
+            primaryStage.show();
+        }
+    }
+
+    public Button addListButton;
+    public Button tagButton;
+
+    public Button copyKeyButton;
+
+    public Button customizeButton;
+    public Button refreshButton;
+
+    /**
+     * Sets up the FXML objects within the board to match the board's colors.
+     */
+    private void setUpButtonColors(){
+        colorButton(addListButton);
+        colorButton(tagButton);
+        colorButton(copyKeyButton);
+        colorButton(customizeButton);
+        colorButton(renameBoardButton);
+        colorButton(refreshButton);
+        accessKey.setStyle("-fx-background-color:"+board.getBackgroundColor()+"; -fx-text-fill:"+board.getTextColor()+";");
+        accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+    }
+    /**
+     * Colors the button in the board's selected colors.
+     * @param button the button to color
+     */
+    private void colorButton(Button button){
+        button.setStyle("-fx-background-color:"+board.getBackgroundColor());
+        button.setTextFill(Color.web(board.getTextColor()));
+        button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:"+board.getTextColor());
+            button.setTextFill(Color.web(board.getBackgroundColor()));
+        });
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color:"+board.getBackgroundColor());
+            button.setTextFill(Color.web(board.getTextColor()));
+        });
+    }
+
 }

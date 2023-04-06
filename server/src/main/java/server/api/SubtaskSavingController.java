@@ -3,10 +3,16 @@ package server.api;
 import commons.Card;
 import commons.Listing;
 import commons.SubTask;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import server.database.SubTaskRepository;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("api/subtask")
@@ -15,6 +21,7 @@ public class SubtaskSavingController {
     private final SimpMessagingTemplate msgs;
 
     private Card card;
+    private Map<Object, Consumer<SubTask>> listenings = new HashMap<>();
 
     /**
      * Constructor for subtask controller.
@@ -38,6 +45,9 @@ public class SubtaskSavingController {
         subTask.setCard(card);
         msgs.convertAndSend("/topic/subtask", subTask);
         SubTask save = repo.save(subTask);
+        listenings.forEach((k,s) -> {
+            s.accept(save);
+        });
         return ResponseEntity.ok(save);
     }
 
@@ -65,6 +75,10 @@ public class SubtaskSavingController {
         subTask.setCard(card);
         subTask = repo.save(subTask);
         msgs.convertAndSend("/topic/subtask", subTask);
+        SubTask sb = subTask;
+        listenings.forEach((k,s) -> {
+            s.accept(sb);
+        });
         return ResponseEntity.ok(subTask);
     }
 
@@ -82,6 +96,9 @@ public class SubtaskSavingController {
         }
         msgs.convertAndSend("/topic/subtask", subTask);
         repo.deleteById(id);
+        listenings.forEach((k,s) -> {
+            s.accept(subTask);
+        });
         return ResponseEntity.ok().build();
     }
 
@@ -97,5 +114,23 @@ public class SubtaskSavingController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(repo.findById(id).get());
+    }
+
+    @GetMapping("/updates")
+    public DeferredResult<ResponseEntity<SubTask>> getUpdatesSubtasks ()
+    {
+        var noContent = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        var result = new DeferredResult<ResponseEntity<SubTask>>(1000L, noContent);
+        var key = new Object();
+
+        listenings.put(key, s ->{
+            System.out.println("Reached");
+            result.setResult(ResponseEntity.ok(s));
+        });
+
+        result.onCompletion(() -> {
+            listenings.remove(key);
+        });
+        return result;
     }
 }

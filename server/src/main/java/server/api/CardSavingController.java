@@ -2,10 +2,17 @@ package server.api;
 
 import commons.Card;
 import commons.Listing;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import server.database.CardRepository;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 
 @RestController
@@ -15,10 +22,12 @@ public class CardSavingController {
     private final CardRepository repo;
     private final SimpMessageSendingOperations msgs;
 
+    private Map<Object, Consumer<Card>> listenings = new HashMap<>();
+
     private Listing list;
 
     /**
-     *Constructor for the card controller.
+     * Constructor for the card controller.
      *
      * @param repo - card repository
      * @param msgs - messages for communication
@@ -36,12 +45,15 @@ public class CardSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<Card> add(@RequestBody Card card) {
-        if(card == null) return ResponseEntity.badRequest().build();
+        if (card == null) return ResponseEntity.badRequest().build();
 
         card.setList(list);
 
         msgs.convertAndSend("/topic/card", card);
         Card save = repo.save(card);
+        listenings.forEach((k, s) -> {
+            s.accept(save);
+        });
         return ResponseEntity.ok(save);
     }
 
@@ -72,6 +84,12 @@ public class CardSavingController {
         }
         msgs.convertAndSend("/topic/card", card);
         repo.deleteById(id);
+
+        if (!listenings.isEmpty()) {
+            listenings.forEach((k, s) -> {
+                s.accept(card);
+            });
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -87,5 +105,29 @@ public class CardSavingController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(repo.findById(id).get());
+    }
+
+    @GetMapping("/updates")
+    public DeferredResult<ResponseEntity<Card>> getUppdatesCards() {
+        var noContent = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        var result = new DeferredResult<ResponseEntity<Card>>(1000L, noContent);
+        var key = new Object();
+
+        listenings.put(key, s -> {
+            result.setResult(ResponseEntity.ok(s));
+        });
+
+        result.onCompletion(() -> {
+            listenings.remove(key);
+        });
+        return result;
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<Boolean> getCard(@RequestBody Card card) {
+        Optional<Card> card1 = repo.findById(card.getCardId());
+        if (card1.isEmpty())
+            return ResponseEntity.ok(true);
+        return ResponseEntity.ok(false);
     }
 }

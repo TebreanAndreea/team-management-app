@@ -26,6 +26,8 @@ import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -149,6 +151,27 @@ public class ServerUtils {
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
+    }
+    /**
+     * Adding a tag to a card.
+     *
+     * @param card the card
+     * @param tag the tag added
+     */
+    public void addTag(Card card, Tag tag) {
+        card.getTags().add(tag);
+        saveCard(card);
+    }
+
+    /**
+     * Removing a tag from a card.
+     *
+     * @param card the card
+     * @param tag the tag removed
+     */
+    public void removeTag(Card card, Tag tag) {
+        card.getTags().remove(tag);
+        saveCard(card);
     }
 
     /**
@@ -416,6 +439,12 @@ public class ServerUtils {
                 });
     }
 
+    /**
+     * Deleting a board.
+     *
+     * @param id the id of the board
+     */
+
     public void deleteBoard(Long id) {
         ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/boards/" + id) //
@@ -451,5 +480,166 @@ public class ServerUtils {
         for (Listing l : currentBoard.getLists())
             editList(l);
         return currentBoard;
+    }
+
+    private static ExecutorService EXEC = Executors.newSingleThreadExecutor();
+    public void registerForUpdatesSubtask(Consumer<SubTask> consumer)
+    {
+        EXEC = Executors.newSingleThreadExecutor();
+        EXEC.submit(() -> {
+            while (!Thread.interrupted())
+            {
+                //System.out.println("Long Polling");
+                var response = ClientBuilder.newClient(new ClientConfig()) //
+                    .target(SERVER).path("api/subtask/updates") //
+                    .request(APPLICATION_JSON) //
+                    .accept(APPLICATION_JSON) //
+                    .get(Response.class);
+
+                if (response.getStatus() == 204)
+                    continue;
+                var subTask = response.readEntity(SubTask.class);
+                consumer.accept(subTask);
+            }
+        });
+    }
+
+    private static ExecutorService EXEC1 = Executors.newSingleThreadExecutor();
+    public void registerForUpdatesTag(Consumer<Tag> consumer)
+    {
+        EXEC1 = Executors.newSingleThreadExecutor();
+        EXEC1.submit(() -> {
+            while (!Thread.interrupted())
+            {
+                //System.out.println("Long Polling");
+                var response = ClientBuilder.newClient(new ClientConfig()) //
+                        .target(SERVER).path("api/tag/updates") //
+                        .request(APPLICATION_JSON) //
+                        .accept(APPLICATION_JSON) //
+                        .get(Response.class);
+
+                if (response.getStatus() == 204)
+                    continue;
+                var tag = response.readEntity(Tag.class);
+                consumer.accept(tag);
+            }
+        });
+    }
+
+    private static ExecutorService EXECII = Executors.newSingleThreadExecutor();
+    public void registerForUpdatesCard(Consumer<Card> consumer)
+    {
+        EXECII = Executors.newSingleThreadExecutor();
+        EXECII.submit(() -> {
+            while (!Thread.interrupted())
+            {
+//                System.out.println("Long Polling");
+                var response = ClientBuilder.newClient(new ClientConfig()) //
+                    .target(SERVER).path("api/card/updates") //
+                    .request(APPLICATION_JSON) //
+                    .accept(APPLICATION_JSON) //
+                    .get(Response.class);
+
+                if (response.getStatus() == 204)
+                    continue;
+                var card = response.readEntity(Card.class);
+                consumer.accept(card);
+            }
+        });
+    }
+    	
+    public boolean checkCard (Card card)
+    {
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/card/check")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(card, APPLICATION_JSON), Boolean.class);
+
+    }
+
+    public void stop()
+    {
+        EXEC.shutdownNow();
+        EXECII.shutdownNow();
+        EXEC1.shutdownNow();
+    }
+    /**
+     * Saves a card in the database.
+     * @param tag the tag
+     * @return a Tag object
+     */
+    public Tag saveTag(Tag tag){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/tag")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(tag, APPLICATION_JSON), Tag.class);
+    }
+
+    /**
+     * Deleting a task from database.
+     *
+     * @param tagId the id of the tag
+     * @param tag the tag to be deletd(tried somt things with this)
+     */
+    public void deleteTag(long tagId, Tag tag) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/tag/delete/" + tagId)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .delete();
+    }
+    /**
+     * Sets a board to a tag.
+     * @param board the board
+     * @return a Board object
+     */
+    public Board sendBoardToTag(Board board){
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/tag/setBoard")
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Sets a board to a scheme.
+     * @param board the board
+     * @return a Board object
+     */
+    public Board sendBoardToScheme(Board board){
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/color/setBoard")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(board, APPLICATION_JSON), Board.class);
+    }
+
+    /**
+     * Saves a color scheme.
+     * @param colorScheme the color scheme
+     * @return a ColorScheme object
+     */
+    public ColorScheme saveColorScheme(ColorScheme colorScheme){
+        return ClientBuilder.newClient(new ClientConfig())
+            .target(SERVER).path("api/color")
+            .request(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .post(Entity.entity(colorScheme, APPLICATION_JSON), ColorScheme.class);
+    }
+
+    /**
+     * Deleting a scheme.
+     *
+     * @param id the id of the scheme
+     */
+
+    public void deleteScheme(Long id) {
+        ClientBuilder.newClient(new ClientConfig()) //
+            .target(SERVER).path("api/color/delete/" + id) //
+            .request(APPLICATION_JSON) //
+            .accept(APPLICATION_JSON) //
+            .delete();
     }
 }

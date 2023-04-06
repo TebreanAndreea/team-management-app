@@ -17,7 +17,12 @@ public class Card {
     private String description;
     private String name;
     private Date dueDate;
-    @ManyToMany(mappedBy = "cards")
+    @ManyToMany()
+    @JoinTable(
+            name = "tagged_cards",
+            joinColumns = @JoinColumn(name = "card_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
     private List<Tag> tags;
     @JsonManagedReference
     @OneToMany(
@@ -25,12 +30,18 @@ public class Card {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+
     private List<SubTask> subTasks;
     private boolean complete;
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "list_id")
     private Listing list;
+
+    private String fontColor;
+    private String backgroundColor;
+
+    private String schemeName;
 
     /**
      *
@@ -41,8 +52,11 @@ public class Card {
      * @param tags - List with tags assigned to card (can be empty)
      * @param subTasks - List of smaller simple subtasks of this card (can be empty)
      * @param list - the list in which the card is
+     * @param fontColor - the font color
+     * @param backgroundColor - the background color
+     * @param schemeName - the name of the scheme
      */
-    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list) {
+    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list, String fontColor, String backgroundColor, String schemeName) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
@@ -50,6 +64,9 @@ public class Card {
         this.subTasks = subTasks;
         this.complete = false;
         this.list = list;
+        this.backgroundColor = backgroundColor;
+        this.fontColor = fontColor;
+        this.schemeName = schemeName;
     }
 
     /**
@@ -167,17 +184,27 @@ public class Card {
         this.complete = complete;
     }
 
+    public String getSchemeName() {
+        return schemeName;
+    }
+
+    public void setSchemeName(String schemeName) {
+        this.schemeName = schemeName;
+    }
+
     /**
      * Equals method for the Card class.
      * @param o - the object with which we check for equality
+     * @param listss - checks wether the method has been called from a list and doesn't check if the lists are equal as this makes the code go in a loop
      * @return - a boolean based on the outcome
      */
-    @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o, boolean listss) {
         if (this == o) return true;
         if (!(o instanceof Card)) return false;
         Card card = (Card) o;
-        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && Objects.equals(dueDate, card.dueDate) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list);
+        if (listss)
+            return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor)) && schemeName.equals(card.schemeName);
+        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor))&& schemeName.equals(card.schemeName);
     }
 
     /**
@@ -196,12 +223,28 @@ public class Card {
         this.list = list;
     }
 
+    public String getFontColor() {
+        return fontColor;
+    }
+
+    public void setFontColor(String fontColor) {
+        this.fontColor = fontColor;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
     /**
      * A hashcode value of the card.
      * @return - the new generated hash code of the card
      */
     @Override
     public int hashCode() {
-        return Objects.hash(cardId, description, name, dueDate, tags, subTasks, complete, list);
+        return Objects.hash(cardId, description, name, dueDate, tags, subTasks, complete);
     }
 }

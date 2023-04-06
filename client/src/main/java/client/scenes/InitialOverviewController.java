@@ -5,6 +5,7 @@ import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Board;
+import commons.ColorScheme;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
@@ -52,14 +53,12 @@ public class InitialOverviewController {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-    private int curPlacedBoards;
     private String fileName="user_files/temp.txt";
 
     @Inject
     public InitialOverviewController(ServerUtils server, MainController mainController) {
         this.server = server;
         this.maincontroller = mainController;
-        curPlacedBoards = 0;
         boardsMap = new HashMap<>();
     }
 
@@ -116,8 +115,14 @@ public class InitialOverviewController {
         dialog.showAndWait().ifPresent(name -> {
 
             if (!name.isEmpty()) {
+
                 Board res = server.addBoard(new Board(name, "", ""));
                 res.setAccessKey();
+                ColorScheme scheme = new ColorScheme("Defualt", "#ffffff", "#000000", res);
+                scheme.setDef(true);
+                server.sendBoardToScheme(res);
+                ColorScheme saved = server.saveColorScheme(scheme);
+                res.getSchemes().add(saved);
                 server.addBoard(res);
                 writeNewBoardToFile(res);
                 refresh();
