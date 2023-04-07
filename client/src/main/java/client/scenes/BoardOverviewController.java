@@ -781,7 +781,7 @@ public class BoardOverviewController {
         colorButton(renameBoardButton);
         colorButton(refreshButton);
         accessKey.setStyle("-fx-background-color:"+board.getBackgroundColor()+"; -fx-text-fill:"+board.getTextColor()+";");
-        accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+
     }
     /**
      * Colors the button in the board's selected colors.

@@ -13,10 +13,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
@@ -25,6 +24,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
+import static java.awt.Color.WHITE;
+import static java.awt.Color.white;
 
 public class ChooseTagController {
 
@@ -121,11 +122,9 @@ public class ChooseTagController {
         for(Tag tag: tags) {
             CheckBox checkBox = new CheckBox(tag.getTitle());
            // checkBox.setStyle("-fx-font-size: 40px;");
-            if(tag.getColor() != null) {
-                Color color = Color.web(tag.getColor());
-                Background background = new Background(new BackgroundFill(color, null, null));
-                checkBox.setBackground(background);
-            }
+            checkBox.setStyle("-fx-background-color: transparent;");
+            checkBox.setBorder(new Border(new BorderStroke(Color.web(tag.getColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(4))));
+
             checkBox.setMinSize(200,50);
             checkBox.setAlignment(Pos.CENTER);
             vbox.setAlignment(Pos.CENTER);

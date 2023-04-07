@@ -484,5 +484,80 @@ public class ServerUtilsTest {
                 .withPath("/api/color/setBoard")
                 .withBody(json(board)), once());
     }
+    /**
+     * Test for the sendList method.
+     * <p> This test verifies that the sendList method makes a POST request to the correct path. </p>
+     */
+    @Test
+    public void testSendList(){
+        // Setup
+        Listing listing = new Listing("listing1", null);
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/api/card/setList")
+                        .withBody(json(listing)))
+                .respond(response()
+                        .withStatusCode(201));
+
+        // Method call
+        serverUtils.sendList(listing);
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("POST")
+                .withPath("/api/card/setList")
+                .withBody(json(listing)), once());
+    }
+
+    /**
+     * Test for the editList method.
+     * <p> This test verifies that the editList method makes a POST request to the correct path. </p>
+     */
+    @Test
+    public void testEditList(){
+        // Setup
+        Listing listing = new Listing("listing1", null);
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/api/lists/edit")
+                        .withBody(json(listing)))
+                .respond(response()
+                        .withStatusCode(201));
+
+        // Method call
+        serverUtils.editList(listing);
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("POST")
+                .withPath("/api/lists/edit")
+                .withBody(json(listing)), once());
+    }
+
+    /**
+     * Test for the updateSubtask method.
+     * <p> This test verifies that the updateSubtask method makes a POST request to the correct path. </p>
+     */
+    @Test
+    public void testUpdateSubtask(){
+        // Setup
+        SubTask subTask = new SubTask("subtask1", null);
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/api/subtask/edit")
+                        .withBody(json(subTask)))
+                .respond(response()
+                        .withStatusCode(201));
+
+        // Method call
+        serverUtils.updateSubtask(subTask, "subtask1");
+
+        // Verification
+        mockServer.verify(request()
+                .withMethod("POST")
+                .withPath("/api/subtask/edit")
+                .withBody(json(subTask)), once());
+    }
+
 
 }

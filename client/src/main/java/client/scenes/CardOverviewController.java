@@ -13,11 +13,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -50,32 +48,34 @@ public class CardOverviewController {
     private Board board = new Board("test", "", "");
     private String fileName = "user_files/temp.txt";
 
+    private boolean isRunning;
+
     public void initialize() {
+        isRunning = true;
         server.registerForUpdatesSubtask(subTask -> {
             Platform.runLater(this::refresh);
         });
-        server.registerForUpdatesTag(tag -> {
-            Platform.runLater(this::refresh);
-        });
+
         server.registerForUpdatesCard(card -> {
+            if(isRunning)
+                Platform.runLater(this::refresh);
 
-
-            Platform.runLater(() -> {
-                boolean check = server.checkCard(card);
-                System.out.println("First: " + check);
-
-                if (check) {
-                    System.out.println(check);
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Card has been deleted.");
-                    alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
-                    alert.showAndWait();
-                    switchBoard((Stage) cardLabel.getScene().getWindow());
-                    server.stop();
-                } else {
-                    refresh();
-                }
-            });
+//            Platform.runLater(() -> {
+//                boolean check = server.checkCard(card);
+//                System.out.println("First: " + check);
+//
+//                if (check) {
+//                    System.out.println(check);
+//                    Alert alert = new Alert(Alert.AlertType.WARNING);
+//                    alert.setTitle("Card has been deleted.");
+//                    alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
+//                    alert.showAndWait();
+//                    switchBoard((Stage) cardLabel.getScene().getWindow());
+//                    server.stop();
+//                } else {
+//                    refresh();
+//                }
+//            });
         });
     }
 
@@ -434,10 +434,26 @@ public class CardOverviewController {
      * Method that refreshes all card components.
      */
     public void refresh() {
+        if(isRunning){
+        try{
+        Card card = server.getCardsById(cardId);
+        }
+        catch (Exception e){
+            isRunning= false;
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Card has been deleted.");
+            alert.setContentText("We are very sorry, but the card you are currently editing has been modified by another user");
+            if (!alert.isShowing()) {
+                alert.showAndWait();
+                switchBoard((Stage) cardLabel.getScene().getWindow());
+            }
+            server.stop();
+        }
         refreshSubTasks();
         refreshCardDetails();
         refreshTags();
         refreshSchemes();
+        }
     }
 
     public void refreshSchemes() {
@@ -500,9 +516,8 @@ public class CardOverviewController {
         hbox.getChildren().clear();
         for (Tag tag : card.getTags()) {
             Label tagLabel = new Label(tag.getTitle());
-            Color color = Color.web(tag.getColor());
-            Background background = new Background(new BackgroundFill(color, null, null));
-            tagLabel.setBackground(background);
+            tagLabel.setStyle("-fx-background-color: trasparent;");
+            tagLabel.setBorder(new Border(new BorderStroke(Paint.valueOf(tag.getColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(2))));
             tagLabel.setAlignment(Pos.CENTER);
             //  tagLabel.setStyle("-fx-background-radius: 20;");
             tagLabel.setMinSize(100, 40);

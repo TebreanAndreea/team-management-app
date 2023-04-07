@@ -255,6 +255,7 @@ public class TagController {
             HBox hbox = new HBox(tagButton,editButton,deleteButton, colorPicker);
             colorPicker.setOnAction(event -> {
                 Color color = colorPicker.getValue();
+                colorPicker.setValue(color);
                 tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
                 tag.setColor(color.toString());
                 saveTagDB(tag, this.board);
