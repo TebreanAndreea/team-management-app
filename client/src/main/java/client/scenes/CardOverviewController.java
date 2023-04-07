@@ -82,7 +82,8 @@ public class CardOverviewController {
             if (isRunning) {
                 Platform.runLater(() -> {
                     if (cardId != card.getCardId()) {
-                        List<Listing> lists = server.getListings();
+                        board = server.getBoardByID(board.getBoardId());
+                        List<Listing> lists = board.getLists();
                         for (Listing l : lists) {
                             for (Card c : l.getCards()) {
                                 if (c.getName().equals(curCard.getName())) {

@@ -146,6 +146,20 @@ public class BoardOverviewController {
         dialog.showAndWait().ifPresent(name -> {
 
             if (!name.isEmpty()) {
+                board = server.getBoardByID(board.getBoardId());
+                List<Listing> lists = board.getLists();
+                for (Listing l : lists) {
+                    for (Card c : l.getCards()) {
+                        if (c.getName().equals(name)) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Card with the same name already exists in the board");
+                            alert.setContentText("Please enter a new name for the card");
+                            alert.showAndWait();
+                            return;
+                        }
+                    }
+                }
+
                 ColorScheme scheme = new ColorScheme();
                 for (ColorScheme s : board.getSchemes()) {
                     if (s.isDef()) {
