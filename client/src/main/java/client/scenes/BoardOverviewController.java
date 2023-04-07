@@ -113,12 +113,13 @@ public class BoardOverviewController {
      *
      * @param card - the card we need to save
      * @param list - the list that has the card
+     * @param savedIntoList checks if the card comes directly from beeing added to a list
      * @return card
      */
-    public Card saveCardDB(Card card, Listing list) {
+    public Card saveCardDB(Card card, Listing list, boolean savedIntoList) {
         try {
             server.sendList(list);
-            return server.saveCard(card);
+            return server.saveCard(card, savedIntoList);
         } catch (WebApplicationException e) {
             var alert = new Alert(Alert.AlertType.ERROR);
             alert.initModality(Modality.APPLICATION_MODAL);
@@ -146,7 +147,7 @@ public class BoardOverviewController {
 
             if (!name.isEmpty()) {
                 ColorScheme scheme = new ColorScheme();
-                for (ColorScheme s :board.getSchemes()) {
+                for (ColorScheme s : board.getSchemes()) {
                     if (s.isDef()) {
                         scheme = s;
                         break;
@@ -155,7 +156,7 @@ public class BoardOverviewController {
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
                 Listing curList = map.get(vBox);
                 Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList, board.getCardFontColor(), board.getCardBackgroundColor(), scheme.getName());
-                Card updatedCard = saveCardDB(curCard, curList);
+                Card updatedCard = saveCardDB(curCard, curList, true);
                 refresh();
             } else {
 
@@ -217,7 +218,7 @@ public class BoardOverviewController {
         HBox clicked = (HBox) ((Button) actionEvent.getSource()).getParent();
         VBox vBox = (VBox) clicked.getParent();
         Card card = cardMap.get(clicked);
-        server.deleteCard(card.getCardId());
+        server.deleteCard(card.getCardId(), true);
         vBox.getChildren().remove(clicked);
     }
 
@@ -299,6 +300,7 @@ public class BoardOverviewController {
             });
         }
     }
+
     /**
      * This method handles dropping a hbox in another titledPane or within the same titledPane.
      *
@@ -325,10 +327,10 @@ public class BoardOverviewController {
             if (mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2) { // the mouse is inside this vbox
 
                 Card card = cardMap.get((HBox) target);
-                server.deleteCard(card.getCardId()); // delete the card from its initial list
+                server.deleteCard(card.getCardId(), false); // delete the card from its initial list
                 vBox.getChildren().remove((HBox) target); // this is for duplicate children
                 Listing list = map.get(vBox);
-                Card updatedCard = saveCardDB(card, list);  // add this card to this list
+                Card updatedCard = saveCardDB(card, list, true);  // add this card to this list
                 list.getCards().add(updatedCard);
                 cardMap.put((HBox) target, updatedCard);
 
@@ -353,7 +355,7 @@ public class BoardOverviewController {
                         foundPlace = true;
                     } else {
                         if (mouseY >= yMiddleUp && mouseY < yMiddleDown) {
-                            if(!vBox.getChildren().contains(target))
+                            if (!vBox.getChildren().contains(target))
                                 vBox.getChildren().add(j + 1, (HBox) target);
                             foundPlace = true;
                         }
@@ -365,13 +367,17 @@ public class BoardOverviewController {
                 for (int j = 0; j < nrCards + 1; j++) { // we delete all the cards from this list
                     HBox hBox = (HBox) vBox.getChildren().get(j);
                     Card card2 = cardMap.get(hBox);
-                    server.deleteCard(card2.getCardId());
+                    server.deleteCard(card2.getCardId(), false);
                 }
 
                 for (int j = 0; j < nrCards + 1; j++) { // we have all the cards in good order, we add them to the list
                     HBox hBox = (HBox) vBox.getChildren().get(j);
                     Card card2 = cardMap.get(hBox);
-                    Card updated = saveCardDB(card2, list);
+                    Card updated;
+                    if (j == nrCards)
+                        updated = saveCardDB(card2, list, false);
+                    else
+                        updated = saveCardDB(card2, list, true);
                     list.getCards().add(updated);
                     cardMap.put(hBox, updated);
                 }
@@ -421,8 +427,8 @@ public class BoardOverviewController {
         map.put(vBox, listing);
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
-        titledPane.setStyle("-fx-text-fill: "+board.getListTextColor()+";");
-        titledPane.getContent().setStyle("-fx-background-color:"+board.getListBackgroundColor()+";");
+        titledPane.setStyle("-fx-text-fill: " + board.getListTextColor() + ";");
+        titledPane.getContent().setStyle("-fx-background-color:" + board.getListBackgroundColor() + ";");
         // Wait for the TitledPane to be displayed and fully initialized
         titledPane.setUserData(listing.getListId());
         titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
@@ -440,6 +446,7 @@ public class BoardOverviewController {
 //            n.setStyle(n.getStyle()+ ";-fx-text-fill: " + card.getFontColor()+";");
 //
 //    }
+
     /**
      * Adds a card to the vBox List.
      *
@@ -447,26 +454,25 @@ public class BoardOverviewController {
      * @param vBox    - the vBox which contains the list
      * @param listing - the list the card is in
      */
-    public void addCard (Card c, VBox vBox, Listing listing)
-    {
+    public void addCard(Card c, VBox vBox, Listing listing) {
         Button newCard;
         VBox vBox1 = new VBox();
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
-        for(SubTask s : c.getSubTasks()) {
-            if(s.isDone() == true) doneSubtasks++;
+        for (SubTask s : c.getSubTasks()) {
+            if (s.isDone() == true) doneSubtasks++;
         }
         Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks));
-        done.setStyle("  -fx-text-fill: " + c.getFontColor()+";");
+        done.setStyle("  -fx-text-fill: " + c.getFontColor() + ";");
         vBox1.getChildren().addAll(done);
         vBox1.setAlignment(Pos.CENTER);
         Label nameCard = new Label(c.getName());
-        nameCard.setStyle( "-fx-text-fill: " + c.getFontColor()+";");
+        nameCard.setStyle("-fx-text-fill: " + c.getFontColor() + ";");
 
         //Create hbox with all the tags attributed to card
         HBox tags = new HBox();
         tags.setSpacing(3);
-        for(Tag tag : c.getTags()){
+        for (Tag tag : c.getTags()) {
             Label labelTag = new Label(" ");
             labelTag.setStyle("-fx-font-size: 1px");
             labelTag.setPrefWidth(25);
@@ -474,9 +480,9 @@ public class BoardOverviewController {
             tags.getChildren().add(labelTag);
         }
 
-        if(!c.getDescription().equals("")) {
+        if (!c.getDescription().equals("")) {
             Label markDescription = new Label("\u2630");
-            markDescription.setStyle("-fx-font-size: 5px;" +  "  -fx-text-fill: " + c.getFontColor()+";");
+            markDescription.setStyle("-fx-font-size: 5px;" + "  -fx-text-fill: " + c.getFontColor() + ";");
             VBox vBoxTag = new VBox(nameCard, tags); //put tag hbox below card name
             vBoxTag.setSpacing(3);
             HBox hbox = new HBox(markDescription, vBoxTag, vBox1);
@@ -493,7 +499,7 @@ public class BoardOverviewController {
         }
 
         newCard.setUserData(c.getCardId());
-        setupButton(newCard,c);
+        setupButton(newCard, c);
         newCard.setCursor(Cursor.CLOSED_HAND);
         // make this card draggable
         newCard.setOnMousePressed(event -> {
@@ -514,10 +520,10 @@ public class BoardOverviewController {
             }
         });
 
-        setupButton(edit,c);
+        setupButton(edit, c);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
-        setupButton(delete,c);
+        setupButton(delete, c);
         HBox buttonList = new HBox();
         buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
         buttonList.getChildren().addAll(newCard, edit, delete);
@@ -576,13 +582,13 @@ public class BoardOverviewController {
                 "-fx-background-color:" + board.getTextColor() + ";" +
                 "}" +
                 ".scroll-bar:vertical .track {" +
-                "-fx-background-color: " +board.getBackgroundColor()  + ";" +
-                "}"+
+                "-fx-background-color: " + board.getBackgroundColor() + ";" +
+                "}" +
                 ".scroll-bar:horizontal .track {" +
-                "-fx-background-color: " +board.getBackgroundColor()  + ";" +
-                "}"+
+                "-fx-background-color: " + board.getBackgroundColor() + ";" +
+                "}" +
                 ".scroll-bar:horizontal .thumb {" +
-                "-fx-background-color: " +board.getTextColor()  + ";" +
+                "-fx-background-color: " + board.getTextColor() + ";" +
                 "}";
         scrollPaneBoard.getStylesheets().add("data:text/css," + scrollbarStyle);
     }
@@ -684,29 +690,33 @@ public class BoardOverviewController {
 
     /**
      * Sets up the buttons contained in the lists.
-     * @param card - the card associated with the button
+     *
+     * @param card   - the card associated with the button
      * @param button the button to set up
      */
     private void setupButton(Button button, Card card) {
         HBox.setHgrow(button, Priority.ALWAYS);
         String style = "-fx-background-color: transparent; " +
-            "-fx-text-fill: " + card.getFontColor()+";";
+                "-fx-text-fill: " + card.getFontColor() + ";";
         button.setStyle(style);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setMinWidth(Button.USE_PREF_SIZE);
-        button.setOnMouseEntered(event -> button.setStyle( "-fx-background-color: rgba(0,0,0,0.1);" +  "-fx-text-fill: " + card.getFontColor()+";"));
+        button.setOnMouseEntered(event -> button.setStyle("-fx-background-color: rgba(0,0,0,0.1);" + "-fx-text-fill: " + card.getFontColor() + ";"));
         button.setOnMouseExited(event -> button.setStyle(style));
     }
 
     /**
      * Setter for the admin control value, which determines whether the app was opened in admin control mode.
+     *
      * @param adminControl the value to set
      */
     public void setAdminControl(boolean adminControl) {
         this.adminControl = adminControl;
     }
+
     /**
      * Copies the board's access key to the clipboard.
+     *
      * @param mouseEvent the event that triggered this method
      */
     public void copyToClipboard(MouseEvent mouseEvent) {
@@ -731,7 +741,7 @@ public class BoardOverviewController {
         dialog.setHeaderText("Please enter a name for the board:");
         dialog.showAndWait().ifPresent(name -> {
 
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 board.setTitle(name);
                 server.updateBoard(board.getBoardId(), name);
             } else {
@@ -746,9 +756,10 @@ public class BoardOverviewController {
 
     /**
      * Method which switches to tag scene.
+     *
      * @param actionEvent the action events
      */
-    public void switchToTagScene(javafx.event.ActionEvent actionEvent){
+    public void switchToTagScene(javafx.event.ActionEvent actionEvent) {
         if (!adminControl) {
             var tagOverview = FXML.load(TagController.class, "client", "scenes", "TagOverview.fxml");
             tagOverview.getKey().setBoard(board);
@@ -773,30 +784,32 @@ public class BoardOverviewController {
     /**
      * Sets up the FXML objects within the board to match the board's colors.
      */
-    private void setUpButtonColors(){
+    private void setUpButtonColors() {
         colorButton(addListButton);
         colorButton(tagButton);
         colorButton(copyKeyButton);
         colorButton(customizeButton);
         colorButton(renameBoardButton);
         colorButton(refreshButton);
-        accessKey.setStyle("-fx-background-color:"+board.getBackgroundColor()+"; -fx-text-fill:"+board.getTextColor()+";");
+        accessKey.setStyle("-fx-background-color:" + board.getBackgroundColor() + "; -fx-text-fill:" + board.getTextColor() + ";");
         accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
     }
+
     /**
      * Colors the button in the board's selected colors.
+     *
      * @param button the button to color
      */
-    private void colorButton(Button button){
-        button.setStyle("-fx-background-color:"+board.getBackgroundColor());
+    private void colorButton(Button button) {
+        button.setStyle("-fx-background-color:" + board.getBackgroundColor());
         button.setTextFill(Color.web(board.getTextColor()));
         button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
         button.setOnMouseEntered(event -> {
-            button.setStyle("-fx-background-color:"+board.getTextColor());
+            button.setStyle("-fx-background-color:" + board.getTextColor());
             button.setTextFill(Color.web(board.getBackgroundColor()));
         });
         button.setOnMouseExited(event -> {
-            button.setStyle("-fx-background-color:"+board.getBackgroundColor());
+            button.setStyle("-fx-background-color:" + board.getBackgroundColor());
             button.setTextFill(Color.web(board.getTextColor()));
         });
     }

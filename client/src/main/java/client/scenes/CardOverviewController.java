@@ -30,13 +30,8 @@ import java.util.List;
 import static com.google.inject.Guice.createInjector;
 
 public class CardOverviewController {
-    private Stage primaryStage;
-    private Scene overview;
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
-    private long cardId;
-    private ServerUtils server;
-
     public VBox vBox;
     public HBox hbox;
     public Listing list;
@@ -46,40 +41,62 @@ public class CardOverviewController {
     public TextArea description;
     @FXML
     public VBox colorSchemes;
-
+    private Stage primaryStage;
+    private Scene overview;
+    private long cardId;
+    private Card curCard;
+    private ServerUtils server;
+    private boolean isRunning = false;
     private Board board = new Board("test", "", "");
     private String fileName = "user_files/temp.txt";
 
+    /**
+     * Setter for the server.
+     *
+     * @param server - the server to assign this card to
+     */
+    @Inject
+    public CardOverviewController(ServerUtils server) {
+        this.server = server;
+    }
+
+    public CardOverviewController() {
+
+    }
+
     public void initialize() {
+        isRunning = true;
         server.registerForUpdatesSubtask(subTask -> {
             Platform.runLater(this::refresh);
         });
-        server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater( ()->{
-            System.out.println("I am here");
-            refresh();
+        server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater(() -> {
+            if (isRunning) {
+                System.out.println("I am here");
+                refresh();
+            }
         }));
-        server.registerForUpdatesTag(tag -> {
-            Platform.runLater(this::refresh);
-        });
+//        server.registerForUpdatesTag(tag -> {
+//            Platform.runLater(this::refresh);
+//        });
         server.registerForUpdatesCard(card -> {
-
-
-            Platform.runLater(() -> {
-                boolean check = server.checkCard(card);
-                System.out.println("First: " + check);
-
-                if (check) {
-                    System.out.println(check);
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Card has been deleted.");
-                    alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
-                    alert.showAndWait();
-                    switchBoard((Stage) cardLabel.getScene().getWindow());
-                    server.stop();
-                } else {
+            if (isRunning) {
+                Platform.runLater(() -> {
+                    if (cardId != card.getCardId()) {
+                        List<Listing> lists = server.getListings();
+                        for (Listing l : lists) {
+                            for (Card c : l.getCards()) {
+                                if (c.getName().equals(curCard.getName())) {
+                                    setList(l);
+                                    setCardId(c.getCardId());
+                                }
+                            }
+                        }
+                    }
                     refresh();
-                }
-            });
+
+
+                });
+            }
         });
     }
 
@@ -91,7 +108,6 @@ public class CardOverviewController {
     public void setList(Listing list) {
         this.list = list;
     }
-
 
     /**
      * Setter for the board.
@@ -112,26 +128,14 @@ public class CardOverviewController {
     }
 
     /**
-     * Setter for the server.
-     *
-     * @param server - the server to assign this card to
-     */
-    @Inject
-    public CardOverviewController(ServerUtils server) {
-        this.server = server;
-    }
-
-    public CardOverviewController() {
-
-    }
-
-    /**
      * Setter for the current card.
      *
      * @param cardId the card's id
      */
     public void setCardId(long cardId) {
         this.cardId = cardId;
+        this.curCard = server.getCardsById(cardId);
+
     }
 
     /**
@@ -142,10 +146,13 @@ public class CardOverviewController {
      */
 
     public void switchToBoardScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        isRunning = false;
         switchBoard((Stage) ((Node) actionEvent.getSource()).getScene().getWindow());
     }
 
     public void switchBoard(Stage stage) {
+        if (stage == null)
+            return;
         var cardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         cardOverview.getKey().setFileName(fileName);
         cardOverview.getKey().setBoard(board);
@@ -155,6 +162,7 @@ public class CardOverviewController {
         primaryStage.setScene(overview);
         primaryStage.show();
         server.stop();
+
     }
 
     /**
@@ -438,13 +446,28 @@ public class CardOverviewController {
      * Method that refreshes all card components.
      */
     public void refresh() {
+
+        System.out.println("Refreshed refresh: " + 0);
+        curCard = server.getCardsById(cardId);
+        if (curCard == null) {
+            isRunning = false;
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Card has been deleted.");
+            alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
+            alert.showAndWait();
+            switchBoard((Stage) cardLabel.getScene().getWindow());
+            server.stop();
+            return;
+        }
+
+
         board = server.getBoardByID(board.getBoardId());
-        System.out.println(board.getSchemes().get(0).getBackgroundColor());
         refreshSubTasks();
         refreshCardDetails();
         refreshTags();
         refreshSchemes();
     }
+
 
     public void refreshSchemes() {
         colorSchemes.getChildren().clear();
@@ -494,8 +517,9 @@ public class CardOverviewController {
             Card card = server.getCardsById(cardId);
             card.setBackgroundColor(scheme.getBackgroundColor());
             card.setFontColor(scheme.getFontColor());
+            card.setSchemeName(scheme.getName());
             server.sendList(list);
-            server.saveCard(card);
+            server.saveCard(card, false);
             refresh();
         });
     }

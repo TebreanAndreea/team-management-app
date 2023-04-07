@@ -127,7 +127,7 @@ public class ListController {
         for(int i = 0; i < list.getCards().size(); i++) {
             Card card = list.getCards().get(i);
             try {
-                server.deleteCard(card.getCardId());
+                server.deleteCard(card.getCardId(), true);
             } catch (WebApplicationException e) {
                 var alert = new Alert(Alert.AlertType.ERROR);
                 alert.initModality(Modality.APPLICATION_MODAL);

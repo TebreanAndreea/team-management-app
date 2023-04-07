@@ -151,7 +151,7 @@ public class AdminOverviewController {
                 for (int i = 0; i < list.getCards().size(); i++) {
                     Card card = list.getCards().get(i);
                     try {
-                        server.deleteCard(card.getCardId());
+                        server.deleteCard(card.getCardId(), true);
                     } catch (WebApplicationException e) {
                         var alertError = new Alert(Alert.AlertType.ERROR);
                         alertError.initModality(Modality.APPLICATION_MODAL);
