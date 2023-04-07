@@ -52,6 +52,6 @@
         <Button fx:id="copyKeyButton" layoutX="564.0" layoutY="392.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
       <Button fx:id="tagButton" layoutX="445.0" layoutY="60.0" mnemonicParsing="false" onAction="#switchToTagScene" text="Tags" />
       <Button fx:id="customizeButton" layoutX="4.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToCustomizationScene" style="-fx-background-color: white;" text="Customize" textFill="#0a0000" />
-      <Button layoutX="490.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToHelpScene" text="?" />
+      <Button fx:id="helpButton" layoutX="490.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToHelpScene" text="?" />
     </children>
 </AnchorPane>

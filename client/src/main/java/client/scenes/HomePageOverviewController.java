@@ -115,12 +115,6 @@ public class HomePageOverviewController {
         if (userUrl.contains(http))
             userUrl = userUrl.substring(6);
 
-
-       // String userUrl = "http://localhost:" + userPort;
-//        if (!userUrl.startsWith("http://")) {
-//            userUrl = "http://" + userUrl;
-//        }
-
         if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
 
             StompSession session = server.startWebSockets(userUrl);

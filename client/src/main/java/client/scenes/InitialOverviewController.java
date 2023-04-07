@@ -99,7 +99,7 @@ public class InitialOverviewController {
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(homePageOverview.getValue());
         primaryStage.setScene(overview);
-        primaryStage.setTitle("Connection");
+        primaryStage.setTitle("Talio");
     }
 
 

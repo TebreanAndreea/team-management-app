@@ -57,6 +57,7 @@ public class BoardOverviewController {
     public TextField accessKey;
     public Label boardName;
     public Button renameBoardButton;
+    public Button helpButton;
     public AnchorPane mainPane;
 
     public ScrollPane scrollPaneBoard;
@@ -794,7 +795,7 @@ public class BoardOverviewController {
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(tagOverview.getValue());
             primaryStage.setScene(overview);
-            primaryStage.setTitle("Tag Overview");
+            primaryStage.setTitle("Talio");
             primaryStage.show();
         }
     }
@@ -897,6 +898,10 @@ public class BoardOverviewController {
      */
     public void handleKeyPress(KeyEvent keyEvent) {
         String key = keyEvent.getCode().getName();
+
+        if (keyEvent.getCode() == KeyCode.SLASH && keyEvent.isShiftDown())
+            helpButton.fire();
+
         ToggleButton toggleButton = (ToggleButton) toggleGroup.getSelectedToggle();
         if (toggleButton == null)
             return;
@@ -926,6 +931,7 @@ public class BoardOverviewController {
                 break;
             case "C":
                 break;
+
             default:
                 break;
         }
