@@ -118,7 +118,7 @@ public class InitialOverviewController {
 
                 Board res = server.addBoard(new Board(name, "", ""));
                 res.setAccessKey();
-                ColorScheme scheme = new ColorScheme("Defualt", "#ffffff", "#000000", res);
+                ColorScheme scheme = new ColorScheme("Default", "#ffffff", "#000000", res);
                 scheme.setDef(true);
                 server.sendBoardToScheme(res);
                 ColorScheme saved = server.saveColorScheme(scheme);

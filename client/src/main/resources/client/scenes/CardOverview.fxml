@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController" onKeyPressed="#ExitIfEscape">
    <children>
       <Button layoutX="512.0" layoutY="352.0" mnemonicParsing="false" onAction="#switchToBoardScene" prefHeight="25.0" prefWidth="61.0" text="Go Back" />
       <Label fx:id="cardLabel" layoutX="14.0" layoutY="14.0" prefHeight="33.0" prefWidth="173.0" text="Card Details">
