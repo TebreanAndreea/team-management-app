@@ -562,7 +562,7 @@ public class CardOverviewController {
      *
      * @param keyEvent the event of the key being pressed
      */
-    public void ExitIfEscape(KeyEvent keyEvent) {
+    public void exitIfEscape(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
             try {
                 switchToBoardScene(keyEvent);
