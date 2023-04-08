@@ -41,6 +41,8 @@ public class CardOverviewController {
     public TextArea description;
     @FXML
     public VBox colorSchemes;
+
+    private boolean hasAccess = true;
     private Stage primaryStage;
     private Scene overview;
     private long cardId;
@@ -119,6 +121,11 @@ public class CardOverviewController {
         this.board = board;
     }
 
+    public void setHasAccess(boolean check)
+    {
+        hasAccess = check;
+    }
+
     /**
      * Setter for the file name.
      *
@@ -172,6 +179,14 @@ public class CardOverviewController {
      * @param actionEvent the event
      */
     public void addDescription(javafx.event.ActionEvent actionEvent) {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         Card card = server.getCardsById(cardId);
         String text = description.getText();
         card.setDescription(text);
@@ -186,6 +201,14 @@ public class CardOverviewController {
      * @param actionEvent the event
      */
     public void updateName(javafx.event.ActionEvent actionEvent) {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         Card card = server.getCardsById(cardId);
         TextInputDialog dialog = new TextInputDialog(card.getName());
         dialog.setTitle("Change the name of the card");
@@ -211,6 +234,14 @@ public class CardOverviewController {
      * Method for addSubTask button in Card Details scene.
      */
     public void addSubTask() {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         Card card = server.getCardsById(cardId);
 
         TextInputDialog dialog = new TextInputDialog();
@@ -240,6 +271,14 @@ public class CardOverviewController {
      * @param subTask     the subtask to be edited
      */
     private void editSubTask(ActionEvent actionEvent, SubTask subTask) {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         Card card = server.getCardsById(cardId);
         //   SubTask subTask = server.getSubtaskById(subtaskId);
         TextInputDialog dialog = new TextInputDialog();
@@ -349,6 +388,14 @@ public class CardOverviewController {
      * @param cardid  the card of the subtask
      */
     private void moveDown(ActionEvent event, SubTask subTask, long cardid) {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         List<SubTask> sbtask = new ArrayList<>();
         Card card = server.getCardsById(cardId);
         int idx = card.getSubTasks().indexOf(subTask);
@@ -387,6 +434,14 @@ public class CardOverviewController {
      */
 
     private void moveUp(ActionEvent event, SubTask subTask, long cardid) {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         List<SubTask> sbtask = new ArrayList<>();
         Card card = server.getCardsById(cardId);
         // sbtask = card.getSubTasks();
@@ -426,6 +481,14 @@ public class CardOverviewController {
      */
 
     private void deleteSubTask(ActionEvent actionEvent, SubTask subtask) {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         HBox clicked = (HBox) ((Button) actionEvent.getSource()).getParent();
         HBox subtsk = (HBox) clicked.getParent();
         VBox vbox = (VBox) subtsk.getParent();
@@ -515,6 +578,14 @@ public class CardOverviewController {
             apply.setStyle("-fx-background-color: white; -fx-text-fill: green; -fx-font-size: 8 px");
         });
         apply.setOnAction(event -> {
+            if (!hasAccess)
+            {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No access!");
+                alert.setContentText("Cant edit in read-only mode!");
+                alert.showAndWait();
+                return;
+            }
             Card card = server.getCardsById(cardId);
             card.setBackgroundColor(scheme.getBackgroundColor());
             card.setFontColor(scheme.getFontColor());
@@ -574,6 +645,14 @@ public class CardOverviewController {
      * @throws IOException possible error
      */
     public void switchToChooseTagScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        if (!hasAccess)
+        {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         var chooseTagOverview = FXML.load(ChooseTagController.class, "client", "scenes", "ChooseTag.fxml");
         chooseTagOverview.getKey().setFileName(fileName);
         chooseTagOverview.getKey().setBoard(board);

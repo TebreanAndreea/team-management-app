@@ -52,6 +52,7 @@ public class InitialOverviewController {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private Map<Long, Boolean> accessMap = new HashMap<>();
 
     private String fileName="user_files/temp.txt";
 
@@ -82,7 +83,9 @@ public class InitialOverviewController {
         Button goToBoard = (Button) actionEvent.getSource();
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         boardOverview.getKey().setFileName(fileName);
-        boardOverview.getKey().setBoard(boardsMap.get(goToBoard));
+        Board desireBoard = boardsMap.get(goToBoard);
+        boardOverview.getKey().setBoard(desireBoard);
+        boardOverview.getKey().setHasAccess(accessMap.get(desireBoard.getBoardId()));
         boardOverview.getKey().refresh();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(boardOverview.getValue());
@@ -124,7 +127,7 @@ public class InitialOverviewController {
                 ColorScheme saved = server.saveColorScheme(scheme);
                 res.getSchemes().add(saved);
                 server.addBoard(res);
-                writeNewBoardToFile(res);
+                writeNewBoardToFile(res, true);
                 refresh();
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
@@ -156,10 +159,12 @@ public class InitialOverviewController {
             List<Board> boards = server.getBoardsFromDB();
             for (Board b : boards) {
                 if (key.equals(b.getAccessKey())) {
-                    writeNewBoardToFile(b);
+                    boolean access = b.getPassword().equals("");
+                    writeNewBoardToFile(b, access);
                     var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
                     boardOverview.getKey().setBoard(b);
                     boardOverview.getKey().setFileName(fileName);
+                    boardOverview.getKey().setHasAccess(access);
                     boardOverview.getKey().refresh();
                     primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     overview = new Scene(boardOverview.getValue());
@@ -192,10 +197,13 @@ public class InitialOverviewController {
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                long id = Long.parseLong(line.split(" ")[0]);
+                String[] lines = line.split(" ");
+                long id = Long.parseLong(lines[0]);
+                boolean hasAccess = Boolean.parseBoolean(lines[1]);
                 try {
                     Board board = server.getBoardByID(id);
                     boards.add(board);
+                    accessMap.put(id, hasAccess);
                     availableBoards += (line + "\n");
                 } catch (Exception ignored) {
 
@@ -281,14 +289,15 @@ public class InitialOverviewController {
 
     /**
      * A method that writes a new board to the user's stored boards file.
-     *
+     * @param hasAccess - checks if the user has editing access to the board
      * @param board - the board to be written
      */
-    private void writeNewBoardToFile(Board board) {
+    private void writeNewBoardToFile(Board board, boolean hasAccess) {
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                long id = Long.parseLong(line.split(" ")[0]);
+                String[] lines = line.split(" ");
+                long id = Long.parseLong(lines[0]);
                 if (id == board.getBoardId()) {
                     return;
                 }
@@ -297,7 +306,7 @@ public class InitialOverviewController {
             System.out.println("No such file");
         }
         try (FileWriter writer = new FileWriter(fileName, true)) {
-            writer.write(board.getBoardId() + " " + board.getTitle() + "\n");
+            writer.write(board.getBoardId() + " " + hasAccess+" " +  board.getTitle()  +"\n");
         } catch (IOException e) {
             System.out.println("Error writing to file");
         }

@@ -47,11 +47,17 @@ public class BoardOverviewController {
     private Scene overview;
     public HBox hBox;
     public TextField accessKey;
+
+    private boolean hasAccess = true;
     public Label boardName;
     public Button renameBoardButton;
     public AnchorPane mainPane;
 
+    @javafx.fxml.FXML
+    public Button lockButton;
+    public Button readOnly;
     public ScrollPane scrollPaneBoard;
+    public Label lockLabel;
     private ServerUtils server;
     private ListController listController;
     private EventTarget target;
@@ -85,6 +91,11 @@ public class BoardOverviewController {
     public BoardOverviewController() {
     }
 
+    public void setHasAccess(boolean check) {
+        this.hasAccess = check;
+        System.out.println("Initially " + hasAccess);
+    }
+
 
     /**
      * Initializes the controller and immediately fetches the lists from the database.
@@ -104,6 +115,13 @@ public class BoardOverviewController {
      * Adds a new list with no contents, besides the 'add' button with a title.
      */
     public void addList() {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         listController.addList();
         refresh();
     }
@@ -111,8 +129,8 @@ public class BoardOverviewController {
     /**
      * Saves the card into db.
      *
-     * @param card - the card we need to save
-     * @param list - the list that has the card
+     * @param card          - the card we need to save
+     * @param list          - the list that has the card
      * @param savedIntoList checks if the card comes directly from beeing added to a list
      * @return card
      */
@@ -136,7 +154,13 @@ public class BoardOverviewController {
      * @param actionEvent the action event.
      */
     public void addCard(javafx.event.ActionEvent actionEvent) {
-
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         // when the + button is clicked, a dialog pops up, and we can enter the card title
         Button addCardButton = (Button) actionEvent.getSource();
 
@@ -184,33 +208,33 @@ public class BoardOverviewController {
 
     }
 
-    /**
-     * This method allows the user to change the name of a card.
-     *
-     * @param actionEvent the action event
-     */
-    public void editCard(javafx.event.ActionEvent actionEvent) {
-        Button editButton = (Button) actionEvent.getSource();
-        HBox hBox = (HBox) editButton.getParent();
-        Button cardButton = (Button) hBox.getChildren().get(0);
-        Card currentCard = cardMap.get(hBox);
-        TextInputDialog dialog = new TextInputDialog(currentCard.getName());
-        dialog.setTitle("Change the name of the card");
-        dialog.setHeaderText("Please enter the new name for the card:");
-        dialog.showAndWait().ifPresent(name -> {
-
-            if (!name.isEmpty()) {
-                cardButton.setText(name);
-                server.updateCard(currentCard.getCardId(), name);
-            } else {
-                Alert emptyField = new Alert(Alert.AlertType.ERROR);
-                emptyField.setContentText("Name field was submitted empty, please enter a name");
-                emptyField.showAndWait();
-                editCard(actionEvent);
-            }
-
-        });
-    }
+//    /**
+//     * This method allows the user to change the name of a card.
+//     *
+//     * @param actionEvent the action event
+//     */
+//    public void editCard(javafx.event.ActionEvent actionEvent) {
+//        Button editButton = (Button) actionEvent.getSource();
+//        HBox hBox = (HBox) editButton.getParent();
+//        Button cardButton = (Button) hBox.getChildren().get(0);
+//        Card currentCard = cardMap.get(hBox);
+//        TextInputDialog dialog = new TextInputDialog(currentCard.getName());
+//        dialog.setTitle("Change the name of the card");
+//        dialog.setHeaderText("Please enter the new name for the card:");
+//        dialog.showAndWait().ifPresent(name -> {
+//
+//            if (!name.isEmpty()) {
+//                cardButton.setText(name);
+//                server.updateCard(currentCard.getCardId(), name);
+//            } else {
+//                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+//                emptyField.setContentText("Name field was submitted empty, please enter a name");
+//                emptyField.showAndWait();
+//                editCard(actionEvent);
+//            }
+//
+//        });
+//    }
 
     /**
      * Edit a List by changing its name.
@@ -220,6 +244,13 @@ public class BoardOverviewController {
      */
     public void editList(javafx.event.ActionEvent actionEvent, Listing list) {
         //listController.setBoard(board);
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         listController.editList(actionEvent, list);
     }
 
@@ -229,6 +260,13 @@ public class BoardOverviewController {
      * @param actionEvent the action  event that caused this method to be called
      */
     public void deleteCard(javafx.event.ActionEvent actionEvent) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         HBox clicked = (HBox) ((Button) actionEvent.getSource()).getParent();
         VBox vBox = (VBox) clicked.getParent();
         Card card = cardMap.get(clicked);
@@ -244,6 +282,13 @@ public class BoardOverviewController {
      * @param list        the list to be deleted
      */
     public void deleteList(javafx.event.ActionEvent actionEvent, Listing list) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         listController.deleteList(actionEvent, list);
     }
 
@@ -278,6 +323,7 @@ public class BoardOverviewController {
         if (!adminControl) {
             var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
             cardOverview.getKey().setCardId(cardID);
+            cardOverview.getKey().setHasAccess(hasAccess);
             cardOverview.getKey().setFileName(fileName);
             cardOverview.getKey().setBoard(board);
             cardOverview.getKey().setList(list);
@@ -300,6 +346,13 @@ public class BoardOverviewController {
      * @throws IOException the exception which might be caused
      */
     public void switchToCustomizationScene(ActionEvent actionEvent) throws IOException {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         if (!adminControl) {
             var customizationOverview = FXML.load(CustomizationOverviewController.class, "client", "scenes", "CustomizationOverview.fxml");
             customizationOverview.getKey().setBoard(board);
@@ -321,6 +374,8 @@ public class BoardOverviewController {
      * @param mouseEvent the mouse event
      */
     private void handleDropping(MouseEvent mouseEvent) {
+        if(!hasAccess)
+            return;
         double mouseX = mouseEvent.getScreenX();
         double mouseY = mouseEvent.getScreenY();
 
@@ -551,6 +606,14 @@ public class BoardOverviewController {
      * fetches the listings from the JSON file and displays them.
      */
     public void refresh() {
+        //board = server.getBoardByID(board.getBoardId());
+        refreshedSecurity();
+        System.out.println(hasAccess);
+        if (hasAccess)
+            readOnly.setVisible(false);
+        else {
+            readOnly.setVisible(true);
+        }
         long id = board.getBoardId();
         hBox.getChildren().clear();
         if (id != 0) {
@@ -582,8 +645,95 @@ public class BoardOverviewController {
         List<Listing> listings = board.getLists();
         map = new HashMap<>();
         setUpButtonColors();
+        setUpLockButton();
         for (Listing listing : listings)
             addListWithListing(listing);
+    }
+
+    private void refreshedSecurity() {
+        if (!hasAccess && board.getPassword().equals("")) {
+            allowAccess();
+        }
+    }
+
+    private void setUpLockButton() {
+        boolean unlocked = board.getPassword().equals("");
+        if (!unlocked) {
+            lockButton.setText("\uD83D\uDD12");
+            lockLabel.setText("Locked!");
+            lockButton.setOnMouseEntered(event -> {
+                lockLabel.setText("Change Password?");
+
+                lockButton.setText("\uD83D\uDD13");
+            });
+            lockButton.setOnMouseExited(event -> {
+                lockButton.setText("\uD83D\uDD12");
+                lockLabel.setText("Locked!");
+
+            });
+        } else {
+            lockButton.setText("\uD83D\uDD13");
+            lockLabel.setText("Unlocked!");
+
+            lockButton.setOnMouseEntered(event -> {
+                lockButton.setText("\uD83D\uDD12");
+                lockLabel.setText("Set password?");
+
+            });
+            lockButton.setOnMouseExited(event -> {
+                lockButton.setText("\uD83D\uDD13");
+                lockLabel.setText("Unlocked!");
+
+            });
+        }
+
+        lockButton.setOnAction(event -> {
+            if (!hasAccess) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No access!");
+                alert.setContentText("Cant edit in read-only mode!");
+                alert.showAndWait();
+                return;
+            }
+            lockEvent(unlocked);
+        });
+
+    }
+
+    private void lockEvent(boolean unlocked) {
+
+        if (unlocked) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Set Password");
+            dialog.setHeaderText("Please enter a new password for the board");
+            dialog.showAndWait().ifPresent(password -> {
+                board.setPassword(password);
+                this.board = server.addBoard(board);
+                refresh();
+            });
+        } else {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Enter your password");
+            dialog.setHeaderText("Please enter the password for your board");
+            dialog.showAndWait().ifPresent(password -> {
+
+                if (board.getPassword().equals(password)) {
+                    TextInputDialog dialogNew = new TextInputDialog();
+                    dialogNew.setTitle("Enter the new password");
+                    dialogNew.setHeaderText("Please enter new password for your board");
+                    dialog.showAndWait().ifPresent(newPassword -> {
+                        board.setPassword(newPassword);
+                        this.board = server.addBoard(board);
+                        refresh();
+                    });
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Wrong password");
+                    alert.setContentText("The password you have provided is wrong. Please try again");
+                    alert.showAndWait();
+                }
+            });
+        }
     }
 
     /**
@@ -750,6 +900,13 @@ public class BoardOverviewController {
      * @param mouseEvent the event that triggered this method
      */
     public void renameBoard(MouseEvent mouseEvent) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Change the name of the board");
         dialog.setHeaderText("Please enter a name for the board:");
@@ -774,6 +931,13 @@ public class BoardOverviewController {
      * @param actionEvent the action events
      */
     public void switchToTagScene(javafx.event.ActionEvent actionEvent) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         if (!adminControl) {
             var tagOverview = FXML.load(TagController.class, "client", "scenes", "TagOverview.fxml");
             tagOverview.getKey().setBoard(board);
@@ -800,11 +964,13 @@ public class BoardOverviewController {
      */
     private void setUpButtonColors() {
         colorButton(addListButton);
+        colorButton(readOnly);
         colorButton(tagButton);
         colorButton(copyKeyButton);
         colorButton(customizeButton);
         colorButton(renameBoardButton);
         colorButton(refreshButton);
+        colorButton(lockButton);
         accessKey.setStyle("-fx-background-color:" + board.getBackgroundColor() + "; -fx-text-fill:" + board.getTextColor() + ";");
         accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
     }
@@ -826,6 +992,56 @@ public class BoardOverviewController {
             button.setStyle("-fx-background-color:" + board.getBackgroundColor());
             button.setTextFill(Color.web(board.getTextColor()));
         });
+    }
+
+    public void disableReadOnly(ActionEvent event) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Enter password");
+        dialog.setHeaderText("Please enter the password for this board");
+        dialog.showAndWait().ifPresent(password -> {
+            if (password.equals(board.getPassword())) {
+                allowAccess();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Wrong password");
+                alert.setContentText("The password you have provided is wrong. Please try again");
+                alert.showAndWait();
+                disableReadOnly(event);
+            }
+        });
+    }
+
+    public void allowAccess() {
+        setHasAccess(true);
+
+        long id = board.getBoardId();
+        File file = new File(fileName);
+        String content = "";
+        try {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (!line.startsWith(Long.toString(id))) {
+                    content = content + line + "\n";
+                } else {
+                    String[] lines = line.split(" ");
+                    lines[1] = "true";
+                    for (String s : lines) {
+                        content += s + " ";
+                    }
+                    content += "\n";
+                }
+            }
+            FileOutputStream outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        refresh();
+
     }
 
 }
