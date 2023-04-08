@@ -533,7 +533,7 @@ public class ServerUtils {
     {
         EXECII = Executors.newSingleThreadExecutor();
         EXECII.submit(() -> {
-            while (!Thread.interrupted())
+            while (!Thread.interrupted() && !EXECII.isShutdown())
             {
 //                System.out.println("Long Polling");
                 var response = ClientBuilder.newClient(new ClientConfig()) //

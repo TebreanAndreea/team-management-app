@@ -121,6 +121,7 @@ public class ChooseTagController {
      * @throws IOException possible exception
      */
     public void switchToCardScene(ActionEvent actionEvent) throws IOException {
+        server.stop();
         var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
         cardOverview.getKey().setCardId(cardId);
         cardOverview.getKey().setFileName(fileName);
