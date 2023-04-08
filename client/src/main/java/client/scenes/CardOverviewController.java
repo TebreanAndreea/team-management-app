@@ -13,6 +13,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -133,12 +135,12 @@ public class CardOverviewController {
     /**
      * Function that goes from the card details back to the board.
      *
-     * @param actionEvent the action event on the button
+     * @param event the event triggering the function
      * @throws IOException the exception which might be caused
      */
 
-    public void switchToBoardScene(javafx.event.ActionEvent actionEvent) throws IOException {
-        switchBoard((Stage) ((Node) actionEvent.getSource()).getScene().getWindow());
+    public void switchToBoardScene(javafx.event.Event event) throws IOException {
+        switchBoard((Stage) ((Node) event.getSource()).getScene().getWindow());
     }
 
     public void switchBoard(Stage stage) {
@@ -553,5 +555,20 @@ public class CardOverviewController {
         overview = new Scene(chooseTagOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
+    }
+
+    /**
+     * Checks if the pressed key was ESCAPE and returns to the board if it is.
+     *
+     * @param keyEvent the event of the key being pressed
+     */
+    public void exitIfEscape(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+            try {
+                switchToBoardScene(keyEvent);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

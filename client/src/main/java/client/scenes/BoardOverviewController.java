@@ -11,6 +11,7 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -20,9 +21,14 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -37,18 +43,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
 
 public class BoardOverviewController {
 
+    public MenuBar menuBar;
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
     public TextField accessKey;
     public Label boardName;
     public Button renameBoardButton;
+    public Button helpButton;
     public AnchorPane mainPane;
 
     public ScrollPane scrollPaneBoard;
@@ -56,10 +65,11 @@ public class BoardOverviewController {
     private ListController listController;
     private EventTarget target;
     private boolean adminControl = false;
+    private ToggleGroup toggleGroup = new ToggleGroup();
 
     // A map that will keep track of all dependencies between
     // the lists in the UI and the lists we have in the DB
-    private Map<VBox, Listing> map = new HashMap<>();
+    private LinkedHashMap<VBox, Listing> map = new LinkedHashMap<>();
     private Map<HBox, Card> cardMap = new HashMap<>();
 
     Board board = new Board("test", "", "");
@@ -91,12 +101,16 @@ public class BoardOverviewController {
      */
     public void initialize() {
         server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
-        server.registerForMessages("/topic/lists", Listing.class, q -> {
-            System.out.println("listing");
-            Platform.runLater(this::refresh);
-        });
+        server.registerForMessages("/topic/lists", Listing.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
         refresh();
+
+        for (MenuItem item: menuBar.getMenus().get(0).getItems()) {
+            String id = item.getId();
+            item.setAccelerator(new KeyCodeCombination(KeyCode.valueOf(id), KeyCodeCombination.SHIFT_DOWN));
+        }
+
+
     }
 
     /**
@@ -246,12 +260,12 @@ public class BoardOverviewController {
     /**
      * Function that goes to the card details.
      *
-     * @param actionEvent the action event on the button
+     * @param event       the event that triggered the function
      * @param cardID      the id of a card
      * @param list        the list of the card
      * @throws IOException the exception which might be caused
      */
-    public void switchToCardScene(MouseEvent actionEvent, long cardID, Listing list) throws IOException {
+    public void switchToCardScene(Event event, long cardID, Listing list) throws IOException {
         if (!adminControl) {
             var cardOverview = FXML.load(CardOverviewController.class, "client", "scenes", "CardOverview.fxml");
             cardOverview.getKey().setCardId(cardID);
@@ -259,13 +273,11 @@ public class BoardOverviewController {
             cardOverview.getKey().setBoard(board);
             cardOverview.getKey().setList(list);
             cardOverview.getKey().refresh();
-            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             overview = new Scene(cardOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
-            primaryStage.setOnCloseRequest(event -> {
-                server.stop();
-            });
+            primaryStage.setOnCloseRequest(closeEvent -> server.stop());
         }
     }
 
@@ -286,9 +298,7 @@ public class BoardOverviewController {
             overview = new Scene(customizationOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
-            primaryStage.setOnCloseRequest(event -> {
-                server.stop();
-            });
+            primaryStage.setOnCloseRequest(event -> server.stop());
         }
     }
     /**
@@ -423,15 +433,6 @@ public class BoardOverviewController {
         hBox.getChildren().add(titledPane);
     }
 
-
-//    public void paintCard(HBox hBox, Card card)
-//    {
-//
-//        hBox.setStyle("-fx-background-color: " + card.getBackgroundColor() + "; -fx-border-radius: 10");
-//        for (Node n : hBox.getChildren())
-//            n.setStyle(n.getStyle()+ ";-fx-text-fill: " + card.getFontColor()+";");
-//
-//    }
     /**
      * Adds a card to the vBox List.
      *
@@ -439,14 +440,14 @@ public class BoardOverviewController {
      * @param vBox    - the vBox which contains the list
      * @param listing - the list the card is in
      */
-    public void addCard (Card c, VBox vBox, Listing listing)
+    public void addCard(Card c, VBox vBox, Listing listing)
     {
-        Button newCard;
+        ToggleButton newCard;
         VBox vBox1 = new VBox();
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for(SubTask s : c.getSubTasks()) {
-            if(s.isDone() == true) doneSubtasks++;
+            if(s.isDone()) doneSubtasks++;
         }
         Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks));
         done.setStyle("  -fx-text-fill: " + c.getFontColor()+";");
@@ -473,10 +474,10 @@ public class BoardOverviewController {
             vBoxTag.setSpacing(3);
             HBox hbox = new HBox(markDescription, vBoxTag, vBox1);
             hbox.setSpacing(8);
-            newCard = new Button();
+            newCard = new ToggleButton();
             newCard.setGraphic(hbox);
         } else {
-            newCard = new Button();
+            newCard = new ToggleButton();
             HBox hbox = new HBox(nameCard, vBox1);
             VBox vBoxTag = new VBox(hbox, tags);  //put tag hbox below card name
             vBoxTag.setSpacing(3);
@@ -552,7 +553,8 @@ public class BoardOverviewController {
         renameBoardButton.setLayoutX(boardName.getLayoutX() + boardText.getLayoutBounds().getWidth() + 10.0);
         accessKey.setText("Access key: " + board.getAccessKey());
         List<Listing> listings = board.getLists();
-        map = new HashMap<>();
+        map = new LinkedHashMap<>();
+        cardMap = new HashMap<>();
         setUpButtonColors();
         for (Listing listing : listings)
             addListWithListing(listing);
@@ -613,17 +615,17 @@ public class BoardOverviewController {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 long id = board.getBoardId();
                 File file = new File(fileName);
-                String content = "";
+                StringBuilder content = new StringBuilder();
                 try {
                     Scanner scanner = new Scanner(file);
                     while (scanner.hasNextLine()) {
                         String line = scanner.nextLine();
                         if (!line.startsWith(Long.toString(id))) {
-                            content = content + line + "\n";
+                            content.append(line).append("\n");
                         }
                     }
                     FileOutputStream outputStream = new FileOutputStream(file);
-                    outputStream.write(content.getBytes());
+                    outputStream.write(content.toString().getBytes());
                     outputStream.flush();
                     outputStream.close();
                     switchToInitialOverviewScene(actionEvent);
@@ -691,6 +693,50 @@ public class BoardOverviewController {
     }
 
     /**
+     * Sets up the toggleButton in the list.
+     *
+     * @param button the toggleButton to set up
+     * @param card the card
+     */
+    private void setupButton(ToggleButton button, Card card) {
+        toggleGroup.getToggles().add(button);
+
+        HBox.setHgrow(button, Priority.ALWAYS);
+        button.setStyle("-fx-background-color: transparent; "+
+                "-fx-text-fill: " + card.getFontColor()+";");
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setMinWidth(Button.USE_PREF_SIZE);
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color: rgba(0, 0, 0, 0.1);");
+            toggleGroup.selectToggle(button);
+        });
+        button.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue) {
+                if (!board.getListBackgroundColor().equals("#0000ffff")) {
+                    Platform.runLater(() -> ((HBox) button.getParent()).setBorder(new Border(new BorderStroke(Color.BLUE, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT))));
+                }
+                else {
+                    Platform.runLater(() -> ((HBox) button.getParent()).setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT))));
+                }
+            }
+            else {
+                Platform.runLater(() -> ((HBox) button.getParent()).setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT))));
+            }
+        }));
+        button.setOnMouseExited(event -> button.setStyle("-fx-background-color: transparent; "+"-fx-text-fill: " + card.getFontColor()+";"));
+
+        // if the toggleButton is a recreation of a selected one, select this one instead
+        ToggleButton selected = (ToggleButton) toggleGroup.getSelectedToggle();
+        if (selected != null) {
+            long selectedCard = (long) selected.getUserData();
+            if (selectedCard == card.getCardId()) {
+                toggleGroup.getToggles().remove(selected);
+                toggleGroup.selectToggle(button);
+            }
+        }
+    }
+
+    /**
      * Setter for the admin control value, which determines whether the app was opened in admin control mode.
      * @param adminControl the value to set
      */
@@ -749,7 +795,7 @@ public class BoardOverviewController {
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(tagOverview.getValue());
             primaryStage.setScene(overview);
-            primaryStage.setTitle("Tag Overview");
+            primaryStage.setTitle("Talio");
             primaryStage.show();
         }
     }
@@ -793,4 +839,201 @@ public class BoardOverviewController {
         });
     }
 
+    /**
+     * Moves the highlighted Card up or down in its list.
+     * @param actionEvent the event that triggered the function
+     */
+    public void moveVertical (ActionEvent actionEvent) {
+        // getting the menuId of the menu that called the function, either UP or DOWN
+        String menuId = ((MenuItem) actionEvent.getSource()).getId();
+
+        // figuring out the old and new position in the list of cards
+        ToggleButton toggleButton = (ToggleButton) toggleGroup.getSelectedToggle();
+        HBox cardHBox = (HBox) toggleButton.getParent();
+        Card card = cardMap.get(cardHBox);
+        VBox vBox = (VBox) cardHBox.getParent();
+        Listing listing = map.get(vBox);
+        int pos = listing.getCards().indexOf(card);
+        if ("UP".equals(menuId))
+            pos--;
+        else pos++;
+
+        if (pos > -1 && pos < listing.getCards().size()) {
+            server.deleteCard(card.getCardId());
+            vBox.getChildren().remove(cardHBox);
+
+            Card updatedCard = saveCardDB(card, listing);
+            listing.getCards().add(pos, updatedCard);
+            cardMap.put(cardHBox, updatedCard);
+            toggleButton.setUserData(updatedCard.getCardId());
+
+            vBox.getChildren().add(pos, cardHBox);
+
+            for (int i = 0; i < vBox.getChildren().size() - 2; i++) { // we delete all the cards from this list
+                HBox hBox = (HBox) vBox.getChildren().get(i);
+                Card card2 = cardMap.get(hBox);
+                server.deleteCard(card2.getCardId());
+            }
+
+            for (int i = 0; i < vBox.getChildren().size() - 2; i++) { // we have all the cards in good order, we add them to the list
+                HBox hBox = (HBox) vBox.getChildren().get(i);
+                Card card2 = cardMap.get(hBox);
+                Card updated = saveCardDB(card2, listing);
+                listing.getCards().add(updated);
+                cardMap.put(hBox, updated);
+                if (hBox.equals(cardHBox)) {
+                    toggleButton.setUserData(updated.getCardId());
+                }
+            }
+
+            toggleGroup.selectToggle(null);
+            toggleGroup.selectToggle((ToggleButton) cardHBox.getChildren().get(0));
+        }
+    }
+
+
+    /**
+     * Runs the corresponding function for the keyboard shortcut.
+     * @param keyEvent the event of the key press
+     */
+    public void handleKeyPress(KeyEvent keyEvent) {
+        String key = keyEvent.getCode().getName();
+
+        if (keyEvent.getCode() == KeyCode.SLASH && keyEvent.isShiftDown())
+            helpButton.fire();
+
+        ToggleButton toggleButton = (ToggleButton) toggleGroup.getSelectedToggle();
+        if (toggleButton == null)
+            return;
+
+        HBox cardHBox = (HBox) toggleButton.getParent();
+        VBox vBox = (VBox) cardHBox.getParent();
+        Card card = cardMap.get(cardHBox);
+        Listing listing = map.get(vBox);
+        switch (key) {
+            case "E":
+                renameCardPopup(card, listing);
+                break;
+            case "Delete":
+            case "Backspace":
+                Button delete = (Button) cardHBox.getChildren().get(2);
+                delete.fire();
+                break;
+            case "Enter":
+                try {
+                    switchToCardScene(keyEvent, card.getCardId(), listing);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
+            case "T":
+                addTagsPopup(card, listing);
+                break;
+            case "C":
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Creates a pop-up window to rename a card.
+     * @param card the card to be renamed
+     * @param list the listing containing the card
+     */
+    public void renameCardPopup(Card card, Listing list) {
+        TextInputDialog dialog = new TextInputDialog(card.getName());
+        dialog.setTitle("Change the name of the card");
+        dialog.setHeaderText("Please enter the new name for the card:");
+        dialog.showAndWait().ifPresent(name -> {
+
+            if (!name.isEmpty()) {
+                card.setName(name);
+                server.sendList(list);
+                server.updateCard(card.getCardId(), name);
+            } else {
+                Alert emptyField = new Alert(Alert.AlertType.ERROR);
+                emptyField.setContentText("Name field was submitted empty, please enter a name");
+                emptyField.showAndWait();
+                renameCardPopup(card, list);
+            }
+
+        });
+    }
+
+    /**
+     * Creates a pop-up adding a tag to the card.
+     * @param card the card being tagged
+     * @param listing the listing containing the card
+     */
+    public void addTagsPopup(Card card, Listing listing) {
+        List<Tag> tags = card.getTags();
+        if (tags.equals(board.getTags())) {
+            return;
+        }
+
+        Dialog<ArrayList<Tag>> dialog = new Dialog<>();
+        dialog.setTitle("Add a tag(s) to the card");
+        dialog.setHeaderText("Tags:");
+        ArrayList<Tag> items = new ArrayList<>();
+
+        for (Tag tag: board.getTags()) {
+            if (!tags.contains(tag)) {
+                items.add(tag);
+            }
+        }
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().add(ButtonType.APPLY);
+        VBox tagsVBox = new VBox();
+        dialogPane.setContent(tagsVBox);
+
+        ArrayList<Tag> result = new ArrayList<>();
+        for (Tag tag: items) {
+            CheckBox checkBox = new CheckBox(tag.getTitle());
+            checkBox.setUserData(tag);
+            if(tag.getColor() != null) {
+                Color color = Color.web(tag.getColor());
+                Background background = new Background(new BackgroundFill(color, null, null));
+                checkBox.setBackground(background);
+            }
+            checkBox.setMinSize(200,50);
+            checkBox.setAlignment(Pos.CENTER);
+            tagsVBox.setAlignment(Pos.CENTER);
+            tagsVBox.setSpacing(10);
+            tagsVBox.getChildren().add(checkBox);
+
+            checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal) {
+                    result.add((Tag) checkBox.getUserData());
+                }
+                else {
+                    result.remove((Tag) checkBox.getUserData());
+                }
+            });
+        }
+
+        dialog.showAndWait();
+        if (result.size() > 0) {
+            for (Tag tag: result) {
+                server.sendList(listing);
+                server.addTag(card, tag);
+            }
+        }
+    }
+
+    /**
+     * This method opens the help scene.
+     * @param actionEvent the action event
+     */
+    public void switchToHelpScene(javafx.event.ActionEvent actionEvent){
+        var helpOverview = FXML.load(HelpOverviewController.class, "client", "scenes", "HelpOverview.fxml");
+        helpOverview.getKey().setBoard(board);
+        helpOverview.getKey().setFileName(fileName);
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(helpOverview.getValue());
+        primaryStage.setScene(overview);
+        primaryStage.show();
+    }
 }

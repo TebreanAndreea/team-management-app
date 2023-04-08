@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainPane" prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
+<AnchorPane fx:id="mainPane" onKeyPressed="#handleKeyPress" prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
-        <Button fx:id="addListButton" layoutX="571.0" layoutY="43.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
+        <Button defaultButton="true" onKeyPressed="#handleKeyPress" visible="false" />
+        <MenuBar fx:id="menuBar" visible="false">
+            <Menu>
+                <MenuItem id="UP" onAction="#moveVertical" />
+                <MenuItem id="DOWN" onAction="#moveVertical" />
+<!--                <MenuItem id="LEFT" onAction="#moveHorizontal" />-->
+<!--                <MenuItem id="RIGHT" onAction="#moveHorizontal" />-->
+            </Menu>
+        </MenuBar>
+        <Button fx:id="addListButton" defaultButton="false" layoutX="571.0" layoutY="43.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
         <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" minWidth="-Infinity" prefHeight="39.0" text="Board Name">
             <font>
                 <Font name="System Bold" size="19.0" />
             </font>
         </Label>
-        <Button fx:id="renameBoardButton" layoutX="204.0" layoutY="23.0" onMouseClicked="#renameBoard" prefHeight="39.0" text="Rename" />
+        <Button fx:id="renameBoardButton" defaultButton="true" layoutX="204.0" layoutY="23.0" onMouseClicked="#renameBoard" prefHeight="39.0" text="Rename" />
         <ScrollPane fx:id="scrollPaneBoard" layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
             <content>
                 <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="265.0" prefWidth="635.0" spacing="20.0">
@@ -36,5 +52,6 @@
         <Button fx:id="copyKeyButton" layoutX="564.0" layoutY="392.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
       <Button fx:id="tagButton" layoutX="445.0" layoutY="60.0" mnemonicParsing="false" onAction="#switchToTagScene" text="Tags" />
       <Button fx:id="customizeButton" layoutX="4.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToCustomizationScene" style="-fx-background-color: white;" text="Customize" textFill="#0a0000" />
+      <Button fx:id="helpButton" layoutX="490.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToHelpScene" text="?" />
     </children>
 </AnchorPane>
