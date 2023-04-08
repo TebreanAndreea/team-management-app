@@ -5,7 +5,7 @@ import commons.Listing;
 import commons.SubTask;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import server.database.SubTaskRepository;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 @RequestMapping("api/subtask")
 public class SubtaskSavingController {
     private final SubTaskRepository repo;
-    private final SimpMessagingTemplate msgs;
+    private final SimpMessageSendingOperations msgs;
 
     private Card card;
     private Map<Object, Consumer<SubTask>> listenings = new HashMap<>();
@@ -29,7 +29,7 @@ public class SubtaskSavingController {
      * @param repo - subtask repository
      * @param msgs - messages for communication
      */
-    public SubtaskSavingController(SubTaskRepository repo, SimpMessagingTemplate msgs) {
+    public SubtaskSavingController(SubTaskRepository repo, SimpMessageSendingOperations msgs) {
         this.repo = repo;
         this.msgs = msgs;
     }
@@ -42,6 +42,7 @@ public class SubtaskSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<SubTask> add(@RequestBody SubTask subTask) {
+        if(subTask == null)  return ResponseEntity.badRequest().build();
         subTask.setCard(card);
         msgs.convertAndSend("/topic/subtask", subTask);
         SubTask save = repo.save(subTask);
@@ -72,6 +73,7 @@ public class SubtaskSavingController {
      */
     @PostMapping(path = { "/edit" })
     public ResponseEntity<SubTask> updateSubtask(@RequestBody SubTask subTask) {
+        if(subTask == null)  return ResponseEntity.badRequest().build();
         subTask.setCard(card);
         subTask = repo.save(subTask);
         msgs.convertAndSend("/topic/subtask", subTask);
