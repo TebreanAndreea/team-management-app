@@ -143,11 +143,12 @@ public class ServerUtils {
      * A method that creates a post request for the card.
      *
      * @param card - the card we are saving
+     * @param addToList checks if it has been added directly from a list
      * @return a subtask
      */
-    public Card saveCard(Card card) {
+    public Card saveCard(Card card, boolean addToList) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/card")
+                .target(SERVER).path("api/card/" + addToList)
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(card, APPLICATION_JSON), Card.class);
@@ -160,7 +161,7 @@ public class ServerUtils {
      */
     public void addTag(Card card, Tag tag) {
         card.getTags().add(tag);
-        saveCard(card);
+        saveCard(card, false);
     }
 
     /**
@@ -171,7 +172,7 @@ public class ServerUtils {
      */
     public void removeTag(Card card, Tag tag) {
         card.getTags().remove(tag);
-        saveCard(card);
+        saveCard(card, false);
     }
 
     /**
@@ -298,7 +299,7 @@ public class ServerUtils {
     public Card updateCard(long id, String newName) {
         Card currentCard = getCardsById(id);
         currentCard.setName(newName);
-        return saveCard(currentCard);
+        return saveCard(currentCard, false);
     }
 
     /**
@@ -311,19 +312,20 @@ public class ServerUtils {
     public Card updateCardDescription(long id, String description) {
         Card currentCard = getCardsById(id);
         currentCard.setDescription(description);
-        return saveCard(currentCard);
+        return saveCard(currentCard, false);
     }
 
 
 
     /**
      * Sends a delete request.
-     *
+     * @param permanentDeletion - tells the server if the card will be permanently deleted,
+     *                          or it is just changing cause of the drag and drop
      * @param id - the id of the card we want to delete
      */
-    public void deleteCard(long id) {
+    public void deleteCard(long id, boolean permanentDeletion) {
         ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/card/delete/" + id) //
+                .target(SERVER).path("api/card/delete/" + id + "/" + permanentDeletion) //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .delete();

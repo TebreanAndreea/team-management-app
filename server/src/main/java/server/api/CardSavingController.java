@@ -39,21 +39,25 @@ public class CardSavingController {
 
     /**
      * A post method that saves the card into the DB.
-     *
+     * @param insertedIntoList  checks if the card has been added from a list
      * @param card - the card that we are saving
      * @return card
      */
-    @PostMapping(path = {"", "/"})
-    public ResponseEntity<Card> add(@RequestBody Card card) {
+    @PostMapping(path = {"/{insertedIntoList}"})
+    public ResponseEntity<Card> add(@RequestBody Card card, @PathVariable boolean insertedIntoList) {
         if (card == null) return ResponseEntity.badRequest().build();
 
         card.setList(list);
 
         msgs.convertAndSend("/topic/card", card);
         Card save = repo.save(card);
-        listenings.forEach((k, s) -> {
-            s.accept(save);
-        });
+        if(!insertedIntoList) {
+            if (!listenings.isEmpty()) {
+                listenings.forEach((k, s) -> {
+                    s.accept(save);
+                });
+            }
+        }
         return ResponseEntity.ok(save);
     }
 
@@ -72,12 +76,13 @@ public class CardSavingController {
 
     /**
      * Method that deletes a card by given id.
-     *
+     * @param permanentDeletion checks if it has been deleted permanently
      * @param id - corresponding to the card to be deleted
-     * @return tag tag corresponding to the operation
+     * @return tag corresponding to the operation
      */
-    @DeleteMapping(path = {"delete/{id}"})
-    public ResponseEntity<Listing> delete(@PathVariable long id) {
+    @DeleteMapping(path = {"delete/{id}/{permanentDeletion}"})
+    public ResponseEntity<Listing> delete(@PathVariable long id, @PathVariable boolean permanentDeletion) {
+        System.out.println("delete");
         Card card = repo.findById(id).orElse(null);
         if (card == null) {
             return ResponseEntity.notFound().build();
@@ -85,10 +90,12 @@ public class CardSavingController {
         msgs.convertAndSend("/topic/card", card);
         repo.deleteById(id);
 
-        if (!listenings.isEmpty()) {
-            listenings.forEach((k, s) -> {
-                s.accept(card);
-            });
+        if (permanentDeletion) {
+            if (!listenings.isEmpty()) {
+                listenings.forEach((k, s) -> {
+                    s.accept(card);
+                });
+            }
         }
         return ResponseEntity.ok().build();
     }
@@ -102,7 +109,7 @@ public class CardSavingController {
     @GetMapping("/{id}")
     public ResponseEntity<Card> getById(@PathVariable("id") long id) {
         if (id < 0 || !repo.existsById(id)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(null);
         }
         return ResponseEntity.ok(repo.findById(id).get());
     }

@@ -36,10 +36,12 @@ public class ColorSavingController {
     @PostMapping(path = {"", "/"})
     public ResponseEntity<ColorScheme> add(@RequestBody ColorScheme color) {
         if (color == null) return ResponseEntity.badRequest().build();
-
         color.setBoard(board);
 
         ColorScheme save = repo.save(color);
+        msgs.convertAndSend("/topic/colors", save);
+        System.out.println("Sent");
+
         return ResponseEntity.ok(save);
     }
 
@@ -69,6 +71,7 @@ public class ColorSavingController {
             return ResponseEntity.notFound().build();
         }
         repo.deleteById(id);
+        msgs.convertAndSend("/topic/colors", color);
         return ResponseEntity.ok().build();
     }
 

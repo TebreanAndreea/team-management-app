@@ -11,13 +11,11 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.SubScene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 
 import javax.inject.Inject;
@@ -34,6 +32,8 @@ public class AdminOverviewController {
     private ServerUtils server;
     private Map<Button, Board> buttonBoardMap = new HashMap<>();
     private Board selectedBoard;
+    @FXML
+    Button securityButton;
     @FXML
     private javafx.scene.control.ScrollPane previewPane;
     @FXML
@@ -58,6 +58,7 @@ public class AdminOverviewController {
     public void initialize() {
         refresh();
         deleteButton.setVisible(false);
+        securityButton.setVisible(false);
     }
 
     /**
@@ -124,13 +125,18 @@ public class AdminOverviewController {
         root.getKey().setBoard(buttonBoardMap.get(actionEvent.getSource()));
         root.getKey().setAdminControl(true);
         root.getKey().refresh();
-        SubScene subScene = new SubScene(root.getValue(), 600, 400);
+        SubScene subScene = new SubScene(root.getValue(), 635, 427);
+        double scaleFactor = Math.min(350 / subScene.getWidth(), 260 / subScene.getHeight());
+        Scale scale = new Scale(scaleFactor, scaleFactor);
+        subScene.getTransforms().clear();
+        subScene.getTransforms().add(scale);
         previewPane.setContent(subScene);
         //double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
         //Scale scale = new Scale(scaleFactor, scaleFactor);
         //subScene.getTransforms().clear();
         //subScene.getTransforms().add(scale);
         deleteButton.setVisible(true);
+        securityButton.setVisible(true);
         selectedBoard = buttonBoardMap.get(actionEvent.getSource());
     }
 
@@ -151,7 +157,7 @@ public class AdminOverviewController {
                 for (int i = 0; i < list.getCards().size(); i++) {
                     Card card = list.getCards().get(i);
                     try {
-                        server.deleteCard(card.getCardId());
+                        server.deleteCard(card.getCardId(), true);
                     } catch (WebApplicationException e) {
                         var alertError = new Alert(Alert.AlertType.ERROR);
                         alertError.initModality(Modality.APPLICATION_MODAL);
@@ -183,6 +189,17 @@ public class AdminOverviewController {
             }
             refresh();
         }
+    }
+
+    public void changePassword() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change Password");
+        dialog.setHeaderText("Please enter a new password for the board");
+        dialog.showAndWait().ifPresent(password -> {
+            selectedBoard.setPassword(password);
+            selectedBoard = server.addBoard(selectedBoard);
+            refresh();
+        });
     }
 
 }

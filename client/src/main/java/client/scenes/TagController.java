@@ -6,8 +6,6 @@ import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Board;
 import commons.Card;
-
-
 import commons.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.WebApplicationException;
@@ -17,8 +15,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -57,49 +53,54 @@ public class TagController {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
     /**
      * Constructor which injects the server.
+     *
      * @param server the ServerUtils instance
      */
     @Inject
-    public TagController(ServerUtils server){
+    public TagController(ServerUtils server) {
         this.server = server;
     }
 
-    public TagController(){}
+    public TagController() {
+    }
 
     /**
      * This method initializes the websockets.
      */
-    public void initialize(){
+    public void initialize() {
         server.registerForMessages("/topic/tag", Card.class, q -> Platform.runLater(this::refresh));
     }
 
 
     /**
      * Sets the board for these tags.
+     *
      * @param board the board of this tag
      */
-    public void setBoard(Board board){
+    public void setBoard(Board board) {
         this.board = board;
     }
 
     /**
      * This method opens a dialog box for setting the name of the tag.
+     *
      * @param actionEvent the action events
      */
-    public void addTag(javafx.event.ActionEvent actionEvent){
+    public void addTag(javafx.event.ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Tag name");
         dialog.setHeaderText("Please enter the name of the tag");
         dialog.showAndWait().ifPresent(name -> {
 
             //verifies if the input field was submitted empty or not
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
 
                 //saving the tag into the database
-                Tag tag = new Tag(name,board);
-                saveTagDB(tag,board);
+                Tag tag = new Tag(name, board);
+                saveTagDB(tag, board);
 
                 Button tagButton = new Button(tag.getTitle());
                 tagButton.setMinSize(200, 50);
@@ -117,7 +118,7 @@ public class TagController {
 
                 ColorPicker colorPicker = new ColorPicker();
                 colorPicker.setMaxSize(10, 10);
-                HBox hbox = new HBox(tagButton,editButton,deleteButton, colorPicker);
+                HBox hbox = new HBox(tagButton, editButton, deleteButton, colorPicker);
                 colorPicker.setOnAction(event -> {
                     Color color = colorPicker.getValue();
                     tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
@@ -126,7 +127,7 @@ public class TagController {
                     //  refresh();
                 });
 
-                if(tag.getColor() != null) {
+                if (tag.getColor() != null) {
                     colorPicker.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
                     Color color = Color.web(tag.getColor());
                     tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
@@ -136,9 +137,7 @@ public class TagController {
                 vBox.setSpacing(10);
 
                 vBox.getChildren().add(hbox);
-            }
-            else
-            {
+            } else {
                 //sends alert and return to the input dialog after
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
                 emptyField.setContentText("Name field was submitted empty, please enter a name");
@@ -149,10 +148,11 @@ public class TagController {
 
     /**
      * This method saves a tag in the database.
-     * @param tag the tag
+     *
+     * @param tag   the tag
      * @param board the board of this tag
      */
-    public void saveTagDB(Tag tag, Board board){
+    public void saveTagDB(Tag tag, Board board) {
         try {
             server.sendBoardToTag(board);
             server.saveTag(tag);
@@ -165,13 +165,13 @@ public class TagController {
     }
 
 
-
     /**
      * Method which opens a dialog box for changing the tag name.
+     *
      * @param actionEvent the action event
-     * @param tag the tag to be edited
+     * @param tag         the tag to be edited
      */
-    public void editTagName(javafx.event.ActionEvent actionEvent, Tag tag){
+    public void editTagName(javafx.event.ActionEvent actionEvent, Tag tag) {
         Button editButton = (Button) actionEvent.getSource();
         HBox hBox = (HBox) editButton.getParent();
         Button tagButton = (Button) hBox.getChildren().get(0);
@@ -179,7 +179,7 @@ public class TagController {
         dialog.setTitle("Tag name");
         dialog.setHeaderText("Please enter the name of the tag");
         dialog.showAndWait().ifPresent(name -> {
-            if(!name.isEmpty()) {
+            if (!name.isEmpty()) {
                 tagButton.setText(name);
                 tag.setTitle(name);
                 server.sendBoardToTag(this.board);
@@ -201,6 +201,14 @@ public class TagController {
      * @throws IOException the exception
      */
     public void switchToBoardScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        for (Tag t : board.getTags()) {
+            if (t.getColor() == null) {
+                Alert emptyColor = new Alert(Alert.AlertType.ERROR);
+                emptyColor.setContentText("You forgot to set a color to tag: " + t.getTitle() + ". Please choose a colour!");
+                emptyColor.showAndWait();
+                return;
+            }
+        }
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         boardOverview.getKey().setFileName(fileName);
         boardOverview.getKey().setBoard(board);
@@ -213,10 +221,9 @@ public class TagController {
 
     /**
      * Refreshing all the available card.
-     *
      */
 
-    public void refresh(){
+    public void refresh() {
         long id = board.getBoardId();
         vBox.getChildren().clear();
         if (id != 0) {
@@ -232,9 +239,8 @@ public class TagController {
             }
         }
         List<Tag> tags = board.getTags();
-       // map = new HashMap<>();
-        for (Tag tag : tags)
-        {
+        // map = new HashMap<>();
+        for (Tag tag : tags) {
             // construct the vbox from frontend, just to see the layout
             Button tagButton = new Button(tag.getTitle());
             tagButton.setMinSize(200, 50);
@@ -243,7 +249,7 @@ public class TagController {
             editButton.setOnAction(event -> {
                 editTagName(event, tag);
             });
-           // editButton.setOnAction(this::editTagName);
+            // editButton.setOnAction(this::editTagName);
 
             Button deleteButton = new Button("delete");
             deleteButton.setOnAction(event -> {
@@ -252,16 +258,16 @@ public class TagController {
 
             ColorPicker colorPicker = new ColorPicker();
             colorPicker.setMaxSize(10, 10);
-            HBox hbox = new HBox(tagButton,editButton,deleteButton, colorPicker);
+            HBox hbox = new HBox(tagButton, editButton, deleteButton, colorPicker);
             colorPicker.setOnAction(event -> {
                 Color color = colorPicker.getValue();
                 tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
                 tag.setColor(color.toString());
                 saveTagDB(tag, this.board);
-              //  refresh();
+                //  refresh();
             });
 
-            if(tag.getColor() != null) {
+            if (tag.getColor() != null) {
                 colorPicker.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
                 Color color = Color.web(tag.getColor());
                 tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
@@ -278,12 +284,12 @@ public class TagController {
      * Deleting a tag from the database.
      *
      * @param event the event
-     * @param tag the tag to be deleted
+     * @param tag   the tag to be deleted
      */
 
     private void deleteTag(ActionEvent event, Tag tag) {
-        HBox clicked = (HBox)((Button) event.getSource()).getParent();
-        VBox vbox = (VBox)clicked.getParent();
+        HBox clicked = (HBox) ((Button) event.getSource()).getParent();
+        VBox vbox = (VBox) clicked.getParent();
         vbox.getChildren().remove(clicked);
         try {
             tag.removeTagFromCards();

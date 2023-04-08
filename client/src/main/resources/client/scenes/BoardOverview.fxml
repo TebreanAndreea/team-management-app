@@ -17,9 +17,6 @@
         <ScrollPane fx:id="scrollPaneBoard" layoutX="-2.0" layoutY="100.0" prefHeight="278.0" prefWidth="635.0">
             <content>
                 <HBox fx:id="hBox" layoutX="1.0" layoutY="103.0" prefHeight="265.0" prefWidth="635.0" spacing="20.0">
-                    <children>
-
-                    </children>
                     <padding>
                         <Insets left="20.0" right="20.0" top="5.0" />
                     </padding>
@@ -32,9 +29,12 @@
             <Font size="17.0" />
          </font></Button>
       <Button layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Remove Board" textFill="RED" />
-        <TextField fx:id="accessKey" editable="false" layoutX="410.0" layoutY="392.0" prefHeight="18.0" text="Access Key:" />
-        <Button fx:id="copyKeyButton" layoutX="564.0" layoutY="392.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
-      <Button fx:id="tagButton" layoutX="445.0" layoutY="60.0" mnemonicParsing="false" onAction="#switchToTagScene" text="Tags" />
+        <TextField fx:id="accessKey" editable="false" layoutX="411.0" layoutY="388.0" prefHeight="18.0" text="Access Key:" />
+        <Button fx:id="copyKeyButton" layoutX="569.0" layoutY="388.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
+      <Button fx:id="tagButton" layoutX="84.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToTagScene" prefHeight="26.0" prefWidth="72.0" text="Tags" />
       <Button fx:id="customizeButton" layoutX="4.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToCustomizationScene" style="-fx-background-color: white;" text="Customize" textFill="#0a0000" />
+      <Button fx:id="lockButton" layoutX="419.0" layoutY="52.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="39.0" text="🔒" />
+      <Button fx:id="readOnly" layoutX="143.0" layoutY="388.0" mnemonicParsing="false" onAction="#disableReadOnly" prefHeight="26.0" prefWidth="247.0" text="Read_Only mode! Enter password here!" />
+      <Label fx:id="lockLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="389.0" layoutY="33.0" prefHeight="18.0" prefWidth="100.0" style="-fx-background-color: transparent;" text="Locked" />
     </children>
 </AnchorPane>

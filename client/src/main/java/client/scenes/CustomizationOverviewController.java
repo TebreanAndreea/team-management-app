@@ -5,7 +5,10 @@ import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Board;
+import commons.Card;
 import commons.ColorScheme;
+import commons.Listing;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -58,14 +61,29 @@ public class CustomizationOverviewController {
      * Initializes the controller.
      */
     public void initialize() {
-        // refresh();
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(() -> {
+            refresh();
+        }));
+        server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater(() -> {
+            refresh();
+        }));
+
+        server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
+
+        //refresh();
+    }
+
+
+    public void print(ColorScheme scheme) {
+        System.out.println(scheme);
     }
 
     /**
      * refreshes the overview.
      */
     public void refresh() {
-        System.out.println(board.getBoardId());
+        System.out.println("refreshed customization");
+        board = server.getBoardByID(board.getBoardId());
         boardBackground.setValue(Color.valueOf(board.getBackgroundColor()));
         boardFont.setValue(Color.valueOf(board.getTextColor()));
         listBackground.setValue(Color.valueOf(board.getListBackgroundColor()));
@@ -145,19 +163,18 @@ public class CustomizationOverviewController {
             defHbox.minWidth(90);
             defHbox.maxWidth(90);
             Label def = new Label("Default");
-            CheckBox check = new CheckBox();
-            check.maxHeight(20);
-            check.maxWidth(20);
+
             nameDefault.getChildren().add(name);
             defHbox.getChildren().add(def);
             nameDefault.getChildren().add(defHbox);
-            check.setOnAction(e -> checkBoxEvent(check));
             if (scheme.isDef()) {
                 name.setStyle("-fx-font-weight: bold");
                 def.setStyle("-fx-font-weight: bold");
 
             } else {
-                defHbox.getChildren().add(check);
+                Button setDef = new Button("V");
+                setDefButton(setDef);
+                defHbox.getChildren().add(setDef);
             }
             hBox.getChildren().add(nameDefault);
             Label font = new Label("F");
@@ -179,6 +196,22 @@ public class CustomizationOverviewController {
         }
     }
 
+    private void setDefButton(Button setDef) {
+        setDef.setMaxSize(20, 20);
+        setDef.setMinSize(20, 20);
+        setDef.setAlignment(Pos.CENTER);
+        setDef.setStyle("-fx-background-color: white; -fx-text-fill: green;");
+        setDef.setOnMouseEntered(event -> {
+            setDef.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+        });
+        setDef.setOnMouseExited(event -> {
+            setDef.setStyle("-fx-background-color: white; -fx-text-fill: green;");
+        });
+        setDef.setOnAction(event -> {
+            checkBoxEvent(event);
+        });
+    }
+
     private void setColorControll(ColorPicker colorPicker) {
         colorPicker.setMaxSize(6, 40);
         colorPicker.setMaxSize(40, 40);
@@ -186,31 +219,56 @@ public class CustomizationOverviewController {
         colorPicker.setOnAction(event -> {
             HBox hBox = (HBox) colorPicker.getParent();
             ColorScheme scheme = map.get(hBox);
+            ColorScheme oldScheme = new ColorScheme(scheme.getName(), scheme.getBackgroundColor(), scheme.getFontColor(), board);
             ColorPicker back = (ColorPicker) hBox.getChildren().get(2);
             ColorPicker font = (ColorPicker) hBox.getChildren().get(4);
             String backString = String.format("#%02X%02X%02X",
-                (int) (back.getValue().getRed() * 255),
-                (int) (back.getValue().getGreen() * 255),
-                (int) (back.getValue().getBlue() * 255));
+                    (int) (back.getValue().getRed() * 255),
+                    (int) (back.getValue().getGreen() * 255),
+                    (int) (back.getValue().getBlue() * 255));
             String fontString = String.format("#%02X%02X%02X",
-                (int) (font.getValue().getRed() * 255),
-                (int) (font.getValue().getGreen() * 255),
-                (int) (font.getValue().getBlue() * 255));
+                    (int) (font.getValue().getRed() * 255),
+                    (int) (font.getValue().getGreen() * 255),
+                    (int) (font.getValue().getBlue() * 255));
 
 
             if (scheme.getBackgroundColor().equals(backString) && scheme.getFontColor().equals(fontString)) {
-                hBox.getChildren().get(hBox.getChildren().size() - 1).setVisible(false);
                 return;
             }
-            if (!scheme.getBackgroundColor().equals(backString))
+            if (!scheme.getBackgroundColor().equals(backString)) {
                 scheme.setBackgroundColor(backString);
-            if (!scheme.getFontColor().equals(fontString))
+                if (scheme.isDef()) {
+                    board.setCardBackgroundColor(backString);
+                    server.addBoard(board);
+                }
+            }
+            if (!scheme.getFontColor().equals(fontString)) {
                 scheme.setFontColor(fontString);
+                if (scheme.isDef()) {
+                    board.setCardFontColor(fontString);
+                    server.addBoard(board);
+                }
+            }
 
+            updateCardColors(scheme, oldScheme);
             server.sendBoardToScheme(board);
             server.saveColorScheme(scheme);
             refresh();
         });
+    }
+
+    private void updateCardColors(ColorScheme newScheme, ColorScheme oldScheme) {
+        for (Listing l : board.getLists()) {
+            for (Card c : l.getCards()) {
+                if (c.getSchemeName().equals(oldScheme.getName())) {
+                    c.setSchemeName(newScheme.getName());
+                    c.setBackgroundColor(newScheme.getBackgroundColor());
+                    c.setFontColor(newScheme.getFontColor());
+                    server.sendList(l);
+                    server.saveCard(c, false);
+                }
+            }
+        }
     }
 
     private void updateName(javafx.scene.input.MouseEvent event, Label name) {
@@ -238,29 +296,26 @@ public class CustomizationOverviewController {
     }
 
 
-    public void checkBoxEvent(CheckBox check) {
+    public void checkBoxEvent(ActionEvent event) {
 
-        if (check.isSelected()) {
-            HBox hBox = (HBox) (check.getParent().getParent().getParent());
-            ColorScheme newDef = map.get(hBox);
-            for (ColorScheme c : board.getSchemes()) {
-                if (c.isDef()) {
-                    c.setDef(false);
-                    server.sendBoardToScheme(board);
-                    server.saveColorScheme(c);
-                    break;
-                }
+        HBox hBox = (HBox) ((Button) event.getSource()).getParent().getParent().getParent();
+        ColorScheme newDef = map.get(hBox);
+        for (ColorScheme c : board.getSchemes()) {
+            if (c.isDef()) {
+                c.setDef(false);
+                server.sendBoardToScheme(board);
+                server.saveColorScheme(c);
+                break;
             }
-            newDef.setDef(true);
-            server.sendBoard(board);
-            server.saveColorScheme(newDef);
-            board.setCardBackgroundColor(newDef.getBackgroundColor());
-            board.setCardFontColor(newDef.getFontColor());
-            server.addBoard(board);
-            refresh();
         }
+        newDef.setDef(true);
+        board.setCardBackgroundColor(newDef.getBackgroundColor());
+        board.setCardFontColor(newDef.getFontColor());
+        server.addBoard(board);
+        server.sendBoardToScheme(board);
+        server.saveColorScheme(newDef);
 
-
+        refresh();
     }
 
     public void setDeleteButton(Button delete) {
@@ -288,6 +343,14 @@ public class CustomizationOverviewController {
             defaultScheme.showAndWait();
             return;
         }
+        ColorScheme def = scheme;
+        for (ColorScheme s : board.getSchemes()) {
+            if (s.isDef()) {
+                def = s;
+                break;
+            }
+        }
+        updateCardColors(def, scheme);
         map.remove((HBox) ((Button) event.getSource()).getParent());
         server.deleteScheme(scheme.getSchemeId());
         board.getSchemes().remove(scheme);

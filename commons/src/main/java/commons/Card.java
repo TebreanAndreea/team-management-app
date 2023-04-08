@@ -41,6 +41,8 @@ public class Card {
     private String fontColor;
     private String backgroundColor;
 
+    private String schemeName;
+
     /**
      *
      * Constructor for the card class.
@@ -52,8 +54,9 @@ public class Card {
      * @param list - the list in which the card is
      * @param fontColor - the font color
      * @param backgroundColor - the background color
+     * @param schemeName - the name of the scheme
      */
-    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list, String fontColor, String backgroundColor) {
+    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list, String fontColor, String backgroundColor, String schemeName) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
@@ -63,6 +66,7 @@ public class Card {
         this.list = list;
         this.backgroundColor = backgroundColor;
         this.fontColor = fontColor;
+        this.schemeName = schemeName;
     }
 
     /**
@@ -180,6 +184,14 @@ public class Card {
         this.complete = complete;
     }
 
+    public String getSchemeName() {
+        return schemeName;
+    }
+
+    public void setSchemeName(String schemeName) {
+        this.schemeName = schemeName;
+    }
+
     /**
      * Equals method for the Card class.
      * @param o - the object with which we check for equality
@@ -191,8 +203,8 @@ public class Card {
         if (!(o instanceof Card)) return false;
         Card card = (Card) o;
         if (listss)
-            return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor));
-        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor));
+            return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor)) && schemeName.equals(card.schemeName);
+        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor))&& schemeName.equals(card.schemeName);
     }
 
     /**
