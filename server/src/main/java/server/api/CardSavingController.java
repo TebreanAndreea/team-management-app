@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import server.database.CardRepository;
+import server.services.CardService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +20,7 @@ import java.util.function.Consumer;
 @RequestMapping("api/card")
 public class CardSavingController {
 
-    private final CardRepository repo;
-    private final SimpMessageSendingOperations msgs;
-
-    private Map<Object, Consumer<Card>> listenings = new HashMap<>();
-
-    private Listing list;
+    private CardService cardService;
 
     /**
      * Constructor for the card controller.
@@ -33,8 +29,7 @@ public class CardSavingController {
      * @param msgs - messages for communication
      */
     public CardSavingController(CardRepository repo, SimpMessageSendingOperations msgs) {
-        this.repo = repo;
-        this.msgs = msgs;
+        this.cardService = new CardService(repo,msgs);
     }
 
     /**
@@ -45,20 +40,7 @@ public class CardSavingController {
      */
     @PostMapping(path = {"/{insertedIntoList}"})
     public ResponseEntity<Card> add(@RequestBody Card card, @PathVariable boolean insertedIntoList) {
-        if (card == null) return ResponseEntity.badRequest().build();
-
-        card.setList(list);
-
-        msgs.convertAndSend("/topic/card", card);
-        Card save = repo.save(card);
-        if(!insertedIntoList) {
-            if (!listenings.isEmpty()) {
-                listenings.forEach((k, s) -> {
-                    s.accept(save);
-                });
-            }
-        }
-        return ResponseEntity.ok(save);
+        return cardService.add(card,insertedIntoList);
     }
 
     /**
@@ -69,9 +51,7 @@ public class CardSavingController {
      */
     @PostMapping(path = {"/setList"})
     public ResponseEntity<Listing> getList(@RequestBody Listing list) {
-
-        this.list = list;
-        return ResponseEntity.ok(list);
+        return cardService.getList(list);
     }
 
     /**
@@ -82,22 +62,7 @@ public class CardSavingController {
      */
     @DeleteMapping(path = {"delete/{id}/{permanentDeletion}"})
     public ResponseEntity<Listing> delete(@PathVariable long id, @PathVariable boolean permanentDeletion) {
-        System.out.println("delete");
-        Card card = repo.findById(id).orElse(null);
-        if (card == null) {
-            return ResponseEntity.notFound().build();
-        }
-        msgs.convertAndSend("/topic/card", card);
-        repo.deleteById(id);
-
-        if (permanentDeletion) {
-            if (!listenings.isEmpty()) {
-                listenings.forEach((k, s) -> {
-                    s.accept(card);
-                });
-            }
-        }
-        return ResponseEntity.ok().build();
+        return cardService.delete(id,permanentDeletion);
     }
 
     /**
@@ -108,33 +73,16 @@ public class CardSavingController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Card> getById(@PathVariable("id") long id) {
-        if (id < 0 || !repo.existsById(id)) {
-            return ResponseEntity.ok(null);
-        }
-        return ResponseEntity.ok(repo.findById(id).get());
+        return cardService.getById(id);
     }
 
     @GetMapping("/updates")
     public DeferredResult<ResponseEntity<Card>> getUppdatesCards() {
-        var noContent = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        var result = new DeferredResult<ResponseEntity<Card>>(1000L, noContent);
-        var key = new Object();
-
-        listenings.put(key, s -> {
-            result.setResult(ResponseEntity.ok(s));
-        });
-
-        result.onCompletion(() -> {
-            listenings.remove(key);
-        });
-        return result;
+        return cardService.getUppdatesCards();
     }
 
     @PostMapping("/check")
     public ResponseEntity<Boolean> getCard(@RequestBody Card card) {
-        Optional<Card> card1 = repo.findById(card.getCardId());
-        if (card1.isEmpty())
-            return ResponseEntity.ok(true);
-        return ResponseEntity.ok(false);
+        return cardService.getCard(card);
     }
 }
