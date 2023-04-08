@@ -121,7 +121,7 @@ public class CardService {
     }
 
     /**
-     * This method checks if a card is in the database
+     * This method checks if a card is in the database.
      * @param card the card
      * @return a response entity boolean
      */
