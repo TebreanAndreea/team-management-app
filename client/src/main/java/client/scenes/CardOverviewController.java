@@ -13,10 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -603,8 +600,10 @@ public class CardOverviewController {
         for (Tag tag : card.getTags()) {
             Label tagLabel = new Label(tag.getTitle());
             Color color = Color.web(tag.getColor());
-            Background background = new Background(new BackgroundFill(color, null, null));
+            Color bg = color.deriveColor(1, 1, 1, 0.5);
+            Background background = new Background(new BackgroundFill(bg, new CornerRadii(5), null));
             tagLabel.setBackground(background);
+            tagLabel.setBorder(new Border(new BorderStroke(color, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(3))));
             tagLabel.setAlignment(Pos.CENTER);
             //  tagLabel.setStyle("-fx-background-radius: 20;");
             tagLabel.setMinSize(100, 40);

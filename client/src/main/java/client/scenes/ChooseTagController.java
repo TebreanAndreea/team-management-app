@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -146,8 +147,10 @@ public class ChooseTagController {
             // checkBox.setStyle("-fx-font-size: 40px;");
             if (tag.getColor() != null) {
                 Color color = Color.web(tag.getColor());
-                Background background = new Background(new BackgroundFill(color, null, null));
+                Color bg = color.deriveColor(1, 1, 1, 0.5);
+                Background background = new Background(new BackgroundFill(bg, new CornerRadii(5), null));
                 checkBox.setBackground(background);
+                checkBox.setBorder(new Border(new BorderStroke(color, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(5))));
             }
             checkBox.setMinSize(200, 50);
             checkBox.setAlignment(Pos.CENTER);
