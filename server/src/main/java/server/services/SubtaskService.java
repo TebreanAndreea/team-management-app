@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import server.database.SubTaskRepository;
 
@@ -69,7 +68,6 @@ public class SubtaskService {
      * @param subTask the subtask to be edited
      * @return the updated subtask
      */
-    @PostMapping(path = { "/edit" })
     public ResponseEntity<SubTask> updateSubtask(SubTask subTask) {
         subTask.setCard(card);
         subTask = repo.save(subTask);

@@ -40,8 +40,8 @@ class CardServiceTest {
         tags.add(tag1);
 
         List<SubTask> subtasks = new ArrayList<>();
-        SubTask s1 = new SubTask("s1",card);
-        subtasks.add(s1);
+        SubTask subtask1 = new SubTask("s1",card);
+        subtasks.add(subtask1);
 
         Listing list = new Listing("list",null);
 
