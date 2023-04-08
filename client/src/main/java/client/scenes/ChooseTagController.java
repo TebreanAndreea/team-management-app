@@ -93,8 +93,7 @@ public class ChooseTagController {
             }
             refresh();
         }));
-
-
+        server.registerForMessages("/topic/tag", Tag.class, q -> Platform.runLater(this::refresh));
     }
 
     /**
@@ -140,6 +139,7 @@ public class ChooseTagController {
      */
     public void refresh() {
         vbox.getChildren().clear();
+        board = server.getBoardByID(board.getBoardId());
         List<Tag> tags = board.getTags();
         Card card = server.getCardsById(cardId);
         for (Tag tag : tags) {

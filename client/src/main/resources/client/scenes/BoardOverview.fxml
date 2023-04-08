@@ -23,12 +23,12 @@
                 </HBox>
             </content>
         </ScrollPane>
-        <Button layoutX="530.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToInitialOverviewScene" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: IndianRed;" text="Exit to menu" textFill="WHITE" />
+        <Button fx:id="exitButton" layoutX="530.0" layoutY="10.0" mnemonicParsing="false" onAction="#switchToInitialOverviewScene" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: IndianRed;" text="Exit to menu" textFill="WHITE" />
         <Button fx:id="refreshButton" layoutX="530.0" layoutY="53.0" mnemonicParsing="false" onAction="#refresh" prefHeight="39.0" prefWidth="39.0" text="⟳">
          <font>
             <Font size="17.0" />
          </font></Button>
-      <Button layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Remove Board" textFill="RED" />
+      <Button fx:id="removeButton" layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Remove Board" textFill="RED" />
         <TextField fx:id="accessKey" editable="false" layoutX="411.0" layoutY="388.0" prefHeight="18.0" text="Access Key:" />
         <Button fx:id="copyKeyButton" layoutX="569.0" layoutY="388.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
       <Button fx:id="tagButton" layoutX="84.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToTagScene" prefHeight="26.0" prefWidth="72.0" text="Tags" />

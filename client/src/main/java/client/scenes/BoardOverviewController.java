@@ -43,6 +43,8 @@ import static com.google.inject.Guice.createInjector;
 
 public class BoardOverviewController {
 
+    public Button exitButton;
+    public Button removeButton;
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
@@ -56,6 +58,8 @@ public class BoardOverviewController {
     @javafx.fxml.FXML
     public Button lockButton;
     public Button readOnly;
+
+    private boolean isAdmin = false;
     public ScrollPane scrollPaneBoard;
     public Label lockLabel;
     private ServerUtils server;
@@ -94,6 +98,10 @@ public class BoardOverviewController {
     public void setHasAccess(boolean check) {
         this.hasAccess = check;
         System.out.println("Initially " + hasAccess);
+    }
+
+    public void setIsAdmin(boolean b) {
+        isAdmin = b;
     }
 
 
@@ -208,34 +216,6 @@ public class BoardOverviewController {
 
     }
 
-//    /**
-//     * This method allows the user to change the name of a card.
-//     *
-//     * @param actionEvent the action event
-//     */
-//    public void editCard(javafx.event.ActionEvent actionEvent) {
-//        Button editButton = (Button) actionEvent.getSource();
-//        HBox hBox = (HBox) editButton.getParent();
-//        Button cardButton = (Button) hBox.getChildren().get(0);
-//        Card currentCard = cardMap.get(hBox);
-//        TextInputDialog dialog = new TextInputDialog(currentCard.getName());
-//        dialog.setTitle("Change the name of the card");
-//        dialog.setHeaderText("Please enter the new name for the card:");
-//        dialog.showAndWait().ifPresent(name -> {
-//
-//            if (!name.isEmpty()) {
-//                cardButton.setText(name);
-//                server.updateCard(currentCard.getCardId(), name);
-//            } else {
-//                Alert emptyField = new Alert(Alert.AlertType.ERROR);
-//                emptyField.setContentText("Name field was submitted empty, please enter a name");
-//                emptyField.showAndWait();
-//                editCard(actionEvent);
-//            }
-//
-//        });
-//    }
-
     /**
      * Edit a List by changing its name.
      *
@@ -299,6 +279,15 @@ public class BoardOverviewController {
      * @throws IOException the exemption it might be caused
      */
     public void switchToInitialOverviewScene(javafx.event.ActionEvent actionEvent) throws IOException {
+        if (isAdmin)
+        {
+            var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
+            primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            overview = new Scene(adminOverview.getValue());
+            primaryStage.setScene(overview);
+            primaryStage.show();
+            return;
+        }
         if (!adminControl) {
             var initialOverview = FXML.load(InitialOverviewController.class, "client", "scenes", "InitialOverview.fxml");
             initialOverview.getKey().setFileName(fileName);
@@ -353,7 +342,7 @@ public class BoardOverviewController {
             alert.showAndWait();
             return;
         }
-        if (!adminControl) {
+        if (!adminControl || isAdmin) {
             var customizationOverview = FXML.load(CustomizationOverviewController.class, "client", "scenes", "CustomizationOverview.fxml");
             customizationOverview.getKey().setBoard(board);
             customizationOverview.getKey().setFileName(fileName);
@@ -650,12 +639,18 @@ public class BoardOverviewController {
             addListWithListing(listing);
     }
 
+    /**
+     * Allows access after a correctly entered password.
+     */
     private void refreshedSecurity() {
         if (!hasAccess && board.getPassword().equals("")) {
             allowAccess();
         }
     }
 
+    /**
+     * Sets up the lock button.
+     */
     private void setUpLockButton() {
         boolean unlocked = board.getPassword().equals("");
         if (!unlocked) {
@@ -700,6 +695,10 @@ public class BoardOverviewController {
 
     }
 
+    /**
+     * It checks if the board is unlocked, and if it is it allows the user to enter a password; otherwise the user can change/remove it.
+     * @param unlocked - whether the board is locked.
+     */
     private void lockEvent(boolean unlocked) {
 
         if (unlocked) {
@@ -781,7 +780,13 @@ public class BoardOverviewController {
      *
      * @param actionEvent the event that triggered this method
      */
-    public void leaveBoard(ActionEvent actionEvent) {
+    public void leaveBoard(ActionEvent actionEvent) throws IOException {
+        if (isAdmin)
+        {
+            switchToInitialOverviewScene(actionEvent);
+            return;
+        }
+
         if (!adminControl) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmation Dialog");
@@ -938,7 +943,7 @@ public class BoardOverviewController {
             alert.showAndWait();
             return;
         }
-        if (!adminControl) {
+        if (!adminControl || isAdmin) {
             var tagOverview = FXML.load(TagController.class, "client", "scenes", "TagOverview.fxml");
             tagOverview.getKey().setBoard(board);
             tagOverview.getKey().setFileName(fileName);
@@ -963,6 +968,12 @@ public class BoardOverviewController {
      * Sets up the FXML objects within the board to match the board's colors.
      */
     private void setUpButtonColors() {
+        if (isAdmin) {
+            exitButton.setText("Admin view");
+            removeButton.setText("Admin view");
+        }
+
+        lockLabel.setTextFill(Color.web(board.getTextColor()));
         colorButton(addListButton);
         colorButton(readOnly);
         colorButton(tagButton);
@@ -994,6 +1005,10 @@ public class BoardOverviewController {
         });
     }
 
+    /**
+     * Disables the read only if the user has entered the correct password.
+     * @param event - the button clicked
+     */
     public void disableReadOnly(ActionEvent event) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Enter password");
@@ -1011,6 +1026,9 @@ public class BoardOverviewController {
         });
     }
 
+    /**
+     * Allows access, helper method to the above.
+     */
     public void allowAccess() {
         setHasAccess(true);
 
@@ -1043,5 +1061,6 @@ public class BoardOverviewController {
         refresh();
 
     }
+
 
 }

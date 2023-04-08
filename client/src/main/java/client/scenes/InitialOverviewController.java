@@ -85,6 +85,7 @@ public class InitialOverviewController {
         boardOverview.getKey().setFileName(fileName);
         Board desireBoard = boardsMap.get(goToBoard);
         boardOverview.getKey().setBoard(desireBoard);
+        boardOverview.getKey().setIsAdmin(false);
         boardOverview.getKey().setHasAccess(accessMap.get(desireBoard.getBoardId()));
         boardOverview.getKey().refresh();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
