@@ -15,10 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -246,31 +243,42 @@ public class TagController {
             tagButton.setMinSize(200, 50);
 
             Button editButton = new Button("edit");
+            editButton.setMinHeight(50);
             editButton.setOnAction(event -> {
                 editTagName(event, tag);
             });
             // editButton.setOnAction(this::editTagName);
 
             Button deleteButton = new Button("delete");
+            deleteButton.setMinHeight(50);
             deleteButton.setOnAction(event -> {
                 deleteTag(event, tag);
             });
 
             ColorPicker colorPicker = new ColorPicker();
-            colorPicker.setMaxSize(10, 10);
+            colorPicker.setMaxSize(40, 50);
+            colorPicker.setStyle("-fx-background-color: transparent;");
+            tagButton.setStyle("-fx-background-color: transparent;");
+            editButton.setStyle("-fx-background-color: transparent;");
+            deleteButton.setStyle("-fx-background-color: transparent;");
             HBox hbox = new HBox(tagButton, editButton, deleteButton, colorPicker);
+            hbox.setMaxWidth(500);
             colorPicker.setOnAction(event -> {
                 Color color = colorPicker.getValue();
-                tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
                 tag.setColor(color.toString());
                 saveTagDB(tag, this.board);
                 //  refresh();
             });
 
             if (tag.getColor() != null) {
-                colorPicker.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
+                colorPicker.setValue(Color.web(tag.getColor()));
+                //colorPicker.setBackground(new Background(new BackgroundFill(Color.web(tag.getColor()), null, null)));
                 Color color = Color.web(tag.getColor());
-                tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
+                //tagButton.setBackground(new Background(new BackgroundFill(color, null, null)));
+                Color bg = color.deriveColor(1, 1, 1, 0.5);
+                Background background = new Background(new BackgroundFill(bg, new CornerRadii(5), null));
+                hbox.setBackground(background);
+                hbox.setBorder(new Border(new BorderStroke(color, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(3))));
             }
 
             hbox.setSpacing(10);
