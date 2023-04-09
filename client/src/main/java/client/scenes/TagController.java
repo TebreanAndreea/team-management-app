@@ -103,15 +103,11 @@ public class TagController {
                 tagButton.setMinSize(200, 50);
 
                 Button editButton = new Button("edit");
-                editButton.setOnAction(event -> {
-                    editTagName(event, tag);
-                });
+                editButton.setOnAction(event -> editTagName(event, tag));
                 // editButton.setOnAction(this::editTagName);
 
                 Button deleteButton = new Button("delete");
-                deleteButton.setOnAction(event -> {
-                    deleteTag(event, tag);
-                });
+                deleteButton.setOnAction(event -> deleteTag(event, tag));
 
                 ColorPicker colorPicker = new ColorPicker();
                 colorPicker.setMaxSize(10, 10);

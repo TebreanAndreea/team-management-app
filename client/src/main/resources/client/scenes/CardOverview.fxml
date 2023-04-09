@@ -9,7 +9,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController" onKeyPressed="#exitIfEscape">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController" onKeyPressed="#exitIfEscape">
    <children>
       <Button layoutX="512.0" layoutY="18.0" mnemonicParsing="false" onAction="#switchToBoardScene" prefHeight="25.0" prefWidth="54.0" style="-fx-background-color: IndianRed;" text="Exit" textFill="WHITE" />
       <Label fx:id="cardLabel" layoutX="27.0" layoutY="14.0" prefHeight="33.0" prefWidth="173.0" text="Card Details">
