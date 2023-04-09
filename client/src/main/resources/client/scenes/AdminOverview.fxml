@@ -11,7 +11,10 @@
          </content>
       </ScrollPane>
       <ScrollPane fx:id="previewPane" layoutX="155.0" layoutY="73.0" prefHeight="260.0" prefWidth="350.0" />
-      <Button fx:id="deleteButton" layoutX="515.0" layoutY="194.0" mnemonicParsing="false" onAction="#delete" prefHeight="44.0" prefWidth="69.0" style="-fx-background-color: red;" text="Delete" textFill="WHITE" />
+      <Button fx:id="deleteButton" layoutX="514.0" layoutY="250.0" mnemonicParsing="false" onAction="#delete" prefHeight="44.0" prefWidth="69.0" style="-fx-background-color: red;" text="Delete" textFill="WHITE" />
       <TextField layoutX="14.0" layoutY="14.0" onKeyTyped="#findByText" prefHeight="26.0" prefWidth="134.0" promptText="Search..." />
+      <Button fx:id="securityButton" layoutX="514.0" layoutY="181.0" mnemonicParsing="false" onAction="#changePassword" prefHeight="44.0" prefWidth="70.0" style="-fx-background-color: orange; -fx-text-fill: white;" text="Security" />
+      <Button fx:id="openButton" onAction="#switchToBoard" layoutX="514.0" layoutY="119.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="70.0" style="-fx-background-color: green;" text="Open" textFill="WHITE" />
+      <Button fx:id="disconnectButton" onAction="#switchToHomePageScene" layoutX="482.0" layoutY="14.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="103.0" style="-fx-background-color: white;" text="Disconnect" textFill="RED" />
    </children>
 </AnchorPane>

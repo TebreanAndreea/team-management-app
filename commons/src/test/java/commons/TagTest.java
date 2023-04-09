@@ -42,10 +42,10 @@ class TagTest {
     @Test
     void setCards() {
         List<Card> cards = new ArrayList<>();
-        Card card1 = new Card("desc","name",new Date(),null,null,null);
+        Card card1 = new Card("desc","name",new Date(),null,null,null,"","","");
         cards.add(card1);
 
-        Card card2 = new Card("desc","name2",new Date(),null,null,null);
+        Card card2 = new Card("desc","name2",new Date(),null,null,null,"","","");
         cards.add(card2);
 
         tag.setCards(cards);

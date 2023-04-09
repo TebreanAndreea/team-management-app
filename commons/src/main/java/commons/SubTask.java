@@ -45,6 +45,15 @@ public class SubTask {
     }
 
     /**
+     * Setter for the id.
+     *
+     * @param id the new id
+     */
+    public void setStId(long id) {
+        this.stId = id;
+    }
+
+    /**
      * Getter for the title of the subtask.
      * @return the title of the subtask
      */
@@ -102,7 +111,7 @@ public class SubTask {
         if (this == o) return true;
         if (!(o instanceof SubTask)) return false;
         SubTask subTask = (SubTask) o;
-        return stId == subTask.stId && done == subTask.done && title.equals(subTask.title) && Objects.equals(card, subTask.card);
+        return stId == subTask.stId && done == subTask.done && title.equals(subTask.title);
     }
 
     /**

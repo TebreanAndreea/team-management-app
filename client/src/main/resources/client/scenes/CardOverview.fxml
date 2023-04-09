@@ -5,30 +5,51 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController" onKeyPressed="#exitIfEscape">
    <children>
-      <Button layoutX="512.0" layoutY="352.0" mnemonicParsing="false" onAction="#switchToBoardScene" prefHeight="25.0" prefWidth="61.0" text="Go Back" />
-      <Label fx:id="cardLabel" layoutX="14.0" layoutY="14.0" prefHeight="33.0" prefWidth="173.0" text="Card Details">
+      <Button layoutX="512.0" layoutY="18.0" mnemonicParsing="false" onAction="#switchToBoardScene" prefHeight="25.0" prefWidth="54.0" style="-fx-background-color: IndianRed;" text="Exit" textFill="WHITE" />
+      <Label fx:id="cardLabel" layoutX="27.0" layoutY="14.0" prefHeight="33.0" prefWidth="173.0" text="Card Details">
          <font>
             <Font name="System Bold" size="28.0" />
          </font></Label>
-      <TextArea fx:id="description" layoutX="12.0" layoutY="71.0" prefHeight="91.0" prefWidth="520.0" />
-      <ScrollPane layoutX="15.0" layoutY="224.0">
+      <TextArea fx:id="description" layoutX="27.0" layoutY="48.0" prefHeight="68.0" prefWidth="541.0" />
+      <ScrollPane layoutX="27.0" layoutY="165.0">
          <content>
-            <VBox fx:id="vBox" prefHeight="109.0" prefWidth="513.0" />
+            <VBox fx:id="vBox" prefHeight="109.0" prefWidth="284.0" />
          </content>
       </ScrollPane>
-      <Label layoutX="18.0" layoutY="183.0" prefHeight="17.0" prefWidth="141.0" text="Subtasks">
+      <Label fx:id="subtaskLabel" layoutX="27.0" layoutY="132.0" prefHeight="17.0" prefWidth="141.0" text="Subtasks">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
-      <Button layoutX="494.0" layoutY="136.0" mnemonicParsing="false" onAction="#addDescription" text="Save" />
-      <Button layoutX="187.0" layoutY="21.0" mnemonicParsing="false" onAction="#updateName" prefHeight="25.0" prefWidth="37.0" text="Edit" />
-      <Button layoutX="88.0" layoutY="183.0" mnemonicParsing="false" onAction="#addSubTask" text="+" />
+      <Button fx:id="addDescriptionButton" layoutX="458.0" layoutY="90.0" mnemonicParsing="false" onAction="#addDescription" text="Save description" />
+      <Button fx:id="cardNameButton" layoutX="213.0" layoutY="18.0" mnemonicParsing="false" onAction="#updateName" prefHeight="26.0" prefWidth="109.0" text="Edit card name" />
+      <Button fx:id="addSubtaskButton" layoutX="106.0" layoutY="129.0" mnemonicParsing="false" onAction="#addSubTask" text="add subtask" />
+      <Label fx:id="tagsLabel" layoutX="27.0" layoutY="283.0" prefHeight="25.0" prefWidth="61.0" text="Tags">
+         <font>
+            <Font size="16.0" />
+         </font></Label>
+      <Button fx:id="addTagButton" layoutX="76.0" layoutY="283.0" mnemonicParsing="false" onAction="#switchToChooseTagScene" text="Add tag" />
+      <ScrollPane layoutX="27.0" layoutY="316.0" prefHeight="50.0" prefWidth="541.0">
+         <content>
+            <HBox fx:id="hbox" prefHeight="38.0" prefWidth="538.0" />
+         </content>
+      </ScrollPane>
+      <Label fx:id="colorSchemesLabel" layoutX="368.0" layoutY="135.0" prefHeight="17.0" prefWidth="141.0" text="Color Schemes">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <ScrollPane layoutX="368.0" layoutY="165.0" prefHeight="112.0" prefWidth="198.0">
+         <content>
+            <VBox fx:id="colorSchemes" prefHeight="110.0" prefWidth="158.0" spacing="8.0" />
+         </content>
+      </ScrollPane>
 <!--      <Button layoutX="63.0" layoutY="183.0" mnemonicParsing="false" onAction="#addSubTask" text="+" />-->
    </children>
 </AnchorPane>

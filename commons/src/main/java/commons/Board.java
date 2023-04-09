@@ -24,6 +24,37 @@ public class Board {
     private String accessKey;
     private String password;
 
+    //private List<Tag> tags;
+    @JsonManagedReference
+    @OneToMany(
+            mappedBy = "board",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Tag> tags;
+
+    private String backgroundColorDefault="#ffffff";
+    private String backgroundColor="#ffffff";
+    private String textColorDefault="#000000";
+    private String textColor="#000000";
+
+    private String listBackgroundColorDefault="#ffffff";
+    private String listBackgroundColor="#ffffff";
+    private String listTextColorDefault="#000000";
+    private String listTextColor="#000000";
+
+    private String cardFontColor;
+    private String cardBackgroundColor;
+
+    @JsonManagedReference
+    @OneToMany(
+        mappedBy = "board",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<ColorScheme> schemes;
+
+
     /**
      * Constructor for a Board item.
      *
@@ -36,6 +67,21 @@ public class Board {
         this.accessKey = accessKey;
         this.password = password;
         this.lists = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.schemes = new ArrayList<>();
+
+        backgroundColorDefault="#ffffff";
+        backgroundColor="#ffffff";
+        textColorDefault="#000000";
+        textColor="#000000";
+
+        listBackgroundColorDefault="#ffffff";
+        listBackgroundColor="#ffffff";
+        listTextColorDefault="#000000";
+        listTextColor="#000000";
+
+        cardFontColor = "#000000";
+        cardBackgroundColor = "#ffffff";
     }
 
     /**
@@ -143,6 +189,23 @@ public class Board {
         this.password = password;
     }
 
+
+    /**
+     * Getter for the tags.
+     * @return a list of tags for this board
+     */
+    public List<Tag> getTags(){
+        return this.tags;
+    }
+
+    /**
+     * Setter for the tags.
+     * @param tags - the list of tags
+     */
+    public void setTags(List<Tag> tags){
+        this.tags = tags;
+    }
+
     /**
      * Equals method for board items.
      *
@@ -165,5 +228,74 @@ public class Board {
     @Override
     public int hashCode() {
         return Objects.hash(boardId, title, lists, accessKey, password);
+    }
+
+
+    public String getBackgroundColorDefault() {
+        return backgroundColorDefault;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public String getTextColorDefault() {
+        return textColorDefault;
+    }
+
+    public String getTextColor() {
+        return textColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public void setTextColor(String textColor) {
+        this.textColor = textColor;
+    }
+
+    public String getListBackgroundColorDefault() {
+        return listBackgroundColorDefault;
+    }
+
+    public String getListBackgroundColor() {
+        return listBackgroundColor;
+    }
+
+    public String getListTextColorDefault() {
+        return listTextColorDefault;
+    }
+
+    public String getListTextColor() {
+        return listTextColor;
+    }
+
+    public String getCardFontColor() {
+        return cardFontColor;
+    }
+
+    public void setCardFontColor(String cardFontColor) {
+        this.cardFontColor = cardFontColor;
+    }
+
+    public String getCardBackgroundColor() {
+        return cardBackgroundColor;
+    }
+
+    public void setCardBackgroundColor(String cardBackgroundColor) {
+        this.cardBackgroundColor = cardBackgroundColor;
+    }
+
+    public List<ColorScheme> getSchemes() {
+        return schemes;
+    }
+
+    public void setListBackgroundColor(String listBackgroundColor) {
+        this.listBackgroundColor = listBackgroundColor;
+    }
+
+    public void setListTextColor(String listTextColor) {
+        this.listTextColor = listTextColor;
     }
 }

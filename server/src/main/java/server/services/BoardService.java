@@ -43,7 +43,7 @@ public class BoardService {
     public ResponseEntity<Board> add(Board board) {
         if(board == null) return ResponseEntity.badRequest().build();
         msgs.convertAndSend("/topic/boards", board);
-        Board save = repo.save(board);
+        Board save = board;
         save.setAccessKey();
         save = repo.save(save);
         return ResponseEntity.ok(save);
@@ -62,6 +62,20 @@ public class BoardService {
         return ResponseEntity.ok(repo.findById(id).get());
     }
 
+    /**
+     * Method that deletes a board from DB.
+     *
+     * @param id - id corresponding to the board to be deleted
+     * @return status of query
+     */
+    public ResponseEntity<Board> delete(Long id) {
+        if (!repo.existsById(id))
+            return ResponseEntity.notFound().build();
 
+        msgs.convertAndSend("/topic/boards", repo.findById(id).get());
+
+        repo.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 
 }

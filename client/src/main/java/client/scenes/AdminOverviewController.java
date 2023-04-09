@@ -10,15 +10,16 @@ import commons.Listing;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.SubScene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -31,9 +32,15 @@ import static com.google.inject.Guice.createInjector;
 public class AdminOverviewController {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    public Button disconnectButton;
+    public Button openButton;
     private ServerUtils server;
+    private Scene overview;
+    private Stage primaryStage;
     private Map<Button, Board> buttonBoardMap = new HashMap<>();
     private Board selectedBoard;
+    @FXML
+    Button securityButton;
     @FXML
     private javafx.scene.control.ScrollPane previewPane;
     @FXML
@@ -57,7 +64,9 @@ public class AdminOverviewController {
      */
     public void initialize() {
         refresh();
+        openButton.setVisible(false);
         deleteButton.setVisible(false);
+        securityButton.setVisible(false);
     }
 
     /**
@@ -124,13 +133,15 @@ public class AdminOverviewController {
         root.getKey().setBoard(buttonBoardMap.get(actionEvent.getSource()));
         root.getKey().setAdminControl(true);
         root.getKey().refresh();
-        SubScene subScene = new SubScene(root.getValue(), 600, 400);
+        SubScene subScene = new SubScene(root.getValue(), 635, 427);
+        double scaleFactor = Math.min(350 / subScene.getWidth(), 260 / subScene.getHeight());
+        Scale scale = new Scale(scaleFactor, scaleFactor);
+        subScene.getTransforms().clear();
+        subScene.getTransforms().add(scale);
         previewPane.setContent(subScene);
-        //double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
-        //Scale scale = new Scale(scaleFactor, scaleFactor);
-        //subScene.getTransforms().clear();
-        //subScene.getTransforms().add(scale);
         deleteButton.setVisible(true);
+        securityButton.setVisible(true);
+        openButton.setVisible(true);
         selectedBoard = buttonBoardMap.get(actionEvent.getSource());
     }
 
@@ -151,7 +162,7 @@ public class AdminOverviewController {
                 for (int i = 0; i < list.getCards().size(); i++) {
                     Card card = list.getCards().get(i);
                     try {
-                        server.deleteCard(card.getCardId());
+                        server.deleteCard(card.getCardId(), true);
                     } catch (WebApplicationException e) {
                         var alertError = new Alert(Alert.AlertType.ERROR);
                         alertError.initModality(Modality.APPLICATION_MODAL);
@@ -183,6 +194,47 @@ public class AdminOverviewController {
             }
             refresh();
         }
+    }
+
+    /**
+     * Changes the password of the selected board.
+     */
+    public void changePassword() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change Password");
+        dialog.setHeaderText("Please enter a new password for the board");
+        dialog.showAndWait().ifPresent(password -> {
+            selectedBoard.setPassword(password);
+            selectedBoard = server.addBoard(selectedBoard);
+            refresh();
+        });
+    }
+
+    /**
+     * Disconnects the admin.
+     * @param actionEvent - the button pressed
+     */
+    public void switchToHomePageScene(ActionEvent actionEvent) {
+        var homePageOverview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(homePageOverview.getValue());
+        primaryStage.setScene(overview);
+        primaryStage.setTitle("Connection");
+    }
+
+    /**
+     * Switches to the board so the admin can use the client app.
+     * @param actionEvent - the button clicked
+     */
+    public void switchToBoard(ActionEvent actionEvent) {
+        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+        boardOverview.getKey().setBoard(selectedBoard);
+        boardOverview.getKey().setHasAccess(true);
+        boardOverview.getKey().setIsAdmin(true);
+        boardOverview.getKey().refresh();
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(boardOverview.getValue());
+        primaryStage.setScene(overview);
     }
 
 }

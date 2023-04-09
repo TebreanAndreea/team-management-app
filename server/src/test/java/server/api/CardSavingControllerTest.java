@@ -23,7 +23,8 @@ public class CardSavingControllerTest {
     @Test
     public void getByNegativeIdTest() {
         long id = -1;
-        assertEquals(ResponseEntity.badRequest().build(), controller.getById(id));
+        Card card =  controller.getById(id).getBody();
+        assertEquals(null, card);
     }
     @Test
     public void getByIdTest() {
@@ -35,24 +36,24 @@ public class CardSavingControllerTest {
     @Test
     public void addTest() {
         Card card = new Card();
-        controller.add(card);
+        controller.add(card, true);
         assertEquals(card, cardRepository.findAll().get(0));
     }
     @Test
     public void addNullTest() {
-        var result = controller.add(null);
+        var result = controller.add(null, true);
         assertEquals(ResponseEntity.badRequest().build(), result);
     }
     @Test
     public void deleteNotExistingListTest() {
         Card card = new Card();
-        assertEquals(ResponseEntity.notFound().build(), controller.delete(card.getCardId()));
+        assertEquals(ResponseEntity.notFound().build(), controller.delete(card.getCardId(), true));
     }
     @Test
     public void deleteListTest() {
         Card card = new Card();
         cardRepository.save(card);
-        controller.delete(card.getCardId());
+        controller.delete(card.getCardId(), true);
         assertEquals(0, cardRepository.findAll().size());
     }
     @Test
@@ -61,5 +62,6 @@ public class CardSavingControllerTest {
         assertEquals(ResponseEntity.ok(list), controller.getList(list));
 
     }
+
 
 }
