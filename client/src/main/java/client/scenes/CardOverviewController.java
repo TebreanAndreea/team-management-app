@@ -677,6 +677,7 @@ public class CardOverviewController {
             }
         }
     
+    /**
      * This method applies styling to buttons from the card overview.
      */
     public void setUpButtons(){
