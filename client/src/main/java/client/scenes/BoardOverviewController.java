@@ -31,6 +31,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -51,6 +52,11 @@ import static com.google.inject.Guice.createInjector;
 public class BoardOverviewController {
 
     public MenuBar menuBar;
+    public Button focus;
+    public Button focusUp;
+    public Button focusDown;
+    public Button focusLeft;
+    public Button focusRight;
     private Stage primaryStage;
     private Scene overview;
     public HBox hBox;
@@ -65,7 +71,7 @@ public class BoardOverviewController {
     private ListController listController;
     private EventTarget target;
     private boolean adminControl = false;
-    private ToggleGroup toggleGroup = new ToggleGroup();
+    private final ToggleGroup toggleGroup = new ToggleGroup();
 
     // A map that will keep track of all dependencies between
     // the lists in the UI and the lists we have in the DB
@@ -100,6 +106,7 @@ public class BoardOverviewController {
      * Initializes the controller and immediately fetches the lists from the database.
      */
     public void initialize() {
+
         server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/lists", Listing.class, q -> Platform.runLater(this::refresh));
         server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
@@ -110,7 +117,45 @@ public class BoardOverviewController {
             item.setAccelerator(new KeyCodeCombination(KeyCode.valueOf(id), KeyCodeCombination.SHIFT_DOWN));
         }
 
+        // focus is the middle invisible button
+        // whenever an arrow key is pushed, the highlight moves to one of the directional buttons and the corresponding
+        // arrow key method is run
+        // the focus is then returned to the middle button
+        focus.requestFocus();
+        focus.focusedProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue) {
+                return;
+            }
 
+            ToggleButton toggleButton = (ToggleButton) toggleGroup.getSelectedToggle();
+            if (toggleButton == null) {
+                focus.requestFocus();
+                return;
+            }
+
+            HBox cardHBox = (HBox) toggleButton.getParent();
+            VBox vBox = (VBox) cardHBox.getParent();
+            Card card = cardMap.get(cardHBox);
+            Listing listing = map.get(vBox);
+
+            boolean axis = focusUp.isFocused() || focusDown.isFocused();
+            boolean dir = focusUp.isFocused() || focusLeft.isFocused();
+            int movement;
+            if (dir) {
+                movement = -1;
+            }
+            else {
+                movement = 1;
+            }
+            if (axis) {
+                targetVertical(vBox, card, listing, movement);
+            }
+            else {
+                targetHorizontal(vBox, card, listing, movement);
+            }
+
+            focus.requestFocus();
+        }));
     }
 
     /**
@@ -390,14 +435,16 @@ public class BoardOverviewController {
      */
     private void addListWithListing(Listing listing) {
         Button addCardButton = new Button("+");
+        addCardButton.setFocusTraversable(false);
 
         addCardButton.setOnAction(this::addCard);
         setupAddCardButton(addCardButton);
         Button editListButton = new Button("Edit");
+        editListButton.setFocusTraversable(false);
         editListButton.setOnAction(event -> editList(event, listing));
         setupAddCardButton(editListButton);
         Button deleteListButton = new Button("delete list");
-        // deleteListButton.setOnAction(this::deleteList);
+        deleteListButton.setFocusTraversable(false);
         deleteListButton.setOnAction(event -> deleteList(event, listing));
         setupDeleteListButton(deleteListButton);
         VBox vBox = new VBox();
@@ -423,6 +470,7 @@ public class BoardOverviewController {
         map.put(vBox, listing);
         // set up the list itself
         TitledPane titledPane = new TitledPane(listing.getTitle(), vBox);
+        titledPane.setFocusTraversable(false);
         titledPane.setStyle("-fx-text-fill: "+board.getListTextColor()+";");
         titledPane.getContent().setStyle("-fx-background-color:"+board.getListBackgroundColor()+";");
         // Wait for the TitledPane to be displayed and fully initialized
@@ -444,12 +492,12 @@ public class BoardOverviewController {
     {
         ToggleButton newCard;
         VBox vBox1 = new VBox();
-        int totalSubtaks = c.getSubTasks().size();
+        int totalSubtasks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for(SubTask s : c.getSubTasks()) {
             if(s.isDone()) doneSubtasks++;
         }
-        Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtaks));
+        Label done = new Label(String.format("(%d/%d)", doneSubtasks, totalSubtasks));
         done.setStyle("  -fx-text-fill: " + c.getFontColor()+";");
         vBox1.getChildren().addAll(done);
         vBox1.setAlignment(Pos.CENTER);
@@ -485,6 +533,7 @@ public class BoardOverviewController {
             newCard.setGraphic(vBoxTag);
         }
 
+        newCard.setFocusTraversable(false);
         newCard.setUserData(c.getCardId());
         setupButton(newCard,c);
         newCard.setCursor(Cursor.CLOSED_HAND);
@@ -496,7 +545,7 @@ public class BoardOverviewController {
         newCard.setOnMouseReleased(this::handleDropping);
 
         Button edit = new Button("\uD83D\uDD89");
-        //edit.setOnAction(this::editCard); // an event happens when the button is clicked
+        edit.setFocusTraversable(false);
         edit.setOnMousePressed(event -> {
             if (event.getClickCount() == 2) {
                 try {
@@ -509,6 +558,7 @@ public class BoardOverviewController {
 
         setupButton(edit,c);
         Button delete = new Button("\uD83D\uDDD9");
+        delete.setFocusTraversable(false);
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
         setupButton(delete,c);
         HBox buttonList = new HBox();
@@ -558,6 +608,13 @@ public class BoardOverviewController {
         setUpButtonColors();
         for (Listing listing : listings)
             addListWithListing(listing);
+
+        // hiding the buttons by matching them to the background
+        focus.setStyle("-fx-background-color: " + board.getBackgroundColor());
+        focusUp.setStyle("-fx-background-color: " + board.getBackgroundColor());
+        focusDown.setStyle("-fx-background-color: " + board.getBackgroundColor());
+        focusLeft.setStyle("-fx-background-color: " + board.getBackgroundColor());
+        focusRight.setStyle("-fx-background-color: " + board.getBackgroundColor());
     }
 
     /**
@@ -718,6 +775,7 @@ public class BoardOverviewController {
                 else {
                     Platform.runLater(() -> ((HBox) button.getParent()).setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT))));
                 }
+                focus.requestFocus();
             }
             else {
                 Platform.runLater(() -> ((HBox) button.getParent()).setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT))));
@@ -930,11 +988,65 @@ public class BoardOverviewController {
                 addTagsPopup(card, listing);
                 break;
             case "C":
+                addColorPresetPopup(card, listing);
                 break;
-
             default:
                 break;
         }
+    }
+
+
+    /**
+     * Moves the highlight vertically if possible.
+     *
+     * @param vBox    the VBox containing the highlighted card
+     * @param card    the highlighted card
+     * @param listing the listing containing the highlighted card
+     * @param i       integer representation of Up/Down
+     */
+    private void targetVertical(VBox vBox, Card card, Listing listing, int i) {
+        int pos = listing.getCards().indexOf(card);
+        if (pos + i < 0 || pos + i >= listing.getCards().size()) {
+            focus.requestFocus();
+            return;
+        }
+        HBox newHBox = (HBox) vBox.getChildren().get(pos + i);
+        ToggleButton toggle = (ToggleButton) newHBox.getChildren().get(0);
+        toggleGroup.selectToggle(toggle);
+    }
+
+    /**
+     * Moves the highlight horizontally if possible.
+     *
+     * @param oldVBox the VBox housing the highlighted card
+     * @param card the highlighted card
+     * @param listing the listing containing the higlithed card
+     * @param i integer representation of Left/Right
+     */
+    private void targetHorizontal(VBox oldVBox, Card card, Listing listing, int i) {
+        int posInBoard = -1;
+        for (VBox vBox: map.keySet()) {
+            posInBoard++;
+            if (vBox.equals(oldVBox)) {
+                break;
+            }
+        }
+        posInBoard += i;
+
+        if (posInBoard < 0 || posInBoard >= map.size()) {
+            focus.requestFocus();
+            return;
+        }
+
+        int pos = listing.getCards().indexOf(card);
+        VBox newVBox = (VBox) ((TitledPane) hBox.getChildren().get(posInBoard)).getContent();
+        if (pos >= map.get(newVBox).getCards().size()) {
+            focus.requestFocus();
+            return;
+        }
+
+        ToggleButton toggle = (ToggleButton) ((HBox) newVBox.getChildren().get(pos)).getChildren().get(0);
+        toggleGroup.selectToggle(toggle);
     }
 
     /**
@@ -1021,6 +1133,98 @@ public class BoardOverviewController {
                 server.addTag(card, tag);
             }
         }
+    }
+
+
+    /**
+     * Creates a pop-up to select a color preset.
+     * @param card the highlighted card
+     * @param listing the listing containing the highlighted card
+     */
+    private void addColorPresetPopup(Card card, Listing listing) {
+        List<ColorScheme> schemes = board.getSchemes();
+        if (schemes.size() == 1) {
+            return;
+        }
+
+        Dialog<ColorScheme> dialog = new Dialog<>();
+        dialog.setTitle("Choose a color scheme");
+        dialog.setHeaderText("Color schemes:");
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().add(ButtonType.OK);
+
+        VBox vBox = new VBox();
+        ArrayList<Button> buttons = new ArrayList<>();
+        for (ColorScheme s : schemes) {
+            HBox schemeHBox = new HBox(10);
+            schemeHBox.setMinSize(150, 20);
+            schemeHBox.setMaxSize(150, 20);
+
+            Label name = new Label(s.getName());
+            Label back = new Label("B");
+            Rectangle backColor = new Rectangle(15, 15);
+            backColor.setFill(Color.web(s.getBackgroundColor()));
+            Label font = new Label("F");
+            Rectangle fontColor = new Rectangle(15, 15);
+            fontColor.setFill(Color.web(s.getFontColor()));
+            Button apply = new Button("\u2713");
+            buttons.add(apply);
+            if (card.getFontColor().equals(s.getFontColor()) && card.getBackgroundColor().equals(s.getBackgroundColor())) {
+                name.setStyle("-fx-font-weight: bold");
+                apply.setVisible(false);
+            }
+            setUpApplyButton(apply, s, card, listing, buttons);
+            schemeHBox.getChildren().add(name);
+            schemeHBox.getChildren().add(back);
+            schemeHBox.getChildren().add(backColor);
+            schemeHBox.getChildren().add(font);
+            schemeHBox.getChildren().add(fontColor);
+            schemeHBox.getChildren().add(apply);
+            vBox.getChildren().add(schemeHBox);
+        }
+
+        dialogPane.setContent(vBox);
+        dialog.showAndWait();
+    }
+
+    /**
+     * Helper method for addColorPresetPopup to set up the buttons for applying a color scheme.
+     *
+     * @param apply   the apply button for a color scheme
+     * @param scheme  the color scheme the button applies
+     * @param card    the card being applied to
+     * @param listing the listing containing the card
+     * @param buttons the list of the buttons in the pop-up window
+     */
+    private void setUpApplyButton(Button apply, ColorScheme scheme, Card card, Listing listing, ArrayList<Button> buttons) {
+        apply.setMaxSize(20, 20);
+        apply.setMinSize(20, 20);
+
+        apply.setAlignment(Pos.CENTER);
+        apply.setStyle("-fx-background-color: white; -fx-text-fill: green; -fx-font-size: 8 px");
+        apply.setOnMouseEntered(event -> apply.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-size: 8 px"));
+        apply.setOnMouseExited(event -> apply.setStyle("-fx-background-color: white; -fx-text-fill: green; -fx-font-size: 8 px"));
+        apply.setUserData(scheme);
+        apply.setOnAction(event -> {
+            card.setBackgroundColor(scheme.getBackgroundColor());
+            card.setFontColor(scheme.getFontColor());
+            server.sendList(listing);
+            server.saveCard(card);
+            refresh();
+
+            for (Button button: buttons) {
+                Label name = (Label) ((HBox) button.getParent()).getChildren().get(0);
+                ColorScheme myScheme = (ColorScheme) button.getUserData();
+                if (card.getFontColor().equals(myScheme.getFontColor()) && card.getBackgroundColor().equals(myScheme.getBackgroundColor())) {
+                    name.setStyle("-fx-font-weight: bold");
+                    button.setVisible(false);
+                }
+                else {
+                    name.setStyle("-fx-font-weight: normal");
+                    button.setVisible(true);
+                }
+            }
+        });
     }
 
     /**

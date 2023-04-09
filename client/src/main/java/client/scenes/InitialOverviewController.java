@@ -87,6 +87,7 @@ public class InitialOverviewController {
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(boardOverview.getValue());
         primaryStage.setScene(overview);
+//        overview.setOnKeyPressed(boardOverview.getKey()::handleKeyPress);
     }
 
     /**
@@ -163,6 +164,7 @@ public class InitialOverviewController {
                     boardOverview.getKey().refresh();
                     primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     overview = new Scene(boardOverview.getValue());
+//                    overview.setOnKeyPressed(boardOverview.getKey()::handleKeyPress);
                     primaryStage.setScene(overview);
                     return;
                 }
@@ -188,7 +190,7 @@ public class InitialOverviewController {
 
 
         List<Board> boards = new ArrayList<>();
-        String availableBoards = "";
+        StringBuilder availableBoards = new StringBuilder();
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -196,7 +198,7 @@ public class InitialOverviewController {
                 try {
                     Board board = server.getBoardByID(id);
                     boards.add(board);
-                    availableBoards += (line + "\n");
+                    availableBoards.append(line).append("\n");
                 } catch (Exception ignored) {
 
                 }
@@ -204,7 +206,7 @@ public class InitialOverviewController {
             }
             scanner.close();
             FileOutputStream outputStream = new FileOutputStream(new File(fileName));
-            outputStream.write(availableBoards.getBytes());
+            outputStream.write(availableBoards.toString().getBytes());
             outputStream.flush();
             outputStream.close();
         } catch (Exception e) {

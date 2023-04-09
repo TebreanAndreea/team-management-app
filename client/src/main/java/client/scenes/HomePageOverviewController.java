@@ -74,7 +74,6 @@ public class HomePageOverviewController {
             }
         });
         setAdminPassword();
-
     }
 
     /**
