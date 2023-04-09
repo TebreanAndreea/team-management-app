@@ -4,7 +4,7 @@ import commons.Card;
 import commons.Listing;
 import commons.SubTask;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import server.database.SubTaskRepository;
@@ -22,7 +22,8 @@ public class SubtaskSavingController {
      * @param repo - subtask repository
      * @param msgs - messages for communication
      */
-    public SubtaskSavingController(SubTaskRepository repo, SimpMessagingTemplate msgs) {
+
+    public SubtaskSavingController(SubTaskRepository repo, SimpMessageSendingOperations msgs) {
         subtaskService = new SubtaskService(repo,msgs);
     }
 

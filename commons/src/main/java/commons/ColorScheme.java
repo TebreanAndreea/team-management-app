@@ -34,6 +34,9 @@ public class ColorScheme {
     public long getSchemeId() {
         return schemeId;
     }
+    public void setSchemeId(long schemeId) {
+        this.schemeId = schemeId;
+    }
 
     public String getName() {
         return name;
