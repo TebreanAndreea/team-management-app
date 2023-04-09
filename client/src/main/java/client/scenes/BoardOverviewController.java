@@ -493,6 +493,17 @@ public class BoardOverviewController {
         titledPane.setMinWidth(135);
         titledPane.setAnimated(false);
         hBox.getChildren().add(titledPane);
+        //        titledPane.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+
+        // sets the color of title of the list
+        titledPane.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+            if (newSkin != null) {
+                Region titleRegion = (Region) titledPane.lookup(".title");
+                titleRegion.setStyle("-fx-background-color: " + board.getListBackgroundColor() + ";"+
+                        "-fx-border-color: " + board.getListTextColor() + ";"+
+                        "-fx-border-width: 1px;"+
+                        "-fx-border-radius: 3px;");
+            }});
     }
 
 
