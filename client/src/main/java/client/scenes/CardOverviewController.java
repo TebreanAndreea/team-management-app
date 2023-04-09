@@ -160,9 +160,9 @@ public class CardOverviewController {
      * @throws IOException the exception which might be caused
      */
 
-    public void switchToBoardScene(javafx.event.ActionEvent actionEvent) throws IOException {
+    public void switchToBoardScene(javafx.event.Event event) throws IOException {
         isRunning = false;
-        switchBoard((Stage) ((Node) actionEvent.getSource()).getScene().getWindow());
+        switchBoard((Stage) ((Node) event.getSource()).getScene().getWindow());
     }
 
     public void switchBoard(Stage stage) {
@@ -400,7 +400,7 @@ public class CardOverviewController {
             }
             vBox.getChildren().clear();
             sbtask.set(idx, card.getSubTasks().get(idx + 1));
-            sbtask.set(idx + 1, sbtask);
+            sbtask.set(idx + 1, subTask);
             for (SubTask task : sbtask) {
                 try {
                     server.sendCard(card);
