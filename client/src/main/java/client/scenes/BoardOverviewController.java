@@ -1295,7 +1295,9 @@ public class BoardOverviewController {
                 emptyField.showAndWait();
                 renameCardPopup(card, list);
             }
-
+        }
+    }
+    
     /**
      * Disables the read only if the user has entered the correct password.
      * @param event - the button clicked
