@@ -75,8 +75,4 @@ public class CardSavingController {
         return cardService.getUppdatesCards();
     }
 
-    @PostMapping("/check")
-    public ResponseEntity<Boolean> getCard(@RequestBody Card card) {
-        return cardService.getCard(card);
-    }
 }

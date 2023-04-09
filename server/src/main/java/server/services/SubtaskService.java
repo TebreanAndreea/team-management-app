@@ -42,6 +42,8 @@ public class SubtaskService {
      * @return subtask
      */
     public ResponseEntity<SubTask> add(SubTask subTask) {
+        if (subTask == null) return ResponseEntity.badRequest().build();
+
         subTask.setCard(card);
         msgs.convertAndSend("/topic/subtask", subTask);
         SubTask save = repo.save(subTask);
@@ -69,6 +71,7 @@ public class SubtaskService {
      * @return the updated subtask
      */
     public ResponseEntity<SubTask> updateSubtask(SubTask subTask) {
+        if (subTask == null) return ResponseEntity.badRequest().build();
         subTask.setCard(card);
         subTask = repo.save(subTask);
         msgs.convertAndSend("/topic/subtask", subTask);
