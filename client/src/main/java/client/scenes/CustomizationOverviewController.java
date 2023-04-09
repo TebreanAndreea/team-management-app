@@ -268,15 +268,9 @@ public class CustomizationOverviewController {
         delete.setMinSize(30, 30);
         delete.setAlignment(Pos.CENTER);
         delete.setStyle("-fx-background-color: white; -fx-text-fill: red;");
-        delete.setOnMouseEntered(event -> {
-            delete.setStyle("-fx-background-color: red; -fx-text-fill: white;");
-        });
-        delete.setOnMouseExited(event -> {
-            delete.setStyle("-fx-background-color: white; -fx-text-fill: red;");
-        });
-        delete.setOnAction(event -> {
-            deleteScheme(event);
-        });
+        delete.setOnMouseEntered(event -> delete.setStyle("-fx-background-color: red; -fx-text-fill: white;"));
+        delete.setOnMouseExited(event -> delete.setStyle("-fx-background-color: white; -fx-text-fill: red;"));
+        delete.setOnAction(this::deleteScheme);
     }
 
     public void deleteScheme(ActionEvent event) {

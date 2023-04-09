@@ -53,32 +53,24 @@ public class CardOverviewController {
     private String fileName = "user_files/temp.txt";
 
     public void initialize() {
-        server.registerForUpdatesSubtask(subTask -> {
-            Platform.runLater(this::refresh);
-        });
-        server.registerForUpdatesTag(tag -> {
-            Platform.runLater(this::refresh);
-        });
-        server.registerForUpdatesCard(card -> {
+        server.registerForUpdatesSubtask(subTask -> Platform.runLater(this::refresh));
+        server.registerForUpdatesTag(tag -> Platform.runLater(this::refresh));
+        server.registerForUpdatesCard(card -> Platform.runLater(() -> {
+            boolean check = server.checkCard(card);
+            System.out.println("First: " + check);
 
-
-            Platform.runLater(() -> {
-                boolean check = server.checkCard(card);
-                System.out.println("First: " + check);
-
-                if (check) {
-                    System.out.println(check);
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Card has been deleted.");
-                    alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
-                    alert.showAndWait();
-                    switchBoard((Stage) cardLabel.getScene().getWindow());
-                    server.stop();
-                } else {
-                    refresh();
-                }
-            });
-        });
+            if (check) {
+                System.out.println(check);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Card has been deleted.");
+                alert.setContentText("We are very sorry, but the card you are currently editing has been deleted by another user");
+                alert.showAndWait();
+                switchBoard((Stage) cardLabel.getScene().getWindow());
+                server.stop();
+            } else {
+                refresh();
+            }
+        }));
     }
 
     /**
@@ -288,15 +280,11 @@ public class CardOverviewController {
     public void showSubTaskList(SubTask subTask) {
         Button up = new Button("\u2191");
         up.setStyle("-fx-font-size: 10px;");
-        up.setOnAction(event -> {
-            moveUp(event, subTask, this.cardId);
-        });
+        up.setOnAction(event -> moveUp(event, subTask, this.cardId));
 
         Button down = new Button("\u2193");
         down.setStyle("-fx-font-size: 10px;");
-        down.setOnAction(event -> {
-            moveDown(event, subTask, this.cardId);
-        });
+        down.setOnAction(event -> moveDown(event, subTask, this.cardId));
 
         CheckBox checkBox = new CheckBox(subTask.getTitle());
         checkBox.setStyle("-fx-font-size: 12px;");
@@ -313,14 +301,10 @@ public class CardOverviewController {
 
         Button editST = new Button("\uD83D\uDD89");
         editST.setStyle("-fx-font-size: 10px;");
-        editST.setOnAction(event -> {
-            editSubTask(event, subTask);
-        });
+        editST.setOnAction(event -> editSubTask(event, subTask));
         Button deleteST = new Button("\uD83D\uDDD9");
         deleteST.setStyle("-fx-font-size: 10px;");
-        deleteST.setOnAction(event -> {
-            deleteSubTask(event, subTask);
-        });
+        deleteST.setOnAction(event -> deleteSubTask(event, subTask));
         HBox hBoxButtons = new HBox(editST, deleteST, up, down);
 
         HBox hBox = new HBox();
@@ -338,22 +322,22 @@ public class CardOverviewController {
      * @param cardid  the card of the subtask
      */
     private void moveDown(ActionEvent event, SubTask subTask, long cardid) {
-        List<SubTask> sbtask = new ArrayList<>();
+        List<SubTask> subTasks = new ArrayList<>();
         Card card = server.getCardsById(cardId);
         int idx = card.getSubTasks().indexOf(subTask);
         System.out.println(idx);
         if (idx < card.getSubTasks().size() - 1) {
             for (int i = 0; i < card.getSubTasks().size(); i++) {
-                sbtask.add(card.getSubTasks().get(i));
+                subTasks.add(card.getSubTasks().get(i));
                 server.deleteSubtask(card.getSubTasks().get(i));
             }
             vBox.getChildren().clear();
-            sbtask.set(idx, card.getSubTasks().get(idx + 1));
-            sbtask.set(idx + 1, subTask);
-            for (int i = 0; i < sbtask.size(); i++) {
+            subTasks.set(idx, card.getSubTasks().get(idx + 1));
+            subTasks.set(idx + 1, subTask);
+            for (SubTask task : subTasks) {
                 try {
                     server.sendCard(card);
-                    server.saveSubtask(sbtask.get(i));
+                    server.saveSubtask(task);
                 } catch (WebApplicationException e) {
                     var alert = new Alert(Alert.AlertType.ERROR);
                     alert.initModality(Modality.APPLICATION_MODAL);
@@ -376,23 +360,22 @@ public class CardOverviewController {
      */
 
     private void moveUp(ActionEvent event, SubTask subTask, long cardid) {
-        List<SubTask> sbtask = new ArrayList<>();
+        List<SubTask> subTasks = new ArrayList<>();
         Card card = server.getCardsById(cardId);
-        // sbtask = card.getSubTasks();
         int idx = card.getSubTasks().indexOf(subTask);
         System.out.println(idx);
         if (idx > 0) {
             for (int i = 0; i < card.getSubTasks().size(); i++) {
-                sbtask.add(card.getSubTasks().get(i));
+                subTasks.add(card.getSubTasks().get(i));
                 server.deleteSubtask(card.getSubTasks().get(i));
             }
             vBox.getChildren().clear();
-            sbtask.set(idx, card.getSubTasks().get(idx - 1));
-            sbtask.set(idx - 1, subTask);
-            for (int i = 0; i < sbtask.size(); i++) {
+            subTasks.set(idx, card.getSubTasks().get(idx - 1));
+            subTasks.set(idx - 1, subTask);
+            for (SubTask task : subTasks) {
                 try {
                     server.sendCard(card);
-                    server.saveSubtask(sbtask.get(i));
+                    server.saveSubtask(task);
                 } catch (WebApplicationException e) {
                     var alert = new Alert(Alert.AlertType.ERROR);
                     alert.initModality(Modality.APPLICATION_MODAL);
@@ -480,12 +463,8 @@ public class CardOverviewController {
 
         apply.setAlignment(Pos.CENTER);
         apply.setStyle("-fx-background-color: white; -fx-text-fill: green; -fx-font-size: 8 px");
-        apply.setOnMouseEntered(event -> {
-            apply.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-size: 8 px");
-        });
-        apply.setOnMouseExited(event -> {
-            apply.setStyle("-fx-background-color: white; -fx-text-fill: green; -fx-font-size: 8 px");
-        });
+        apply.setOnMouseEntered(event -> apply.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-size: 8 px"));
+        apply.setOnMouseExited(event -> apply.setStyle("-fx-background-color: white; -fx-text-fill: green; -fx-font-size: 8 px"));
         apply.setOnAction(event -> {
             Card card = server.getCardsById(cardId);
             card.setBackgroundColor(scheme.getBackgroundColor());
