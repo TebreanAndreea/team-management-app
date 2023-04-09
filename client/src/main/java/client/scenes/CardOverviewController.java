@@ -170,6 +170,7 @@ public class CardOverviewController {
             return;
         var cardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         cardOverview.getKey().setFileName(fileName);
+        cardOverview.getKey().setHasAccess(hasAccess);
         cardOverview.getKey().setBoard(board);
         cardOverview.getKey().refresh();
         primaryStage = stage;
