@@ -597,7 +597,7 @@ public class BoardOverviewController {
     public void refresh() {
         //board = server.getBoardByID(board.getBoardId());
         refreshedSecurity();
-        System.out.println(hasAccess);
+        //System.out.println(hasAccess);
         if (hasAccess)
             readOnly.setVisible(false);
         else {

@@ -10,23 +10,26 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 
 import javax.inject.Inject;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -234,7 +237,7 @@ public class InitialOverviewController {
             newBoard.setMinSize(90, 60);
             newBoard.setText(boards.get(i).getTitle());
             newBoard.setOnAction(this::switchToBoard);
-            normalStyle(newBoard);
+            normalStyle(newBoard, boards.get(i));
 
             boardsMap.put(newBoard, boards.get(i));
             newBoard.setOnMouseEntered(event -> {
@@ -249,9 +252,10 @@ public class InitialOverviewController {
                 subScene.getTransforms().add(scale);
                 hoverStyle(newBoard);
             });
+            Board temp = boards.get(i);
             newBoard.setOnMouseExited(event -> {
                 scrollPane.setContent(null);
-                normalStyle(newBoard);
+                normalStyle(newBoard,temp);
 
             });
             hbox.getChildren().add(newBoard);
@@ -260,23 +264,17 @@ public class InitialOverviewController {
     }
 
     public void hoverStyle(Button button) {
-        button.setStyle("-fx-border-width: 5px;" +
-                "-fx-background-color: white;" +
-                "-fx-border-color: #656565;" +
-                "-fx-text-fill: #4a4ad5;" +
-                "-fx-font-family: 'Adobe Thai';" +
-                "-fx-font-size: 14 px;" +
-                "-fx-rotate: 350;" +
+        button.setStyle(button.getStyle()+"-fx-rotate: 350;" +
                 "-fx-font-weight: bolder");
     }
 
-    public void normalStyle(Button button) {
-        button.setStyle("-fx-border-width: 3px;" +
-                "-fx-background-color: white;" +
-                "-fx-border-color: gray;" +
-                "-fx-text-fill: #4a4ad5;" +
+    public void normalStyle(Button button, Board board) {
+        button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(3), new BorderWidths(3))));
+        Color newColor = Color.web(board.getBackgroundColor()).deriveColor(1, 1, 1, 0.7);
+        button.setStyle("-fx-text-fill:"+board.getTextColor() +";" +
                 "-fx-font-family: 'Adobe Thai';" +
                 "-fx-font-size: 14 px;");
+        button.setBackground(new Background(new BackgroundFill(newColor, new CornerRadii(3), new Insets(3))));
     }
 
     /**
