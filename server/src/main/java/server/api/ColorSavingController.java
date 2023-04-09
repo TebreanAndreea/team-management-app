@@ -6,15 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import server.database.ColorSchemeRepository;
+import server.services.ColorService;
 
 @RestController
 @RequestMapping("/api/color")
 public class ColorSavingController {
 
-    private final ColorSchemeRepository repo;
-    private final SimpMessageSendingOperations msgs;
-
-    private static Board board;
+    private ColorService colorService;
 
     /**
      * Constructor for the color controller.
@@ -23,8 +21,7 @@ public class ColorSavingController {
      * @param msgs - messages for communication
      */
     public ColorSavingController(ColorSchemeRepository repo, SimpMessageSendingOperations msgs) {
-        this.repo = repo;
-        this.msgs = msgs;
+        colorService = new ColorService(repo,msgs);
     }
 
     /**
@@ -35,12 +32,7 @@ public class ColorSavingController {
      */
     @PostMapping(path = {"", "/"})
     public ResponseEntity<ColorScheme> add(@RequestBody ColorScheme color) {
-        if (color == null) return ResponseEntity.badRequest().build();
-
-        color.setBoard(board);
-
-        ColorScheme save = repo.save(color);
-        return ResponseEntity.ok(save);
+        return colorService.add(color);
     }
 
     /**
@@ -51,9 +43,7 @@ public class ColorSavingController {
      */
     @PostMapping(path = {"/setBoard"})
     public ResponseEntity<Board> getBoard(@RequestBody Board board) {
-
-        this.board = board;
-        return ResponseEntity.ok(board);
+        return colorService.getBoard(board);
     }
 
     /**
@@ -64,16 +54,6 @@ public class ColorSavingController {
      */
     @DeleteMapping(path = {"delete/{id}"})
     public ResponseEntity<ColorScheme> delete(@PathVariable long id) {
-        ColorScheme color = repo.findById(id).orElse(null);
-        if (color == null) {
-            return ResponseEntity.notFound().build();
-        }
-        repo.deleteById(id);
-        return ResponseEntity.ok().build();
+        return colorService.delete(id);
     }
-
-
-
-
-
 }

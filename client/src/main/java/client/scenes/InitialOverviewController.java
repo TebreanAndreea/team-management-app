@@ -10,23 +10,26 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 
 import javax.inject.Inject;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -52,6 +55,7 @@ public class InitialOverviewController {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private Map<Long, Boolean> accessMap = new HashMap<>();
 
     private String fileName="user_files/temp.txt";
 
@@ -82,7 +86,10 @@ public class InitialOverviewController {
         Button goToBoard = (Button) actionEvent.getSource();
         var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
         boardOverview.getKey().setFileName(fileName);
-        boardOverview.getKey().setBoard(boardsMap.get(goToBoard));
+        Board desireBoard = boardsMap.get(goToBoard);
+        boardOverview.getKey().setBoard(desireBoard);
+        boardOverview.getKey().setIsAdmin(false);
+        boardOverview.getKey().setHasAccess(accessMap.get(desireBoard.getBoardId()));
         boardOverview.getKey().refresh();
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(boardOverview.getValue());
@@ -125,7 +132,7 @@ public class InitialOverviewController {
                 ColorScheme saved = server.saveColorScheme(scheme);
                 res.getSchemes().add(saved);
                 server.addBoard(res);
-                writeNewBoardToFile(res);
+                writeNewBoardToFile(res, true);
                 refresh();
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
@@ -157,10 +164,12 @@ public class InitialOverviewController {
             List<Board> boards = server.getBoardsFromDB();
             for (Board b : boards) {
                 if (key.equals(b.getAccessKey())) {
-                    writeNewBoardToFile(b);
+                    boolean access = b.getPassword().equals("");
+                    writeNewBoardToFile(b, access);
                     var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
                     boardOverview.getKey().setBoard(b);
                     boardOverview.getKey().setFileName(fileName);
+                    boardOverview.getKey().setHasAccess(access);
                     boardOverview.getKey().refresh();
                     primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     overview = new Scene(boardOverview.getValue());
@@ -194,11 +203,14 @@ public class InitialOverviewController {
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                long id = Long.parseLong(line.split(" ")[0]);
+                String[] lines = line.split(" ");
+                long id = Long.parseLong(lines[0]);
+                boolean hasAccess = Boolean.parseBoolean(lines[1]);
                 try {
                     Board board = server.getBoardByID(id);
                     boards.add(board);
-                    availableBoards.append(line).append("\n");
+                    accessMap.put(id, hasAccess);
+                    availableBoards += (line + "\n");
                 } catch (Exception ignored) {
 
                 }
@@ -227,7 +239,7 @@ public class InitialOverviewController {
             newBoard.setMinSize(90, 60);
             newBoard.setText(boards.get(i).getTitle());
             newBoard.setOnAction(this::switchToBoard);
-            normalStyle(newBoard);
+            normalStyle(newBoard, boards.get(i));
 
             boardsMap.put(newBoard, boards.get(i));
             newBoard.setOnMouseEntered(event -> {
@@ -242,9 +254,10 @@ public class InitialOverviewController {
                 subScene.getTransforms().add(scale);
                 hoverStyle(newBoard);
             });
+            Board temp = boards.get(i);
             newBoard.setOnMouseExited(event -> {
                 scrollPane.setContent(null);
-                normalStyle(newBoard);
+                normalStyle(newBoard,temp);
 
             });
             hbox.getChildren().add(newBoard);
@@ -253,23 +266,17 @@ public class InitialOverviewController {
     }
 
     public void hoverStyle(Button button) {
-        button.setStyle("-fx-border-width: 5px;" +
-                "-fx-background-color: white;" +
-                "-fx-border-color: #656565;" +
-                "-fx-text-fill: #4a4ad5;" +
-                "-fx-font-family: 'Adobe Thai';" +
-                "-fx-font-size: 14 px;" +
-                "-fx-rotate: 350;" +
+        button.setStyle(button.getStyle()+"-fx-rotate: 350;" +
                 "-fx-font-weight: bolder");
     }
 
-    public void normalStyle(Button button) {
-        button.setStyle("-fx-border-width: 3px;" +
-                "-fx-background-color: white;" +
-                "-fx-border-color: gray;" +
-                "-fx-text-fill: #4a4ad5;" +
+    public void normalStyle(Button button, Board board) {
+        button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(3), new BorderWidths(3))));
+        Color newColor = Color.web(board.getBackgroundColor()).deriveColor(1, 1, 1, 0.7);
+        button.setStyle("-fx-text-fill:"+board.getTextColor() +";" +
                 "-fx-font-family: 'Adobe Thai';" +
                 "-fx-font-size: 14 px;");
+        button.setBackground(new Background(new BackgroundFill(newColor, new CornerRadii(3), new Insets(3))));
     }
 
     /**
@@ -283,14 +290,15 @@ public class InitialOverviewController {
 
     /**
      * A method that writes a new board to the user's stored boards file.
-     *
+     * @param hasAccess - checks if the user has editing access to the board
      * @param board - the board to be written
      */
-    private void writeNewBoardToFile(Board board) {
+    private void writeNewBoardToFile(Board board, boolean hasAccess) {
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                long id = Long.parseLong(line.split(" ")[0]);
+                String[] lines = line.split(" ");
+                long id = Long.parseLong(lines[0]);
                 if (id == board.getBoardId()) {
                     return;
                 }
@@ -299,7 +307,7 @@ public class InitialOverviewController {
             System.out.println("No such file");
         }
         try (FileWriter writer = new FileWriter(fileName, true)) {
-            writer.write(board.getBoardId() + " " + board.getTitle() + "\n");
+            writer.write(board.getBoardId() + " " + hasAccess+" " +  board.getTitle()  +"\n");
         } catch (IOException e) {
             System.out.println("Error writing to file");
         }

@@ -5,15 +5,19 @@ import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Board;
+import commons.Card;
 import commons.ColorScheme;
+import commons.Listing;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
@@ -23,6 +27,20 @@ import java.util.Map;
 import static com.google.inject.Guice.createInjector;
 
 public class CustomizationOverviewController {
+    public Label LVII;
+    public Label LI;
+    public Label LII;
+    public Label LIII;
+    public Label LIV;
+    public Label LV;
+    public Label LVI;
+    public Button resetBoardColor;
+    public Button resetListColor;
+    public Button addSchemeButton;
+    public Button saveButton;
+    public Button backButton;
+    public AnchorPane pane;
+    public ScrollPane scrollPane;
     private Stage primaryStage;
     private Scene overview;
     private static final Injector INJECTOR = createInjector(new MyModule());
@@ -58,19 +76,80 @@ public class CustomizationOverviewController {
      * Initializes the controller.
      */
     public void initialize() {
-        // refresh();
+        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(() -> {
+            refresh();
+        }));
+        server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater(() -> {
+            refresh();
+        }));
+
+        server.registerForMessages("/topic/card", Card.class, q -> Platform.runLater(this::refresh));
+
+        //refresh();
+    }
+
+
+    public void print(ColorScheme scheme) {
+        System.out.println(scheme);
     }
 
     /**
      * refreshes the overview.
      */
     public void refresh() {
-        System.out.println(board.getBoardId());
+        System.out.println("refreshed customization");
+        board = server.getBoardByID(board.getBoardId());
         boardBackground.setValue(Color.valueOf(board.getBackgroundColor()));
         boardFont.setValue(Color.valueOf(board.getTextColor()));
         listBackground.setValue(Color.valueOf(board.getListBackgroundColor()));
         listFont.setValue(Color.valueOf(board.getListTextColor()));
+        colorEverything();
         loadSchemes();
+
+    }
+
+    /**
+     * Sets up the colors of a board.
+     */
+    private void colorEverything() {
+        Color background = Color.web(board.getBackgroundColor());
+        Color font = Color.web(board.getTextColor());
+        colorButton(resetBoardColor);
+        colorButton(resetListColor);
+        colorButton(addSchemeButton);
+        colorButton(backButton);
+        colorButton(saveButton);
+        pane.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0) )));
+        LI.setTextFill(font);
+        LII.setTextFill(font);
+        LIII.setTextFill(font);
+        LIV.setTextFill(font);
+        LV.setTextFill(font);
+        LVI.setTextFill(font);
+        LVII.setTextFill(font);
+        scrollPane.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0))));
+        vBox.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0))));
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+    }
+
+    /**
+     * Colors the button.
+     * @param button - the button that needs coloring
+     */
+    private void colorButton(Button button){
+        button.setStyle("-fx-background-color:" + board.getBackgroundColor());
+        button.setTextFill(Color.web(board.getTextColor()));
+        button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:" + board.getTextColor());
+            button.setTextFill(Color.web(board.getBackgroundColor()));
+        });
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color:" + board.getBackgroundColor());
+            button.setTextFill(Color.web(board.getTextColor()));
+        });
     }
 
     /**
@@ -135,34 +214,42 @@ public class CustomizationOverviewController {
             hBox.minHeight(40);
             hBox.maxHeight(40);
             VBox nameDefault = new VBox();
+            nameDefault.setStyle("-fx-background-color: transparent");
             nameDefault.setMinSize(90, 40);
             nameDefault.setMaxSize(90, 40);
             Label name = new Label(scheme.getName());
+            name.setTextFill(Color.web(board.getTextColor()));
             name.setOnMouseClicked(event -> updateName(event, name));
             HBox defHbox = new HBox();
             defHbox.maxHeight(20);
             defHbox.minHeight(20);
             defHbox.minWidth(90);
             defHbox.maxWidth(90);
+            defHbox.setStyle("-fx-background-color: transparent");
             Label def = new Label("Default");
-            CheckBox check = new CheckBox();
-            check.maxHeight(20);
-            check.maxWidth(20);
+            def.setTextFill(Color.web(board.getTextColor()));
             nameDefault.getChildren().add(name);
             defHbox.getChildren().add(def);
             nameDefault.getChildren().add(defHbox);
-            check.setOnAction(e -> checkBoxEvent(check));
             if (scheme.isDef()) {
                 name.setStyle("-fx-font-weight: bold");
                 def.setStyle("-fx-font-weight: bold");
 
             } else {
-                defHbox.getChildren().add(check);
+                Button setDef = new Button("V");
+                setDefButton(setDef);
+                defHbox.getChildren().add(setDef);
             }
             hBox.getChildren().add(nameDefault);
             Label font = new Label("F");
+            font.setAlignment(Pos.CENTER);
+            font.setMinHeight(40);
+            font.setTextFill(Color.web(board.getTextColor()));
             ColorPicker colorFont = new ColorPicker(Color.web(scheme.getFontColor()));
             Label back = new Label("B");
+            back.setAlignment(Pos.CENTER);
+            back.setMinHeight(40);
+            back.setTextFill(Color.web(board.getTextColor()));
             ColorPicker colorBack = new ColorPicker(Color.web(scheme.getBackgroundColor()));
             setColorControll(colorFont);
             setColorControll(colorBack);
@@ -173,10 +260,27 @@ public class CustomizationOverviewController {
             Button delete = new Button("X");
             setDeleteButton(delete);
             hBox.getChildren().add(delete);
+            hBox.setStyle("-fx-background-color: transparent;");
             vBox.getChildren().add(hBox);
 
             map.put(hBox, scheme);
         }
+    }
+
+    private void setDefButton(Button setDef) {
+        setDef.setMaxSize(20, 20);
+        setDef.setMinSize(20, 20);
+        setDef.setAlignment(Pos.CENTER);
+//        setDef.setStyle("-fx-background-color: white; -fx-text-fill: green;");
+//        setDef.setOnMouseEntered(event -> {
+//            setDef.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+//        });
+//        setDef.setOnMouseExited(event -> {
+//            setDef.setStyle("-fx-background-color: white; -fx-text-fill: green;");
+//        });
+        setDef.setOnAction(this::checkBoxEvent);
+        colorButton(setDef);
+        setDef.setFont(new Font(8));
     }
 
     private void setColorControll(ColorPicker colorPicker) {
@@ -186,31 +290,56 @@ public class CustomizationOverviewController {
         colorPicker.setOnAction(event -> {
             HBox hBox = (HBox) colorPicker.getParent();
             ColorScheme scheme = map.get(hBox);
+            ColorScheme oldScheme = new ColorScheme(scheme.getName(), scheme.getBackgroundColor(), scheme.getFontColor(), board);
             ColorPicker back = (ColorPicker) hBox.getChildren().get(2);
             ColorPicker font = (ColorPicker) hBox.getChildren().get(4);
             String backString = String.format("#%02X%02X%02X",
-                (int) (back.getValue().getRed() * 255),
-                (int) (back.getValue().getGreen() * 255),
-                (int) (back.getValue().getBlue() * 255));
+                    (int) (back.getValue().getRed() * 255),
+                    (int) (back.getValue().getGreen() * 255),
+                    (int) (back.getValue().getBlue() * 255));
             String fontString = String.format("#%02X%02X%02X",
-                (int) (font.getValue().getRed() * 255),
-                (int) (font.getValue().getGreen() * 255),
-                (int) (font.getValue().getBlue() * 255));
+                    (int) (font.getValue().getRed() * 255),
+                    (int) (font.getValue().getGreen() * 255),
+                    (int) (font.getValue().getBlue() * 255));
 
 
             if (scheme.getBackgroundColor().equals(backString) && scheme.getFontColor().equals(fontString)) {
-                hBox.getChildren().get(hBox.getChildren().size() - 1).setVisible(false);
                 return;
             }
-            if (!scheme.getBackgroundColor().equals(backString))
+            if (!scheme.getBackgroundColor().equals(backString)) {
                 scheme.setBackgroundColor(backString);
-            if (!scheme.getFontColor().equals(fontString))
+                if (scheme.isDef()) {
+                    board.setCardBackgroundColor(backString);
+                    server.addBoard(board);
+                }
+            }
+            if (!scheme.getFontColor().equals(fontString)) {
                 scheme.setFontColor(fontString);
+                if (scheme.isDef()) {
+                    board.setCardFontColor(fontString);
+                    server.addBoard(board);
+                }
+            }
 
+            updateCardColors(scheme, oldScheme);
             server.sendBoardToScheme(board);
             server.saveColorScheme(scheme);
             refresh();
         });
+    }
+
+    private void updateCardColors(ColorScheme newScheme, ColorScheme oldScheme) {
+        for (Listing l : board.getLists()) {
+            for (Card c : l.getCards()) {
+                if (c.getSchemeName().equals(oldScheme.getName())) {
+                    c.setSchemeName(newScheme.getName());
+                    c.setBackgroundColor(newScheme.getBackgroundColor());
+                    c.setFontColor(newScheme.getFontColor());
+                    server.sendList(l);
+                    server.saveCard(c, false);
+                }
+            }
+        }
     }
 
     private void updateName(javafx.scene.input.MouseEvent event, Label name) {
@@ -238,38 +367,40 @@ public class CustomizationOverviewController {
     }
 
 
-    public void checkBoxEvent(CheckBox check) {
+    public void checkBoxEvent(ActionEvent event) {
 
-        if (check.isSelected()) {
-            HBox hBox = (HBox) (check.getParent().getParent().getParent());
-            ColorScheme newDef = map.get(hBox);
-            for (ColorScheme c : board.getSchemes()) {
-                if (c.isDef()) {
-                    c.setDef(false);
-                    server.sendBoardToScheme(board);
-                    server.saveColorScheme(c);
-                    break;
-                }
+        HBox hBox = (HBox) ((Button) event.getSource()).getParent().getParent().getParent();
+        ColorScheme newDef = map.get(hBox);
+        for (ColorScheme c : board.getSchemes()) {
+            if (c.isDef()) {
+                c.setDef(false);
+                server.sendBoardToScheme(board);
+                server.saveColorScheme(c);
+                break;
             }
-            newDef.setDef(true);
-            server.sendBoard(board);
-            server.saveColorScheme(newDef);
-            board.setCardBackgroundColor(newDef.getBackgroundColor());
-            board.setCardFontColor(newDef.getFontColor());
-            server.addBoard(board);
-            refresh();
         }
+        newDef.setDef(true);
+        board.setCardBackgroundColor(newDef.getBackgroundColor());
+        board.setCardFontColor(newDef.getFontColor());
+        server.addBoard(board);
+        server.sendBoardToScheme(board);
+        server.saveColorScheme(newDef);
 
-
+        refresh();
     }
 
     public void setDeleteButton(Button delete) {
         delete.setMaxSize(30, 30);
         delete.setMinSize(30, 30);
         delete.setAlignment(Pos.CENTER);
-        delete.setStyle("-fx-background-color: white; -fx-text-fill: red;");
-        delete.setOnMouseEntered(event -> delete.setStyle("-fx-background-color: red; -fx-text-fill: white;"));
-        delete.setOnMouseExited(event -> delete.setStyle("-fx-background-color: white; -fx-text-fill: red;"));
+//        delete.setStyle("-fx-background-color: white; -fx-text-fill: red;");
+//        delete.setOnMouseEntered(event -> {
+//            delete.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+//        });
+//        delete.setOnMouseExited(event -> {
+//            delete.setStyle("-fx-background-color: white; -fx-text-fill: red;");
+//        });
+        colorButton(delete);
         delete.setOnAction(this::deleteScheme);
     }
 
@@ -282,6 +413,14 @@ public class CustomizationOverviewController {
             defaultScheme.showAndWait();
             return;
         }
+        ColorScheme def = scheme;
+        for (ColorScheme s : board.getSchemes()) {
+            if (s.isDef()) {
+                def = s;
+                break;
+            }
+        }
+        updateCardColors(def, scheme);
         map.remove((HBox) ((Button) event.getSource()).getParent());
         server.deleteScheme(scheme.getSchemeId());
         board.getSchemes().remove(scheme);

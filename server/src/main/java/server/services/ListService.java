@@ -56,8 +56,10 @@ public class ListService {
     public ResponseEntity<Listing> add(Listing list) {
         if (list == null) return ResponseEntity.badRequest().build();
         list.setBoard(board);
-        msgs.convertAndSend("/topic/lists", list);
         Listing saved = repo.save(list);
+        msgs.convertAndSend("/topic/boards", saved.getBoard());
+        msgs.convertAndSend("/topic/lists", saved);
+
         return ResponseEntity.ok(saved);
     }
 

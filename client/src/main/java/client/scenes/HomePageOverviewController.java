@@ -138,10 +138,14 @@ public class HomePageOverviewController {
             primaryStage.show();
         } else {
             // put a message in the text area
-            if (username.getText().trim().length() > 0)
+            if (username.getText().trim().length() > 0) {
                 serverAddress.setText("Invalid url");
-            else
+                serverAddress.setStyle("-fx-border-color: red; -fx-border-radius: 5px;");
+            }
+            else {
                 username.setText("Invalid username");
+                username.setStyle("-fx-border-color: red; -fx-border-radius: 5px;");
+            }
         }
     }
 
@@ -182,8 +186,8 @@ public class HomePageOverviewController {
      */
     public void adminLogin(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Input Dialog");
-        dialog.setHeaderText("Please enter your name and age:");
+        dialog.setTitle("Admin login");
+        dialog.setHeaderText("Please enter the necessary information:");
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -222,4 +226,21 @@ public class HomePageOverviewController {
         }
 
     }
+
+    public void connectHover(){
+
+        connect.setStyle("-fx-background-color: green"
+                + "; -fx-text-fill: #ffffff; -fx-border-color: #ffffff;" +
+                "-fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;" +
+                "-fx-background-insets: 2px");
+    }
+
+    public void connectNormal( ){
+        connect.setStyle("-fx-background-color: #ffffff"
+                + "; -fx-text-fill: green; -fx-border-color: green;"+
+                "-fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;"+
+                "-fx-background-insets: 2px");
+    }
+
+
 }
