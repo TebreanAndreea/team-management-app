@@ -30,14 +30,17 @@
       <Button fx:id="addDescriptionButton" layoutX="458.0" layoutY="90.0" mnemonicParsing="false" onAction="#addDescription" text="Save description" />
       <Button fx:id="cardNameButton" layoutX="213.0" layoutY="18.0" mnemonicParsing="false" onAction="#updateName" prefHeight="26.0" prefWidth="109.0" text="Edit card name" />
       <Button fx:id="addSubtaskButton" layoutX="106.0" layoutY="129.0" mnemonicParsing="false" onAction="#addSubTask" text="add subtask" />
-      <Label fx:id="tagsLabel" layoutX="27.0" layoutY="283.0" prefHeight="25.0" prefWidth="61.0" text="Tags" />
+      <Label fx:id="tagsLabel" layoutX="27.0" layoutY="283.0" prefHeight="25.0" prefWidth="61.0" text="Tags">
+         <font>
+            <Font size="16.0" />
+         </font></Label>
       <Button fx:id="addTagButton" layoutX="76.0" layoutY="283.0" mnemonicParsing="false" onAction="#switchToChooseTagScene" text="Add tag" />
       <ScrollPane layoutX="27.0" layoutY="316.0" prefHeight="50.0" prefWidth="541.0">
          <content>
             <HBox fx:id="hbox" prefHeight="38.0" prefWidth="538.0" />
          </content>
       </ScrollPane>
-      <Label fx:id="colorSchemesId" layoutX="368.0" layoutY="135.0" prefHeight="17.0" prefWidth="141.0" text="Color Schemes">
+      <Label fx:id="colorSchemesLabel" layoutX="368.0" layoutY="135.0" prefHeight="17.0" prefWidth="141.0" text="Color Schemes">
          <font>
             <Font size="16.0" />
          </font>

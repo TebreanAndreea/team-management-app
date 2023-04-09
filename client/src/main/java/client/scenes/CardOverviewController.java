@@ -9,6 +9,7 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -53,7 +54,7 @@ public class CardOverviewController {
     @FXML
     private Label tagsLabel;
     @FXML
-    private Label colorSchemeLabel;
+    private Label colorSchemesLabel;
 
     private boolean hasAccess = true;
     private Stage primaryStage;
@@ -505,13 +506,16 @@ public class CardOverviewController {
      * Method that refreshes all card components.
      */
     public void refresh() {
-        // setting the background color of the card details the same as the board
+        // setting the background color of the card details the same as the card scheme
 
-        /*Color background = Color.web(board.getBackgroundColor());
+        Color background = Color.web(curCard.getBackgroundColor());
         anchorPane.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0) )));
 
-        Color font = Color.web(board.getTextColor());
-        cardLabel.setTextFill(font);*/
+        Color fontColor = Color.web(curCard.getFontColor());
+        cardLabel.setTextFill(fontColor);
+        subtaskLabel.setTextFill(fontColor);
+        tagsLabel.setTextFill(fontColor);
+        colorSchemesLabel.setTextFill(fontColor);
 
 
         System.out.println("Refreshed refresh: " + 0);
@@ -688,16 +692,19 @@ public class CardOverviewController {
      * @param button the button to color
      */
     private void colorButton(Button button) {
-        button.setStyle("-fx-background-color:" + board.getBackgroundColor());
-        button.setTextFill(Color.web(board.getTextColor()));
-        button.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+        String backgroundColor = curCard.getBackgroundColor();
+        String fontColor = curCard.getFontColor();
+
+        button.setStyle("-fx-background-color:" + backgroundColor);
+        button.setTextFill(Color.web(fontColor));
+        button.setBorder(new Border(new BorderStroke(Color.web(fontColor), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
         button.setOnMouseEntered(event -> {
-            button.setStyle("-fx-background-color:" + board.getTextColor());
-            button.setTextFill(Color.web(board.getBackgroundColor()));
+            button.setStyle("-fx-background-color:" + fontColor);
+            button.setTextFill(Color.web(backgroundColor));
         });
         button.setOnMouseExited(event -> {
-            button.setStyle("-fx-background-color:" + board.getBackgroundColor());
-            button.setTextFill(Color.web(board.getTextColor()));
+            button.setStyle("-fx-background-color:" + backgroundColor);
+            button.setTextFill(Color.web(fontColor));
         });
     }
 }
