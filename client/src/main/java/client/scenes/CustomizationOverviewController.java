@@ -103,8 +103,9 @@ public class CustomizationOverviewController {
         boardFont.setValue(Color.valueOf(board.getTextColor()));
         listBackground.setValue(Color.valueOf(board.getListBackgroundColor()));
         listFont.setValue(Color.valueOf(board.getListTextColor()));
-        loadSchemes();
         colorEverything();
+        loadSchemes();
+
     }
 
     /**
@@ -126,7 +127,11 @@ public class CustomizationOverviewController {
         LV.setTextFill(font);
         LVI.setTextFill(font);
         LVII.setTextFill(font);
-        scrollPane.setStyle("-fx-background-color: " + background);
+        scrollPane.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0))));
+        vBox.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0))));
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
     }
 
     /**
