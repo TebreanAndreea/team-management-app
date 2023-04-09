@@ -52,8 +52,8 @@
                </children>
             </HBox>
          </children></VBox>
-      <ScrollPane fx:id="scrollPane" layoutX="300.0" layoutY="61.0" prefHeight="307.0" prefWidth="246.0" style="-fx-background-color: transparent;">
-            <VBox fx:id="vBox" prefHeight="304.0" prefWidth="242.0" style="-fx-background-color: transparent;" />
+      <ScrollPane fx:id="scrollPane" layoutX="300.0" layoutY="67.0" prefHeight="307.0" prefWidth="246.0">
+            <VBox fx:id="vBox" prefHeight="310.0" prefWidth="246.0" />
       </ScrollPane>
       <Button fx:id="addSchemeButton" layoutX="478.0" layoutY="34.0" mnemonicParsing="false" onAction="#addScheme" prefHeight="26.0" prefWidth="53.0" style="-fx-background-color: green;" text="Add" textFill="WHITE" />
       <Label fx:id="LVII" layoutX="300.0" layoutY="34.0" prefHeight="26.0" prefWidth="105.0" text="Task Colors">
@@ -61,7 +61,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button fx:id="backButton" layoutX="511.0" layoutY="375.0" mnemonicParsing="false" onAction="#switchToBoard" text="Back" />
+      <Button fx:id="backButton" layoutX="546.0" layoutY="381.0" mnemonicParsing="false" onAction="#switchToBoard" text="Back" />
       <Button fx:id="saveButton" layoutX="100.0" layoutY="371.0" mnemonicParsing="false" onAction="#updateColors" prefHeight="34.0" prefWidth="99.0" text="Save Changes" />
    </children>
 </AnchorPane>
