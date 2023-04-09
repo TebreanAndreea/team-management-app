@@ -617,7 +617,6 @@ public class BoardOverviewController {
             newCard.setGraphic(vBoxTag);
         }
 
-        newCard.setFocusTraversable(false);
         newCard.setUserData(c.getCardId());
         setupButton(newCard, c);
         newCard.setCursor(Cursor.CLOSED_HAND);
@@ -629,7 +628,6 @@ public class BoardOverviewController {
         newCard.setOnMouseReleased(this::handleDropping);
 
         Button edit = new Button("\uD83D\uDD89");
-        edit.setFocusTraversable(false);
         edit.setOnMousePressed(event -> {
             if (event.getClickCount() == 2) {
                 try {
@@ -641,7 +639,6 @@ public class BoardOverviewController {
         });
         setupButton(edit, c);
         Button delete = new Button("\uD83D\uDDD9");
-        delete.setFocusTraversable(false);
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
         setupButton(delete, c);
         HBox buttonList = new HBox();
@@ -936,6 +933,7 @@ public class BoardOverviewController {
      * @param button the button to set up
      */
     private void setupButton(Button button, Card card) {
+        button.setFocusTraversable(false);
         HBox.setHgrow(button, Priority.ALWAYS);
         String style = "-fx-background-color: transparent; " +
                 "-fx-text-fill: " + card.getFontColor() + ";";
@@ -953,6 +951,7 @@ public class BoardOverviewController {
      * @param card the card
      */
     private void setupButton(ToggleButton button, Card card) {
+        button.setFocusTraversable(false);
         toggleGroup.getToggles().add(button);
 
         HBox.setHgrow(button, Priority.ALWAYS);
