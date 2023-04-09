@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainPane" prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
+<AnchorPane fx:id="mainPane" prefHeight="427.0" prefWidth="635.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.BoardOverviewController">
     <children>
         <Button fx:id="addListButton" layoutX="571.0" layoutY="43.0" mnemonicParsing="false" onAction="#addList" prefHeight="52.0" prefWidth="50.0" text="+Add" />
         <Label fx:id="boardName" layoutX="20.0" layoutY="23.0" minWidth="-Infinity" prefHeight="39.0" text="Board Name">
@@ -31,8 +35,8 @@
       <Button fx:id="removeButton" layoutX="20.0" layoutY="388.0" mnemonicParsing="false" onAction="#leaveBoard" style="-fx-background-color: WHITE;" text="Remove Board" textFill="RED" />
         <TextField fx:id="accessKey" editable="false" layoutX="411.0" layoutY="388.0" prefHeight="18.0" text="Access Key:" />
         <Button fx:id="copyKeyButton" layoutX="569.0" layoutY="388.0" onMouseClicked="#copyToClipboard" prefHeight="18.0" text="Copy" />
-      <Button fx:id="tagButton" layoutX="84.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToTagScene" prefHeight="26.0" prefWidth="72.0" text="Tags" />
-      <Button fx:id="customizeButton" layoutX="4.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToCustomizationScene" style="-fx-background-color: white;" text="Customize" textFill="#0a0000" />
+      <Button fx:id="tagButton" layoutX="101.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToTagScene" prefHeight="26.0" prefWidth="72.0" text="Tags" />
+      <Button fx:id="customizeButton" layoutX="20.0" layoutY="73.0" mnemonicParsing="false" onAction="#switchToCustomizationScene" style="-fx-background-color: white;" text="Customize" textFill="#0a0000" />
       <Button fx:id="lockButton" layoutX="419.0" layoutY="52.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="39.0" text="🔒" />
       <Button fx:id="readOnly" layoutX="143.0" layoutY="388.0" mnemonicParsing="false" onAction="#disableReadOnly" prefHeight="26.0" prefWidth="247.0" text="Read_Only mode! Enter password here!" />
       <Label fx:id="lockLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="389.0" layoutY="33.0" prefHeight="18.0" prefWidth="100.0" style="-fx-background-color: transparent;" text="Locked" />

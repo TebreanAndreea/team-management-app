@@ -490,7 +490,7 @@ public class BoardOverviewController {
         // Wait for the TitledPane to be displayed and fully initialized
         titledPane.setUserData(listing.getListId());
         titledPane.setPrefHeight(253); // TODO: refactor the dimensions of the lists
-        titledPane.setMinWidth(135);
+        titledPane.setMinWidth(200);
         titledPane.setAnimated(false);
         hBox.getChildren().add(titledPane);
         //        titledPane.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
@@ -526,6 +526,7 @@ public class BoardOverviewController {
     public void addCard(Card c, VBox vBox, Listing listing) {
         Button newCard;
         VBox vBox1 = new VBox();
+
         int totalSubtaks = c.getSubTasks().size();
         int doneSubtasks = 0;
         for (SubTask s : c.getSubTasks()) {
@@ -537,6 +538,7 @@ public class BoardOverviewController {
         vBox1.setAlignment(Pos.CENTER);
         Label nameCard = new Label(c.getName());
         nameCard.setStyle("-fx-text-fill: " + c.getFontColor() + ";");
+        nameCard.setMaxWidth(50);
 
         //Create hbox with all the tags attributed to card
         HBox tags = new HBox();
@@ -566,7 +568,6 @@ public class BoardOverviewController {
             hbox.setSpacing(8);
             newCard.setGraphic(vBoxTag);
         }
-
         newCard.setUserData(c.getCardId());
         setupButton(newCard, c);
         newCard.setCursor(Cursor.CLOSED_HAND);
@@ -588,12 +589,13 @@ public class BoardOverviewController {
                 }
             }
         });
-
         setupButton(edit, c);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
         setupButton(delete, c);
         HBox buttonList = new HBox();
+        buttonList.setMaxWidth(200);
+        buttonList.setPrefWidth(200);
         buttonList.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), BorderWidths.DEFAULT)));
         buttonList.getChildren().addAll(newCard, edit, delete);
         buttonList.setAlignment(Pos.CENTER);

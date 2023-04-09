@@ -9,6 +9,7 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -38,6 +39,22 @@ public class CardOverviewController {
     public TextArea description;
     @FXML
     public VBox colorSchemes;
+    @FXML
+    private AnchorPane anchorPane;
+    @FXML
+    private Button addDescriptionButton;
+    @FXML
+    private Button cardNameButton;
+    @FXML
+    private Button addSubtaskButton;
+    @FXML
+    private Button addTagButton;
+    @FXML
+    private Label subtaskLabel;
+    @FXML
+    private Label tagsLabel;
+    @FXML
+    private Label colorSchemesLabel;
 
     private boolean hasAccess = true;
     private Stage primaryStage;
@@ -59,9 +76,7 @@ public class CardOverviewController {
         this.server = server;
     }
 
-    public CardOverviewController() {
-
-    }
+    public CardOverviewController() {}
 
     public void initialize() {
         isRunning = true;
@@ -93,11 +108,7 @@ public class CardOverviewController {
                         }
                     }
                     refresh();
-
-
-                });
-            }
-        });
+                });}});
     }
 
     /**
@@ -140,7 +151,6 @@ public class CardOverviewController {
     public void setCardId(long cardId) {
         this.cardId = cardId;
         this.curCard = server.getCardsById(cardId);
-
     }
 
     /**
@@ -167,7 +177,6 @@ public class CardOverviewController {
         primaryStage.setScene(overview);
         primaryStage.show();
         server.stop();
-
     }
 
     /**
@@ -176,8 +185,7 @@ public class CardOverviewController {
      * @param actionEvent the event
      */
     public void addDescription(javafx.event.ActionEvent actionEvent) {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -198,8 +206,7 @@ public class CardOverviewController {
      * @param actionEvent the event
      */
     public void updateName(javafx.event.ActionEvent actionEvent) {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -231,8 +238,7 @@ public class CardOverviewController {
      * Method for addSubTask button in Card Details scene.
      */
     public void addSubTask() {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -268,8 +274,7 @@ public class CardOverviewController {
      * @param subTask     the subtask to be edited
      */
     private void editSubTask(ActionEvent actionEvent, SubTask subTask) {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -371,7 +376,7 @@ public class CardOverviewController {
         HBox hBoxButtons = new HBox(editST, deleteST, up, down);
 
         HBox hBox = new HBox();
-        hBox.setSpacing(100);
+        hBox.setSpacing(10);
         hBox.getChildren().addAll(hBoxCB, hBoxButtons);
 
         vBox.getChildren().add(hBox);
@@ -385,8 +390,7 @@ public class CardOverviewController {
      * @param cardid  the card of the subtask
      */
     private void moveDown(ActionEvent event, SubTask subTask, long cardid) {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -431,8 +435,7 @@ public class CardOverviewController {
      */
 
     private void moveUp(ActionEvent event, SubTask subTask, long cardid) {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -463,12 +466,9 @@ public class CardOverviewController {
                     alert.showAndWait();
                 }
             }
-//             server.sendList(this.list);
-//            server.saveCard(card);
             refresh();
         }
     }
-    //}
 
     /**
      * Deleting a subtask from database.
@@ -478,8 +478,7 @@ public class CardOverviewController {
      */
 
     private void deleteSubTask(ActionEvent actionEvent, SubTask subtask) {
-        if (!hasAccess)
-        {
+        if (!hasAccess) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No access!");
             alert.setContentText("Cant edit in read-only mode!");
@@ -507,6 +506,17 @@ public class CardOverviewController {
      * Method that refreshes all card components.
      */
     public void refresh() {
+        // setting the background color of the card details the same as the card scheme
+
+        Color background = Color.web(curCard.getBackgroundColor());
+        anchorPane.setBackground(new Background(new BackgroundFill(background, new CornerRadii(0), new Insets(0) )));
+
+        Color fontColor = Color.web(curCard.getFontColor());
+        cardLabel.setTextFill(fontColor);
+        subtaskLabel.setTextFill(fontColor);
+        tagsLabel.setTextFill(fontColor);
+        colorSchemesLabel.setTextFill(fontColor);
+
 
         System.out.println("Refreshed refresh: " + 0);
         curCard = server.getCardsById(cardId);
@@ -527,6 +537,8 @@ public class CardOverviewController {
         refreshCardDetails();
         refreshTags();
         refreshSchemes();
+
+        setUpButtons();
     }
 
 
@@ -662,5 +674,37 @@ public class CardOverviewController {
         overview = new Scene(chooseTagOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.show();
+    }
+
+    /**
+     * This method applies styling to buttons from the card overview.
+     */
+    public void setUpButtons(){
+        colorButton(addDescriptionButton);
+        colorButton(cardNameButton);
+        colorButton(addSubtaskButton);
+        colorButton(addTagButton);
+    }
+
+    /**
+     * Colors a certain button in the card overview.
+     *
+     * @param button the button to color
+     */
+    private void colorButton(Button button) {
+        String backgroundColor = curCard.getBackgroundColor();
+        String fontColor = curCard.getFontColor();
+
+        button.setStyle("-fx-background-color:" + backgroundColor);
+        button.setTextFill(Color.web(fontColor));
+        button.setBorder(new Border(new BorderStroke(Color.web(fontColor), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:" + fontColor);
+            button.setTextFill(Color.web(backgroundColor));
+        });
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color:" + backgroundColor);
+            button.setTextFill(Color.web(fontColor));
+        });
     }
 }
