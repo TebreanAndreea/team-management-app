@@ -9,7 +9,6 @@ import jakarta.ws.rs.WebApplicationException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -674,7 +673,7 @@ public class CardOverviewController {
     }
 
     /**
-     * This method applies styling to buttons from the card overview
+     * This method applies styling to buttons from the card overview.
      */
     public void setUpButtons(){
         colorButton(addDescriptionButton);
@@ -684,7 +683,7 @@ public class CardOverviewController {
     }
 
     /**
-     * Colors a certain button in the card overview
+     * Colors a certain button in the card overview.
      *
      * @param button the button to color
      */
