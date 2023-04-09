@@ -11,7 +11,6 @@ import server.database.CardRepository;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 @Service
@@ -120,16 +119,6 @@ public class CardService {
         return result;
     }
 
-    /**
-     * This method checks if a card is in the database.
-     * @param card the card
-     * @return a response entity boolean
-     */
-    public ResponseEntity<Boolean> getCard(Card card) {
-        Optional<Card> card1 = repo.findById(card.getCardId());
-        if (card1.isEmpty())
-            return ResponseEntity.ok(true);
-        return ResponseEntity.ok(false);
-    }
+
 
 }

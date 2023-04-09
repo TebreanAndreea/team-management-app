@@ -1,13 +1,18 @@
 package server.services;
 
-import commons.*;
+import commons.Card;
+import commons.Listing;
+import commons.SubTask;
+import commons.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.web.context.request.async.DeferredResult;
 import server.database.CardRepository;
 
 import java.util.ArrayList;
@@ -15,9 +20,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
@@ -25,6 +30,8 @@ class CardServiceTest {
 
     CardService cardService;
     CardRepository repo;
+
+    DeferredResult<ResponseEntity<Card>> result;
     @Mock
     SimpMessageSendingOperations msgs;
     Card card;
@@ -43,6 +50,7 @@ class CardServiceTest {
         SubTask subtask1 = new SubTask("s1",card);
         subtasks.add(subtask1);
 
+        result = cardService.getUppdatesCards();
         Listing list = new Listing("list",null);
 
         card = new Card("desc","name",new Date(),tags,subtasks,list,"black","black","name");
@@ -52,12 +60,41 @@ class CardServiceTest {
     void add() {
         when(repo.save(card)).thenReturn(card);
 
+        Card save = cardService.add(card,false).getBody();
+
+        verify(msgs).convertAndSend("/topic/card", card);
+        verify(repo).save(card);
+        ResponseEntity<Card> response = (ResponseEntity<Card>) result.getResult();
+
+
+        assertEquals(response.getBody(),  card);
+        assertEquals(save, card);
+    }
+
+    @Test
+    void addIntoList() {
+        when(repo.save(card)).thenReturn(card);
+
         Card save = cardService.add(card,true).getBody();
 
         verify(msgs).convertAndSend("/topic/card", card);
         verify(repo).save(card);
 
+
+        assertNull(result.getResult());
         assertEquals(save, card);
+    }
+
+    @Test
+    void addInvalid() {
+
+        ResponseEntity<Card> response= cardService.add(null,true);
+
+        verify(msgs, never()).convertAndSend("/topic/card", card);
+        verify(repo, never()).save(card);
+
+
+        assertEquals(response, ResponseEntity.badRequest().build());
     }
 
     @Test
@@ -68,20 +105,20 @@ class CardServiceTest {
         assertEquals(save,list);
     }
 
-    /* This doesn't work for now
     @Test
     void delete() {
-        when(repo.existsById(1L)).thenReturn(true);
-        when(repo.findById(1L)).thenReturn(Optional.of(card));
+        when(repo.findById(0L)).thenReturn(Optional.of(card));
 
-        doNothing().when(repo).deleteById(1L);
+        doNothing().when(repo).deleteById(0L);
 
-        ResponseEntity<Listing> response = cardService.delete(1L,true);
+        ResponseEntity<Listing> response = cardService.delete(0L,true);
         verify(msgs).convertAndSend("/topic/card", card);
-        verify(repo).existsById(1L);
-        verify(repo).findById(1L);
-        verify(repo).deleteById(1L);
+        verify(repo).findById(0L);
+        verify(repo).deleteById(0L);
+        ResponseEntity<Card> responseI = (ResponseEntity<Card>) result.getResult();
 
+
+        assertEquals(responseI.getBody(),  card);
         assertEquals(ResponseEntity.ok().build(), response);
     }
 
@@ -89,17 +126,15 @@ class CardServiceTest {
     @Test
     void deleteInvalid() {
 
-        when(repo.existsById(1L)).thenReturn(false);
-
-        ResponseEntity<Listing> bbb = cardService.delete(1L,true);
-        verify(repo).existsById(1L);
-        verify(repo,never()).findById(1L);
-        verify(repo,never()).deleteById(1L);
+        when(repo.findById(0L)).thenReturn(Optional.empty());
+        ResponseEntity<Listing> bbb = cardService.delete(0L,true);
+        verify(repo).findById(0L);
+        verify(repo,never()).deleteById(0L);
         verify(msgs, never()).convertAndSend("/topic/card", card);
 
         assertEquals(bbb, ResponseEntity.notFound().build());
     }
-*/
+
     @Test
     void getById() {
         when(repo.existsById(1L)).thenReturn(true);
@@ -111,17 +146,25 @@ class CardServiceTest {
 
         assertEquals(card2, card);
     }
-
-    /*
     @Test
-    void getCard() {
-        Card card2 = new Card("d","name",null,null,null,null,null,null,null);
-        boolean exists = cardService.getCard(card).getBody();
-        boolean notExists = cardService.getCard(card2).getBody();
+    void getByIdInvalid() {
+        when(repo.existsById(1L)).thenReturn(false);
 
-        assertTrue(exists);
-        assertFalse(notExists);
+        Card card2 = cardService.getById(1L).getBody();
+        verify(repo).existsById(1L);
+        verify(repo, never()).findById(1L);
+
+        assertNull(card2);
     }
 
-     */
+    @Test
+    void update()
+    {
+        result = cardService.getUppdatesCards();
+        assertNull(result.getResult());
+    }
+
+
+
+
 }

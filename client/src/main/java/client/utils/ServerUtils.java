@@ -549,16 +549,6 @@ public class ServerUtils {
             }
         });
     }
-    	
-    public boolean checkCard (Card card)
-    {
-        return ClientBuilder.newClient(new ClientConfig())
-            .target(SERVER).path("api/card/check")
-            .request(APPLICATION_JSON)
-            .accept(APPLICATION_JSON)
-            .post(Entity.entity(card, APPLICATION_JSON), Boolean.class);
-
-    }
 
     public void stop()
     {
