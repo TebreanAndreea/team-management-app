@@ -198,7 +198,7 @@ public class BoardOverviewController {
      *
      * @param card          - the card we need to save
      * @param list          - the list that has the card
-     * @param savedIntoList checks if the card comes directly from beeing added to a list
+     * @param savedIntoList checks if the card comes directly from being added to a list
      * @return card
      */
     public Card saveCardDB(Card card, Listing list, boolean savedIntoList) {
@@ -1127,6 +1127,14 @@ public class BoardOverviewController {
      * @param actionEvent the event that triggered the function
      */
     public void moveVertical (ActionEvent actionEvent) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
+
         // getting the menuId of the menu that called the function, either UP or DOWN
         String menuId = ((MenuItem) actionEvent.getSource()).getId();
 
@@ -1142,10 +1150,10 @@ public class BoardOverviewController {
         else pos++;
 
         if (pos > -1 && pos < listing.getCards().size()) {
-            server.deleteCard(card.getCardId());
+            server.deleteCard(card.getCardId(), false);
             vBox.getChildren().remove(cardHBox);
 
-            Card updatedCard = saveCardDB(card, listing);
+            Card updatedCard = saveCardDB(card, listing, false);
             listing.getCards().add(pos, updatedCard);
             cardMap.put(cardHBox, updatedCard);
             toggleButton.setUserData(updatedCard.getCardId());
@@ -1155,13 +1163,13 @@ public class BoardOverviewController {
             for (int i = 0; i < vBox.getChildren().size() - 2; i++) { // we delete all the cards from this list
                 HBox hBox = (HBox) vBox.getChildren().get(i);
                 Card card2 = cardMap.get(hBox);
-                server.deleteCard(card2.getCardId());
+                server.deleteCard(card2.getCardId(), false);
             }
 
             for (int i = 0; i < vBox.getChildren().size() - 2; i++) { // we have all the cards in good order, we add them to the list
                 HBox hBox = (HBox) vBox.getChildren().get(i);
                 Card card2 = cardMap.get(hBox);
-                Card updated = saveCardDB(card2, listing);
+                Card updated = saveCardDB(card2, listing, false);
                 listing.getCards().add(updated);
                 cardMap.put(hBox, updated);
                 if (hBox.equals(cardHBox)) {
@@ -1280,6 +1288,13 @@ public class BoardOverviewController {
      * @param list the listing containing the card
      */
     public void renameCardPopup(Card card, Listing list) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         TextInputDialog dialog = new TextInputDialog(card.getName());
         dialog.setTitle("Change the name of the card");
         dialog.setHeaderText("Please enter the new name for the card:");
@@ -1325,6 +1340,13 @@ public class BoardOverviewController {
      * @param listing the listing containing the card
      */
     public void addTagsPopup(Card card, Listing listing) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         List<Tag> tags = card.getTags();
         if (tags.equals(board.getTags())) {
             return;
@@ -1387,6 +1409,13 @@ public class BoardOverviewController {
      * @param listing the listing containing the highlighted card
      */
     private void addColorPresetPopup(Card card, Listing listing) {
+        if (!hasAccess) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No access!");
+            alert.setContentText("Cant edit in read-only mode!");
+            alert.showAndWait();
+            return;
+        }
         List<ColorScheme> schemes = board.getSchemes();
         if (schemes.size() == 1) {
             return;
@@ -1453,8 +1482,7 @@ public class BoardOverviewController {
         apply.setOnAction(event -> {
             card.setBackgroundColor(scheme.getBackgroundColor());
             card.setFontColor(scheme.getFontColor());
-            server.sendList(listing);
-            server.saveCard(card);
+            saveCardDB(card, listing, false);
             refresh();
 
             for (Button button: buttons) {
