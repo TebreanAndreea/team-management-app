@@ -557,7 +557,6 @@ public class BoardOverviewController {
             hbox.setSpacing(8);
             newCard.setGraphic(vBoxTag);
         }
-
         newCard.setUserData(c.getCardId());
         setupButton(newCard, c);
         newCard.setCursor(Cursor.CLOSED_HAND);
@@ -579,7 +578,6 @@ public class BoardOverviewController {
                 }
             }
         });
-
         setupButton(edit, c);
         Button delete = new Button("\uD83D\uDDD9");
         delete.setOnAction(this::deleteCard); // an events happens when the button is clicked
