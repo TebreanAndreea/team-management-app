@@ -1296,6 +1296,7 @@ public class BoardOverviewController {
                 renameCardPopup(card, list);
             }
 
+    /**
      * Disables the read only if the user has entered the correct password.
      * @param event - the button clicked
      */
@@ -1483,6 +1484,7 @@ public class BoardOverviewController {
         primaryStage.show();
     }
 
+    /**
      * Allows access, helper method to the above.
      */
     public void allowAccess() {
