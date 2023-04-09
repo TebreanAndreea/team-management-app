@@ -199,7 +199,7 @@ public class InitialOverviewController {
 
 
         List<Board> boards = new ArrayList<>();
-        StringBuilder availableBoards = new StringBuilder();
+        String availableBoards = "";
         try (Scanner scanner = new Scanner(new File(fileName))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -218,7 +218,7 @@ public class InitialOverviewController {
             }
             scanner.close();
             FileOutputStream outputStream = new FileOutputStream(new File(fileName));
-            outputStream.write(availableBoards.toString().getBytes());
+            outputStream.write(availableBoards.getBytes());
             outputStream.flush();
             outputStream.close();
         } catch (Exception e) {
