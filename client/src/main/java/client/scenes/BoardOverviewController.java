@@ -140,18 +140,18 @@ public class BoardOverviewController {
 
             boolean axis = focusUp.isFocused() || focusDown.isFocused();
             boolean dir = focusUp.isFocused() || focusLeft.isFocused();
-            int i;
+            int movement;
             if (dir) {
-                i = -1;
+                movement = -1;
             }
             else {
-                i = 1;
+                movement = 1;
             }
             if (axis) {
-                targetVertical(vBox, card, listing, i);
+                targetVertical(vBox, card, listing, movement);
             }
             else {
-                targetHorizontal(vBox, card, listing, i);
+                targetHorizontal(vBox, card, listing, movement);
             }
 
             focus.requestFocus();
@@ -997,7 +997,7 @@ public class BoardOverviewController {
 
 
     /**
-     * Moves the highlight vertically if possible
+     * Moves the highlight vertically if possible.
      *
      * @param vBox    the VBox containing the highlighted card
      * @param card    the highlighted card
@@ -1016,7 +1016,8 @@ public class BoardOverviewController {
     }
 
     /**
-     * Moves the highlight horizontally if possible
+     * Moves the highlight horizontally if possible.
+     *
      * @param oldVBox the VBox housing the highlighted card
      * @param card the highlighted card
      * @param listing the listing containing the higlithed card
