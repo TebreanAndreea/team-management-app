@@ -1295,7 +1295,7 @@ public class BoardOverviewController {
                 emptyField.showAndWait();
                 renameCardPopup(card, list);
             }
-        }
+        });
     }
     
     /**
