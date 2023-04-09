@@ -48,7 +48,7 @@ class ListingTest {
     @Test
     public void testAddCard() {
 
-        Card card = new Card("desc","name",new Date(),null,null,listing,"","");
+        Card card = new Card("desc","name",new Date(),null,null,listing,"","","");
         listing.getCards().add(card);
         assertEquals(1, listing.getCards().size());
         assertTrue(listing.getCards().contains(card));

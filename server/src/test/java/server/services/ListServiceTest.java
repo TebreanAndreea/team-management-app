@@ -156,9 +156,9 @@ class ListServiceTest {
 
     @Test
     void editList() {
-        Card c1 = new Card("aaa", "a", new Date(), new ArrayList<>(), new ArrayList<>(), list, "","");
-        Card c2 = new Card("bbb", "b", new Date(), new ArrayList<>(), new ArrayList<>(), list, "","");
-        Card c3 = new Card("ccc", "c", new Date(), new ArrayList<>(), new ArrayList<>(), list, "","");
+        Card c1 = new Card("aaa", "a", new Date(), new ArrayList<>(), new ArrayList<>(), list, "","","");
+        Card c2 = new Card("bbb", "b", new Date(), new ArrayList<>(), new ArrayList<>(), list, "","","");
+        Card c3 = new Card("ccc", "c", new Date(), new ArrayList<>(), new ArrayList<>(), list, "","","");
 
         list.getCards().add(c1);
         list.getCards().add(c2);
