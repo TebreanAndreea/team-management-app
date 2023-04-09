@@ -676,6 +676,7 @@ public class CardOverviewController {
                 throw new RuntimeException(e);
             }
         }
+    }
     
     /**
      * This method applies styling to buttons from the card overview.
