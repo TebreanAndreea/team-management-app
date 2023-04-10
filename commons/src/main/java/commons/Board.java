@@ -24,7 +24,6 @@ public class Board {
     private String accessKey;
     private String password;
 
-    //private List<Tag> tags;
     @JsonManagedReference
     @OneToMany(
             mappedBy = "board",
@@ -104,7 +103,7 @@ public class Board {
     /**
      * Setter for the board's id.
      *
-     * @param boardId the new Id of a board
+     * @param boardId the new ID of a board
      */
     public void setBoardId(long boardId) {
         this.boardId = boardId;

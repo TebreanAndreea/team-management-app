@@ -3,6 +3,7 @@ package commons;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class ColorScheme {
@@ -76,5 +77,18 @@ public class ColorScheme {
 
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ColorScheme)) return false;
+        ColorScheme colorScheme = (ColorScheme) o;
+        return getSchemeId() == colorScheme.getSchemeId() && Objects.equals(getName(), colorScheme.getName()) && Objects.equals(getBackgroundColor(), colorScheme.getBackgroundColor()) && Objects.equals(getFontColor(), colorScheme.getFontColor()) && getBoard().equals(colorScheme.getBoard());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSchemeId(), getName(), getBackgroundColor(), getFontColor(), getBoard());
     }
 }

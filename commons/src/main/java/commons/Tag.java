@@ -88,6 +88,14 @@ public class Tag {
     }
 
     /**
+     * Getter for the board.
+     * @return the board
+     */
+    public Board getBoard() {
+        return board;
+    }
+
+    /**
      * Getter for the id.
      * @return the tag id
      */
