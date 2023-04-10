@@ -251,6 +251,23 @@ public class Card {
         this.backgroundColor = backgroundColor;
     }
 
+    @Override
+    public String toString() {
+        return "Card{" +
+                "cardId=" + cardId +
+                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
+                ", dueDate=" + dueDate +
+                ", tags=" + tags +
+                ", subTasks=" + subTasks +
+                ", complete=" + complete +
+                ", list=" + list +
+                ", fontColor='" + fontColor + '\'' +
+                ", backgroundColor='" + backgroundColor + '\'' +
+                ", schemeName='" + schemeName + '\'' +
+                '}';
+    }
+
     /**
      * A hashcode value of the card.
      * @return - the new generated hash code of the card
