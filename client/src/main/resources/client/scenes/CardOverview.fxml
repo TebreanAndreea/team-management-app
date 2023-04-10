@@ -1,43 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.CardOverviewController" onKeyPressed="#exitIfEscape">
    <children>
-      <Button layoutX="512.0" layoutY="352.0" mnemonicParsing="false" onAction="#switchToBoardScene" prefHeight="25.0" prefWidth="61.0" style="-fx-background-color: indianred;" text="Go Back" textFill="WHITE" />
-      <Label fx:id="cardLabel" layoutX="14.0" layoutY="14.0" prefHeight="33.0" prefWidth="173.0" text="Card Details">
+      <Button layoutX="512.0" layoutY="18.0" mnemonicParsing="false" onAction="#switchToBoardScene" prefHeight="25.0" prefWidth="54.0" style="-fx-background-color: IndianRed;" text="Exit" textFill="WHITE" />
+      <Label fx:id="cardLabel" layoutX="27.0" layoutY="14.0" prefHeight="33.0" prefWidth="173.0" text="Card Details">
          <font>
             <Font name="System Bold" size="28.0" />
          </font></Label>
-      <TextArea fx:id="description" layoutX="10.0" layoutY="54.0" prefHeight="91.0" prefWidth="520.0" />
-      <ScrollPane layoutX="12.0" layoutY="170.0">
+      <TextArea fx:id="description" layoutX="27.0" layoutY="48.0" prefHeight="68.0" prefWidth="541.0" />
+      <ScrollPane layoutX="27.0" layoutY="165.0">
          <content>
-            <VBox fx:id="vBox" prefHeight="110.0" prefWidth="270.0" />
+            <VBox fx:id="vBox" prefHeight="109.0" prefWidth="284.0" />
          </content>
       </ScrollPane>
-      <Label layoutX="7.0" layoutY="145.0" prefHeight="17.0" prefWidth="141.0" text="Subtasks">
+      <Label fx:id="subtaskLabel" layoutX="27.0" layoutY="132.0" prefHeight="17.0" prefWidth="141.0" text="Subtasks">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
-      <Button layoutX="479.0" layoutY="119.0" mnemonicParsing="false" onAction="#addDescription" prefHeight="27.0" prefWidth="54.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 5;" text="Save" />
-      <Button layoutX="187.0" layoutY="21.0" mnemonicParsing="false" onAction="#updateName" prefHeight="27.0" prefWidth="41.0" style="-fx-background-color: transparent; -fx-border-color: black; -fx-border-radius: 10;" text="Edit" />
-      <Button layoutX="88.0" layoutY="145.0" mnemonicParsing="false" onAction="#addSubTask" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 5;" text="+" />
-      <Label layoutX="14.0" layoutY="282.0" prefHeight="25.0" prefWidth="61.0" text="Tags" />
-      <Button layoutX="63.0" layoutY="282.0" mnemonicParsing="false" onAction="#switchToChooseTagScene" style="-fx-background-color: white; -fx-border-color: black; -fx-border-radius: 5;" text="+" />
-      <ScrollPane layoutX="14.0" layoutY="312.0" prefHeight="57.0" prefWidth="491.0">
+      <Button fx:id="addDescriptionButton" layoutX="458.0" layoutY="90.0" mnemonicParsing="false" onAction="#addDescription" text="Save description" />
+      <Button fx:id="cardNameButton" layoutX="213.0" layoutY="18.0" mnemonicParsing="false" onAction="#updateName" prefHeight="26.0" prefWidth="109.0" text="Edit card name" />
+      <Button fx:id="addSubtaskButton" layoutX="106.0" layoutY="129.0" mnemonicParsing="false" onAction="#addSubTask" text="add subtask" />
+      <Label fx:id="tagsLabel" layoutX="27.0" layoutY="283.0" prefHeight="25.0" prefWidth="61.0" text="Tags">
+         <font>
+            <Font size="16.0" />
+         </font></Label>
+      <Button fx:id="addTagButton" layoutX="76.0" layoutY="283.0" mnemonicParsing="false" onAction="#switchToChooseTagScene" text="Add tag" />
+      <ScrollPane layoutX="27.0" layoutY="316.0" prefHeight="50.0" prefWidth="541.0">
          <content>
-            <HBox fx:id="hbox" prefHeight="38.0" prefWidth="473.0" />
+            <HBox fx:id="hbox" prefHeight="38.0" prefWidth="538.0" />
          </content>
       </ScrollPane>
-      <Label layoutX="352.0" layoutY="145.0" prefHeight="17.0" prefWidth="141.0" text="Color Schemes">
+      <Label fx:id="colorSchemesLabel" layoutX="368.0" layoutY="135.0" prefHeight="17.0" prefWidth="141.0" text="Color Schemes">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
-      <ScrollPane layoutX="352.0" layoutY="170.0" prefHeight="112.0" prefWidth="174.0">
+      <ScrollPane layoutX="368.0" layoutY="165.0" prefHeight="112.0" prefWidth="198.0">
          <content>
             <VBox fx:id="colorSchemes" prefHeight="110.0" prefWidth="158.0" spacing="8.0" />
          </content>

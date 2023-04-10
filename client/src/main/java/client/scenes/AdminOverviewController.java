@@ -8,19 +8,18 @@ import commons.Board;
 import commons.Card;
 import commons.Listing;
 import jakarta.ws.rs.WebApplicationException;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.SubScene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -33,9 +32,15 @@ import static com.google.inject.Guice.createInjector;
 public class AdminOverviewController {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
-    private final ServerUtils server;
+    public Button disconnectButton;
+    public Button openButton;
+    private ServerUtils server;
+    private Scene overview;
+    private Stage primaryStage;
     private Map<Button, Board> buttonBoardMap = new HashMap<>();
     private Board selectedBoard;
+    @FXML
+    Button securityButton;
     @FXML
     private javafx.scene.control.ScrollPane previewPane;
     @FXML
@@ -58,9 +63,10 @@ public class AdminOverviewController {
      * Initializes the controller.
      */
     public void initialize() {
-        server.registerForMessages("/topic/boards", Board.class, q -> Platform.runLater(this::refresh));
         refresh();
+        openButton.setVisible(false);
         deleteButton.setVisible(false);
+        securityButton.setVisible(false);
     }
 
     /**
@@ -124,28 +130,28 @@ public class AdminOverviewController {
      */
     private void seePreview(ActionEvent actionEvent) {
         var root = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
-        root.getKey().setBoard(buttonBoardMap.get((Button) actionEvent.getSource()));
+        root.getKey().setBoard(buttonBoardMap.get(actionEvent.getSource()));
         root.getKey().setAdminControl(true);
         root.getKey().refresh();
-        SubScene subScene = new SubScene(root.getValue(), 600, 400);
-        previewPane.setContent(subScene);
-        double scaleFactor = Math.min(400 / subScene.getWidth(), 300 / subScene.getHeight());
+        SubScene subScene = new SubScene(root.getValue(), 635, 427);
+        double scaleFactor = Math.min(350 / subScene.getWidth(), 260 / subScene.getHeight());
         Scale scale = new Scale(scaleFactor, scaleFactor);
         subScene.getTransforms().clear();
         subScene.getTransforms().add(scale);
-        previewPane.setFitToHeight(true);
-        previewPane.setFitToWidth(true);
-        previewPane.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
-        previewPane.setVbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
+        previewPane.setContent(subScene);
         deleteButton.setVisible(true);
-        selectedBoard = buttonBoardMap.get((Button) actionEvent.getSource());
+        securityButton.setVisible(true);
+        openButton.setVisible(true);
+        selectedBoard = buttonBoardMap.get(actionEvent.getSource());
     }
 
     /**
      * Deletes the selected board from the database.
      * If a user is using the board, the user will be shown a message that the board has been deleted.
+     *
+     * @param actionEvent the event that triggered the method
      */
-    public void delete() {
+    public void delete(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete board");
         alert.setHeaderText("Are you sure you want to delete this board?");
@@ -156,7 +162,7 @@ public class AdminOverviewController {
                 for (int i = 0; i < list.getCards().size(); i++) {
                     Card card = list.getCards().get(i);
                     try {
-                        server.deleteCard(card.getCardId());
+                        server.deleteCard(card.getCardId(), true);
                     } catch (WebApplicationException e) {
                         var alertError = new Alert(Alert.AlertType.ERROR);
                         alertError.initModality(Modality.APPLICATION_MODAL);
@@ -186,9 +192,49 @@ public class AdminOverviewController {
                 alertError.setContentText(e.getMessage());
                 alertError.showAndWait();
             }
-            deleteButton.setVisible(false);
             refresh();
         }
+    }
+
+    /**
+     * Changes the password of the selected board.
+     */
+    public void changePassword() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Change Password");
+        dialog.setHeaderText("Please enter a new password for the board");
+        dialog.showAndWait().ifPresent(password -> {
+            selectedBoard.setPassword(password);
+            selectedBoard = server.addBoard(selectedBoard);
+            refresh();
+        });
+    }
+
+    /**
+     * Disconnects the admin.
+     * @param actionEvent - the button pressed
+     */
+    public void switchToHomePageScene(ActionEvent actionEvent) {
+        var homePageOverview = FXML.load(HomePageOverviewController.class, "client", "scenes", "HomePageOverview.fxml");
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(homePageOverview.getValue());
+        primaryStage.setScene(overview);
+        primaryStage.setTitle("Connection");
+    }
+
+    /**
+     * Switches to the board so the admin can use the client app.
+     * @param actionEvent - the button clicked
+     */
+    public void switchToBoard(ActionEvent actionEvent) {
+        var boardOverview = FXML.load(BoardOverviewController.class, "client", "scenes", "BoardOverview.fxml");
+        boardOverview.getKey().setBoard(selectedBoard);
+        boardOverview.getKey().setHasAccess(true);
+        boardOverview.getKey().setIsAdmin(true);
+        boardOverview.getKey().refresh();
+        primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        overview = new Scene(boardOverview.getValue());
+        primaryStage.setScene(overview);
     }
 
 }

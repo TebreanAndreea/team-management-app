@@ -74,7 +74,6 @@ public class HomePageOverviewController {
             }
         });
         setAdminPassword();
-
     }
 
     /**
@@ -115,12 +114,6 @@ public class HomePageOverviewController {
         if (userUrl.contains(http))
             userUrl = userUrl.substring(6);
 
-
-       // String userUrl = "http://localhost:" + userPort;
-//        if (!userUrl.startsWith("http://")) {
-//            userUrl = "http://" + userUrl;
-//        }
-
         if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
 
             StompSession session = server.startWebSockets(userUrl);
@@ -145,10 +138,14 @@ public class HomePageOverviewController {
             primaryStage.show();
         } else {
             // put a message in the text area
-            if (username.getText().trim().length() > 0)
+            if (username.getText().trim().length() > 0) {
                 serverAddress.setText("Invalid url");
-            else
+                serverAddress.setStyle("-fx-border-color: red; -fx-border-radius: 5px;");
+            }
+            else {
                 username.setText("Invalid username");
+                username.setStyle("-fx-border-color: red; -fx-border-radius: 5px;");
+            }
         }
     }
 
@@ -189,8 +186,8 @@ public class HomePageOverviewController {
      */
     public void adminLogin(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Input Dialog");
-        dialog.setHeaderText("Please enter the admin details below:");
+        dialog.setTitle("Admin login");
+        dialog.setHeaderText("Please enter the necessary information:");
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -205,16 +202,16 @@ public class HomePageOverviewController {
         grid.add(serverField, 1, 0);
         grid.add(new Label("Admin Password:"), 0, 1);
         grid.add(passwordField, 1, 1);
+
         dialog.getDialogPane().setContent(grid);
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
-            String serverLink = serverField.getText();
+            String server = serverField.getText();
             String password = passwordField.getText();
-            String port = serverLink.substring(serverLink.lastIndexOf(":") + 1);
-            if (password.equals(adminPassword) && checkConnection(serverLink)) {
+            String port = server.substring(server.lastIndexOf(":") + 1);
+            if (password.equals(adminPassword) && checkConnection(server)) {
                 System.out.println("Admin login successful");
-                StompSession session = server.startWebSockets(serverLink);
                 var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
                 primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                 overview = new Scene(adminOverview.getValue());
@@ -229,4 +226,21 @@ public class HomePageOverviewController {
         }
 
     }
+
+    public void connectHover(){
+
+        connect.setStyle("-fx-background-color: green"
+                + "; -fx-text-fill: #ffffff; -fx-border-color: #ffffff;" +
+                "-fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;" +
+                "-fx-background-insets: 2px");
+    }
+
+    public void connectNormal( ){
+        connect.setStyle("-fx-background-color: #ffffff"
+                + "; -fx-text-fill: green; -fx-border-color: green;"+
+                "-fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;"+
+                "-fx-background-insets: 2px");
+    }
+
+
 }

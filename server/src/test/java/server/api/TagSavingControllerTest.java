@@ -48,5 +48,11 @@ public class TagSavingControllerTest {
         controller.setBoardToTag(board);
         assertEquals(ResponseEntity.ok(board), controller.setBoardToTag(board));
     }
+//    @Test
+//    public void getUpdateTagTest() {
+//        var noContent = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//        var result = new DeferredResult<ResponseEntity<Tag>>(1000L, noContent);
+//        assertTrue(result.equals(controller.getUpdatesTag()));
+//    }
 
 }

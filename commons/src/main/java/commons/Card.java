@@ -41,6 +41,8 @@ public class Card {
     private String fontColor;
     private String backgroundColor;
 
+    private String schemeName;
+
     /**
      *
      * Constructor for the card class.
@@ -52,8 +54,9 @@ public class Card {
      * @param list - the list in which the card is
      * @param fontColor - the font color
      * @param backgroundColor - the background color
+     * @param schemeName - the name of the scheme
      */
-    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list, String fontColor, String backgroundColor) {
+    public Card(String description, String name, Date dueDate, List<Tag> tags, List<SubTask> subTasks, Listing list, String fontColor, String backgroundColor, String schemeName) {
         this.description = description;
         this.name = name;
         this.dueDate = dueDate;
@@ -63,6 +66,7 @@ public class Card {
         this.list = list;
         this.backgroundColor = backgroundColor;
         this.fontColor = fontColor;
+        this.schemeName = schemeName;
     }
 
     /**
@@ -180,19 +184,27 @@ public class Card {
         this.complete = complete;
     }
 
+    public String getSchemeName() {
+        return schemeName;
+    }
+
+    public void setSchemeName(String schemeName) {
+        this.schemeName = schemeName;
+    }
+
     /**
      * Equals method for the Card class.
      * @param o - the object with which we check for equality
-     * @param lists - checks whether the method has been called from a list and doesn't check if the lists are equal as this makes the code go in a loop
+     * @param listss - checks wether the method has been called from a list and doesn't check if the lists are equal as this makes the code go in a loop
      * @return - a boolean based on the outcome
      */
-    public boolean equals(Object o, boolean lists) {
+    public boolean equals(Object o, boolean listss) {
         if (this == o) return true;
         if (!(o instanceof Card)) return false;
         Card card = (Card) o;
-        if (lists)
-            return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor));
-        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor));
+        if (listss)
+            return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor)) && schemeName.equals(card.schemeName);
+        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor))&& schemeName.equals(card.schemeName);
     }
 
     /**
@@ -234,13 +246,5 @@ public class Card {
     @Override
     public int hashCode() {
         return Objects.hash(cardId, description, name, dueDate, tags, subTasks, complete);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Card card = (Card) o;
-        return cardId == card.cardId && complete == card.complete && Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags) && Objects.equals(subTasks, card.subTasks) && Objects.equals(fontColor, card.fontColor) && Objects.equals(backgroundColor, card.backgroundColor);
     }
 }

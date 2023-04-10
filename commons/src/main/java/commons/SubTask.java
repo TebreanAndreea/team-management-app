@@ -45,6 +45,15 @@ public class SubTask {
     }
 
     /**
+     * Setter for the id.
+     *
+     * @param id the new id
+     */
+    public void setStId(long id) {
+        this.stId = id;
+    }
+
+    /**
      * Getter for the title of the subtask.
      * @return the title of the subtask
      */

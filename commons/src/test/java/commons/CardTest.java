@@ -34,7 +34,7 @@ class CardTest {
 
         listing = new Listing("list",null);
 
-        card = new Card("desc","name",dueDate,tags,subtasks,listing,"","");
+        card = new Card("desc","name",dueDate,tags,subtasks,listing,"","","");
     }
 
     @Test
@@ -143,22 +143,22 @@ class CardTest {
 
     @Test
     void testEquals() {
-        Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
-        Card card2 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
+        Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","","");
+        Card card2 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","","");
         assertTrue(card1.equals(card2, false));
     }
 
     @Test
     void testNotEquals(){
-        Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
-        Card card2 = new Card(null, "card", new Date(), tags, subtasks, listing,"","");
+        Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","","");
+        Card card2 = new Card(null, "card", new Date(), tags, subtasks, listing,"","","");
         assertTrue(card1.equals(card2, false) == false);
     }
 
     @Test
     void testHashCode() {
-        Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
-        Card card2 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","");
+        Card card1 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","","");
+        Card card2 = new Card("desc", "card", new Date(), tags, subtasks, listing,"","","");
         assertEquals(card1.hashCode(),card2.hashCode());
     }
 }

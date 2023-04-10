@@ -48,12 +48,12 @@ public class MainController {
 
     public void showBoardOverview() {
 
-        primaryStage.setTitle("Quotes: Adding Quote");
+        primaryStage.setTitle("Talio");
         primaryStage.setScene(boardOverview);
     }
 
     public void showOverview() {
-        primaryStage.setTitle("Board: Overview");
+        primaryStage.setTitle("Talio");
         primaryStage.setScene(homePageOverview);
 
         // to be implemented: refresh
@@ -61,7 +61,7 @@ public class MainController {
     }
 
     public void showCardOverview() {
-        primaryStage.setTitle("Card: Overview");
+        primaryStage.setTitle("Talio");
         primaryStage.setScene(cardOverview);
     }
 
