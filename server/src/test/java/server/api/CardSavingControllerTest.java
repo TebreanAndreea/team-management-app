@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class CardSavingControllerTest {
     private CardSavingController controller;
@@ -63,5 +64,10 @@ public class CardSavingControllerTest {
 
     }
 
+    @Test
+    public void getUpdates()
+    {
+        assertNull(controller.getUppdatesCards().getResult());
+    }
 
 }

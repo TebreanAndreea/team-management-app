@@ -13,6 +13,11 @@ public class ServerConnectionController {
 
     @Autowired
     private ServerProperties serverProperties;
+
+    public ServerConnectionController(ServerProperties serverProperties)
+    {
+        this.serverProperties = serverProperties;
+    }
     @GetMapping(path = {"", "/"})
     public ResponseEntity checkServer(){
         return ResponseEntity.ok().build();
