@@ -206,6 +206,18 @@ public class Card {
             return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor)) && schemeName.equals(card.schemeName);
         return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor))&& schemeName.equals(card.schemeName);
     }
+    /**
+     * Equals method for the Card class. (FOR TESTING PURPOSES ONLY)
+     * @param o - the object with which we check for equality
+     * @return - a boolean based on the outcome
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return cardId == card.cardId && complete == card.complete && Objects.equals(description, card.description) && Objects.equals(name, card.name) && Objects.equals(dueDate, card.dueDate) && Objects.equals(tags, card.tags) && Objects.equals(subTasks, card.subTasks) && Objects.equals(fontColor, card.fontColor) && Objects.equals(backgroundColor, card.backgroundColor) && Objects.equals(schemeName, card.schemeName);
+    }
 
     /**
      * Getter for the list of the card.

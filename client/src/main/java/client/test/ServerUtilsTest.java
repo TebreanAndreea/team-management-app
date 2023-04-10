@@ -1,24 +1,22 @@
-package client.utils.test;
+package client.test;
 
 import client.utils.ServerUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import commons.Tag;
 import commons.*;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.JsonBody;
+import org.mockserver.verify.VerificationTimes;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.JsonBody.json;
 import static org.mockserver.verify.VerificationTimes.once;
 
@@ -30,7 +28,7 @@ public class ServerUtilsTest {
 
     @BeforeAll
     public static void openConnection() {
-        mockServer = startClientAndServer(MOCK_SERVER_PORT);
+        mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
     }
 
     @AfterAll
@@ -58,13 +56,13 @@ public class ServerUtilsTest {
                 new Board("Board2", "789", "101"),
                 new Board("Board3", "112", "131")
         );
-        mockServer.when(request().withMethod("GET").withPath("/api/boards"))
-                .respond(response()
+        mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/boards"))
+                .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(expectedBoards)));
         List<Board> actualBoards = serverUtils.getBoardsFromDB();
-        assertEquals(expectedBoards, actualBoards);
+        Assertions.assertEquals(expectedBoards, actualBoards);
     }
 
     /**
@@ -75,13 +73,13 @@ public class ServerUtilsTest {
     @Test
     public void testGetBoardByID() throws JsonProcessingException {
         Board expectedBoard = new Board("Board1", "123", "456");
-        mockServer.when(request().withMethod("GET").withPath("/api/boards/1"))
-                .respond(response()
+        mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/boards/1"))
+                .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(expectedBoard)));
         Board actualBoard = serverUtils.getBoardByID(1);
-        assertEquals(expectedBoard, actualBoard);
+        Assertions.assertEquals(expectedBoard, actualBoard);
     }
 
     /**
@@ -92,14 +90,14 @@ public class ServerUtilsTest {
     @Test
     public void testGetCardByID() throws JsonProcessingException {
         Card card = new Card("description", "name", Date.from(Instant.EPOCH),
-                new ArrayList<>(), new ArrayList<>(), null, "", "");
-        mockServer.when(request().withMethod("GET").withPath("/api/card/1"))
-                .respond(response()
+                new ArrayList<>(), new ArrayList<>(), null, "", "", null);
+        mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/card/1"))
+                .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(card)));
         Card actualCard = serverUtils.getCardsById(1);
-        assertEquals(card, actualCard);
+        Assertions.assertEquals(card, actualCard);
     }
 
     /**
@@ -110,13 +108,13 @@ public class ServerUtilsTest {
     @Test
     public void testGetListingsByID() throws JsonProcessingException {
         Listing listing = new Listing("title", null);
-        mockServer.when(request().withMethod("GET").withPath("/api/lists/1"))
-                .respond(response()
+        mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/lists/1"))
+                .respond(HttpResponse.response()
                         .withStatusCode(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(listing)));
         Listing actualListing = serverUtils.getListingsById(1);
-        assertEquals(listing, actualListing);
+        Assertions.assertEquals(listing, actualListing);
     }
 
     // --------------------- TESTS FOR THE DELETE METHODS --------------------------------
@@ -128,17 +126,17 @@ public class ServerUtilsTest {
     @Test
     public void testDeleteBoard() {
         // Setup
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("DELETE")
                         .withPath("/api/boards/123"))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(200));
 
         // Method call
         serverUtils.deleteBoard(123L);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("DELETE")
                 .withPath("/api/boards/123"), once());
     }
@@ -150,17 +148,17 @@ public class ServerUtilsTest {
     @Test
     public void testDeleteListing() {
         // Setup
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("DELETE")
                         .withPath("/api/lists/123"))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(200));
 
         // Method call
         serverUtils.deleteList(123L);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("DELETE")
                 .withPath("/api/lists/123"), once());
     }
@@ -172,19 +170,19 @@ public class ServerUtilsTest {
     @Test
     public void testDeleteCard() {
         // Setup
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("DELETE")
-                        .withPath("/api/card/delete/123"))
-                .respond(response()
+                        .withPath("/api/card/delete/123/true"))
+                .respond(HttpResponse.response()
                         .withStatusCode(200));
 
         // Method call
-        serverUtils.deleteCard(123);
+        serverUtils.deleteCard(123,true);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("DELETE")
-                .withPath("/api/card/delete/123"), once());
+                .withPath("/api/card/delete/123/true"), once());
     }
 
     /**
@@ -194,10 +192,10 @@ public class ServerUtilsTest {
     @Test
     public void deleteSubtask() {
         // Setup
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("DELETE")
                         .withPath("/api/subtask/delete/123"))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(200));
 
         // Method call
@@ -206,7 +204,7 @@ public class ServerUtilsTest {
         serverUtils.deleteSubtask(subTask);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("DELETE")
                 .withPath("/api/subtask/delete/123"), once());
     }
@@ -218,10 +216,10 @@ public class ServerUtilsTest {
     @Test
     public void testDeleteTag() {
         // Setup
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("DELETE")
                         .withPath("/api/tag/delete/123"))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(200));
 
         // Method call
@@ -230,7 +228,7 @@ public class ServerUtilsTest {
         serverUtils.deleteTag(123, tag);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("DELETE")
                 .withPath("/api/tag/delete/123"), once());
     }
@@ -242,17 +240,17 @@ public class ServerUtilsTest {
     @Test
     public void testDeleteScheme() {
         // Setup
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("DELETE")
                         .withPath("/api/color/delete/123"))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(200));
 
         // Method call
         serverUtils.deleteScheme(123L);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("DELETE")
                 .withPath("/api/color/delete/123"), once());
     }
@@ -267,18 +265,18 @@ public class ServerUtilsTest {
     public void testSaveBoard() {
         // Setup
         Board board = new Board("board1", null, null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/boards")
                         .withBody(json(board)))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.addBoard(board);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/boards")
                 .withBody(json(board)), once());
@@ -292,18 +290,18 @@ public class ServerUtilsTest {
     public void testSaveListing() {
         // Setup
         Listing listing = new Listing("listing1", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/lists")
                         .withBody(json(listing)))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.saveList(listing);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/lists")
                 .withBody(json(listing)), once());
@@ -317,22 +315,22 @@ public class ServerUtilsTest {
     public void testSaveCard() {
         // Setup
         Card card = new Card("description", "name", Date.from(Instant.EPOCH),
-                new ArrayList<>(), new ArrayList<>(), null, "", "");
-        mockServer.when(request()
+                new ArrayList<>(), new ArrayList<>(), null, "", "", null);
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
-                        .withPath("/api/card")
+                        .withPath("/api/card/false")
                         .withBody(json(card)))
-                .respond(response()
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
-        serverUtils.saveCard(card);
+        serverUtils.saveCard(card,false);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
-                .withPath("/api/card")
-                .withBody(json(card)), once());
+                .withPath("/api/card/false")
+                .withBody(JsonBody.json(card)), VerificationTimes.once());
     }
 
     /**
@@ -343,21 +341,21 @@ public class ServerUtilsTest {
     public void testSaveSubtask() {
         // Setup
         SubTask subTask = new SubTask("subtask1", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/subtask")
-                        .withBody(json(subTask)))
-                .respond(response()
+                        .withBody(JsonBody.json(subTask)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.saveSubtask(subTask);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/subtask")
-                .withBody(json(subTask)), once());
+                .withBody(JsonBody.json(subTask)), VerificationTimes.once());
     }
 
     /**
@@ -368,21 +366,21 @@ public class ServerUtilsTest {
     public void testSaveTag() {
         // Setup
         Tag tag = new Tag("tag1", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/tag")
-                        .withBody(json(tag)))
-                .respond(response()
+                        .withBody(JsonBody.json(tag)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.saveTag(tag);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/tag")
-                .withBody(json(tag)), once());
+                .withBody(JsonBody.json(tag)), VerificationTimes.once());
     }
 
     /**
@@ -393,21 +391,21 @@ public class ServerUtilsTest {
     public void testSaveColorScheme() {
         // Setup
         ColorScheme colorScheme = new ColorScheme("scheme1", "", "", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/color")
-                        .withBody(json(colorScheme)))
-                .respond(response()
+                        .withBody(JsonBody.json(colorScheme)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.saveColorScheme(colorScheme);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/color")
-                .withBody(json(colorScheme)), once());
+                .withBody(JsonBody.json(colorScheme)), VerificationTimes.once());
     }
 
     /**
@@ -418,21 +416,21 @@ public class ServerUtilsTest {
     public void testSendBoard() {
         // Setup
         Board board = new Board("board1", null, null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/lists/setBoard")
-                        .withBody(json(board)))
-                .respond(response()
+                        .withBody(JsonBody.json(board)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.sendBoard(board);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/lists/setBoard")
-                .withBody(json(board)), once());
+                .withBody(JsonBody.json(board)), VerificationTimes.once());
     }
 
     /**
@@ -443,21 +441,21 @@ public class ServerUtilsTest {
     public void testSendBoardToTag() {
         // Setup
         Board board = new Board("board1", null, null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/tag/setBoard")
-                        .withBody(json(board)))
-                .respond(response()
+                        .withBody(JsonBody.json(board)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.sendBoardToTag(board);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/tag/setBoard")
-                .withBody(json(board)), once());
+                .withBody(JsonBody.json(board)), VerificationTimes.once());
     }
 
     /**
@@ -468,21 +466,21 @@ public class ServerUtilsTest {
     public void testSendBoardToScheme() {
         // Setup
         Board board = new Board("board1", null, null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/color/setBoard")
-                        .withBody(json(board)))
-                .respond(response()
+                        .withBody(JsonBody.json(board)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.sendBoardToScheme(board);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/color/setBoard")
-                .withBody(json(board)), once());
+                .withBody(JsonBody.json(board)), VerificationTimes.once());
     }
     /**
      * Test for the sendList method.
@@ -492,21 +490,21 @@ public class ServerUtilsTest {
     public void testSendList(){
         // Setup
         Listing listing = new Listing("listing1", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/card/setList")
-                        .withBody(json(listing)))
-                .respond(response()
+                        .withBody(JsonBody.json(listing)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.sendList(listing);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/card/setList")
-                .withBody(json(listing)), once());
+                .withBody(JsonBody.json(listing)), VerificationTimes.once());
     }
 
     /**
@@ -517,21 +515,21 @@ public class ServerUtilsTest {
     public void testEditList(){
         // Setup
         Listing listing = new Listing("listing1", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/lists/edit")
-                        .withBody(json(listing)))
-                .respond(response()
+                        .withBody(JsonBody.json(listing)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.editList(listing);
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/lists/edit")
-                .withBody(json(listing)), once());
+                .withBody(JsonBody.json(listing)), VerificationTimes.once());
     }
 
     /**
@@ -542,21 +540,21 @@ public class ServerUtilsTest {
     public void testUpdateSubtask(){
         // Setup
         SubTask subTask = new SubTask("subtask1", null);
-        mockServer.when(request()
+        mockServer.when(HttpRequest.request()
                         .withMethod("POST")
                         .withPath("/api/subtask/edit")
-                        .withBody(json(subTask)))
-                .respond(response()
+                        .withBody(JsonBody.json(subTask)))
+                .respond(HttpResponse.response()
                         .withStatusCode(201));
 
         // Method call
         serverUtils.updateSubtask(subTask, "subtask1");
 
         // Verification
-        mockServer.verify(request()
+        mockServer.verify(HttpRequest.request()
                 .withMethod("POST")
                 .withPath("/api/subtask/edit")
-                .withBody(json(subTask)), once());
+                .withBody(JsonBody.json(subTask)), VerificationTimes.once());
     }
 
 
