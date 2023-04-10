@@ -108,8 +108,7 @@ public class BoardOverviewController {
         this.listController = listController;
     }
 
-    public BoardOverviewController() {
-    }
+    public BoardOverviewController() {}
 
     public void setHasAccess(boolean check) {
         this.hasAccess = check;
@@ -161,18 +160,13 @@ public class BoardOverviewController {
             boolean axis = focusUp.isFocused() || focusDown.isFocused();
             boolean dir = focusUp.isFocused() || focusLeft.isFocused();
             int movement;
-            if (dir) {
+            if (dir)
                 movement = -1;
-            }
-            else {
-                movement = 1;
-            }
-            if (axis) {
+            else movement = 1;
+
+            if (axis)
                 targetVertical(vBox, card, listing, movement);
-            }
-            else {
-                targetHorizontal(vBox, card, listing, movement);
-            }
+            else targetHorizontal(vBox, card, listing, movement);
 
             focus.requestFocus();
         }));
@@ -344,6 +338,7 @@ public class BoardOverviewController {
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(adminOverview.getValue());
             primaryStage.setScene(overview);
+            primaryStage.setResizable(false);
             primaryStage.show();
             return;
         }
@@ -354,7 +349,7 @@ public class BoardOverviewController {
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             overview = new Scene(initialOverview.getValue());
             primaryStage.setScene(overview);
-
+            primaryStage.setResizable(false);
             primaryStage.show();
         }
     }
@@ -380,6 +375,7 @@ public class BoardOverviewController {
             overview = new Scene(cardOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
+            primaryStage.setResizable(false);
             primaryStage.setOnCloseRequest(closeEvent -> server.stop());
         }
     }
@@ -408,6 +404,7 @@ public class BoardOverviewController {
             overview = new Scene(customizationOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
+            primaryStage.setResizable(false);
             primaryStage.setOnCloseRequest(event -> server.stop());
         }
     }
@@ -449,7 +446,7 @@ public class BoardOverviewController {
 
                 int nrCards = vBox.getChildren().size() - 2;
                 boolean foundPlace = false;
-                for (int j = 0; j < nrCards - 1; j++) { // check for collisions between cards to insert it in the correct place
+                for (int j = 0; j <= nrCards - 1; j++) { // check for collisions between cards to insert it in the correct place
                     HBox hBoxUp = (HBox) vBox.getChildren().get(j);
 
                     Bounds hboxBounds = hBoxUp.getLayoutBounds();
@@ -661,9 +658,8 @@ public class BoardOverviewController {
         //System.out.println(hasAccess);
         if (hasAccess)
             readOnly.setVisible(false);
-        else {
-            readOnly.setVisible(true);
-        }
+        else readOnly.setVisible(true);
+
         long id = board.getBoardId();
         hBox.getChildren().clear();
         if (id != 0) {
@@ -712,9 +708,8 @@ public class BoardOverviewController {
      * Allows access after a correctly entered password.
      */
     private void refreshedSecurity() {
-        if (!hasAccess && board.getPassword().equals("")) {
+        if (!hasAccess && board.getPassword().equals(""))
             allowAccess();
-        }
     }
 
     /**
@@ -850,8 +845,7 @@ public class BoardOverviewController {
      * @param actionEvent the event that triggered this method
      */
     public void leaveBoard(ActionEvent actionEvent) throws IOException {
-        if (isAdmin)
-        {
+        if (isAdmin) {
             switchToInitialOverviewScene(actionEvent);
             return;
         }
@@ -870,9 +864,8 @@ public class BoardOverviewController {
                     Scanner scanner = new Scanner(file);
                     while (scanner.hasNextLine()) {
                         String line = scanner.nextLine();
-                        if (!line.startsWith(Long.toString(id))) {
+                        if (!line.startsWith(Long.toString(id)))
                             content.append(line).append("\n");
-                        }
                     }
                     FileOutputStream outputStream = new FileOutputStream(file);
                     outputStream.write(content.toString().getBytes());
@@ -882,8 +875,6 @@ public class BoardOverviewController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
             }
         }
     }
@@ -1068,15 +1059,14 @@ public class BoardOverviewController {
             overview = new Scene(tagOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.setTitle("Talio");
+            primaryStage.setResizable(false);
             primaryStage.show();
         }
     }
 
     public Button addListButton;
     public Button tagButton;
-
     public Button copyKeyButton;
-
     public Button customizeButton;
     public Button refreshButton;
 
@@ -1098,6 +1088,7 @@ public class BoardOverviewController {
         colorButton(renameBoardButton);
         colorButton(refreshButton);
         colorButton(lockButton);
+        colorButton(helpButton);
         accessKey.setStyle("-fx-background-color:" + board.getBackgroundColor() + "; -fx-text-fill:" + board.getTextColor() + ";");
         accessKey.setBorder(new Border(new BorderStroke(Color.web(board.getTextColor()), BorderStrokeStyle.SOLID, new CornerRadii(5), BorderWidths.DEFAULT)));
     }
@@ -1259,9 +1250,8 @@ public class BoardOverviewController {
         int posInBoard = -1;
         for (VBox vBox: map.keySet()) {
             posInBoard++;
-            if (vBox.equals(oldVBox)) {
+            if (vBox.equals(oldVBox))
                 break;
-            }
         }
         posInBoard += i;
 
@@ -1347,9 +1337,8 @@ public class BoardOverviewController {
             return;
         }
         List<Tag> tags = card.getTags();
-        if (tags.equals(board.getTags())) {
+        if (tags.equals(board.getTags()))
             return;
-        }
 
         Dialog<ArrayList<Tag>> dialog = new Dialog<>();
         dialog.setTitle("Add a tag(s) to the card");
@@ -1357,9 +1346,8 @@ public class BoardOverviewController {
         ArrayList<Tag> items = new ArrayList<>();
 
         for (Tag tag: board.getTags()) {
-            if (!tags.contains(tag)) {
+            if (!tags.contains(tag))
                 items.add(tag);
-            }
         }
 
         DialogPane dialogPane = dialog.getDialogPane();
@@ -1401,7 +1389,6 @@ public class BoardOverviewController {
         }
     }
 
-
     /**
      * Creates a pop-up to select a color preset.
      * @param card the highlighted card
@@ -1416,9 +1403,8 @@ public class BoardOverviewController {
             return;
         }
         List<ColorScheme> schemes = board.getSchemes();
-        if (schemes.size() == 1) {
+        if (schemes.size() == 1)
             return;
-        }
 
         Dialog<ColorScheme> dialog = new Dialog<>();
         dialog.setTitle("Choose a color scheme");
@@ -1510,6 +1496,7 @@ public class BoardOverviewController {
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(helpOverview.getValue());
         primaryStage.setScene(overview);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
