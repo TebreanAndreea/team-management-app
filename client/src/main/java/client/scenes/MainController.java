@@ -54,6 +54,7 @@ public class MainController {
 
     public void showOverview() {
         primaryStage.setTitle("Talio");
+        primaryStage.setResizable(false);
         primaryStage.setScene(homePageOverview);
 
         // to be implemented: refresh

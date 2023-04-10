@@ -133,6 +133,7 @@ public class HomePageOverviewController {
             initialOverview.getKey().setFileName(fileName);
             initialOverview.getKey().refresh();
             primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            primaryStage.setResizable(false);
             overview = new Scene(initialOverview.getValue());
             primaryStage.setScene(overview);
             primaryStage.show();
@@ -149,11 +150,6 @@ public class HomePageOverviewController {
         }
     }
 
-//    public void initializeWebSockets(StompSession session)
-//    {
-//        boardOverviewController.init(session);
-//        initialOverviewController.init(session);
-//    }
     /**
      * This method checks if the url entered by the user is a valid one.
      *

@@ -94,6 +94,7 @@ public class InitialOverviewController {
         primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         overview = new Scene(boardOverview.getValue());
         primaryStage.setScene(overview);
+        primaryStage.setResizable(false);
 //        overview.setOnKeyPressed(boardOverview.getKey()::handleKeyPress);
     }
 
@@ -108,6 +109,7 @@ public class InitialOverviewController {
         overview = new Scene(homePageOverview.getValue());
         primaryStage.setScene(overview);
         primaryStage.setTitle("Talio");
+        primaryStage.setResizable(false);
     }
 
 
@@ -174,6 +176,7 @@ public class InitialOverviewController {
                     primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     overview = new Scene(boardOverview.getValue());
 //                    overview.setOnKeyPressed(boardOverview.getKey()::handleKeyPress);
+                    primaryStage.setResizable(false);
                     primaryStage.setScene(overview);
                     return;
                 }
