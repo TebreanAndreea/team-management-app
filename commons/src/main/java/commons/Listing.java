@@ -116,7 +116,7 @@ public class Listing {
                 return false;
         }
 
-        return listId == listing.listId && title.equals(listing.title) && board.equals(listing.board);
+        return listId == listing.listId && title.equals(listing.title);
     }
 
     /**
@@ -127,5 +127,11 @@ public class Listing {
         return Objects.hash(listId, title, cards, board);
     }
 
-
+    /**
+     * Sets the id. (for testing purposes only)
+     * @param listId the id to be set.
+     */
+    public void setListId(long listId) {
+        this.listId = listId;
+    }
 }

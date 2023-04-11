@@ -69,12 +69,19 @@ public class TestBoardRepository implements BoardRepository {
     /**
      * Deletes the entity with the given id.
      *
-     * @param aLong must not be {@literal null}.
+     * @param id must not be {@literal null}.
      * @throws IllegalArgumentException in case the given {@literal id} is {@literal null}
      */
     @Override
-    public void deleteById(Long aLong) {
-
+    public void deleteById(Long id) {
+        Board board = null;
+        for(int i = 0; i < boards.size(); i++) {
+            if(boards.get(i).getBoardId() == id) {
+                board = boards.get(i);
+            }
+        }
+        if(board == null)  throw new IllegalArgumentException();
+        boards.remove(board);
     }
 
     /**

@@ -57,4 +57,12 @@ public class BoardSavingControllerTest {
         long id = board.getBoardId();
         assertEquals(ResponseEntity.ok(board), controller.getById(id));
     }
+
+    @Test
+    public void deleteBoardTest() {
+        Board board = new Board();
+        board = boardRepository.save(board);
+        controller.delete(board.getBoardId());
+        assertEquals(0, boardRepository.findAll().size());
+    }
 }

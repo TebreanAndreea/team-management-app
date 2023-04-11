@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SubTaskSavingControllerTest {
     private SubtaskSavingController controller;
@@ -67,5 +68,11 @@ public class SubTaskSavingControllerTest {
     @Test
     public void updateSubTaskNullTest() {
         assertEquals(ResponseEntity.badRequest().build(), controller.updateSubtask(null));
+    }
+
+    @Test
+    public void getUpdates()
+    {
+        assertNull(controller.getUpdatesSubtasks().getResult());
     }
 }

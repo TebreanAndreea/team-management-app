@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TagSavingControllerTest {
     private TagSavingController controller;
@@ -48,11 +49,12 @@ public class TagSavingControllerTest {
         controller.setBoardToTag(board);
         assertEquals(ResponseEntity.ok(board), controller.setBoardToTag(board));
     }
-//    @Test
-//    public void getUpdateTagTest() {
-//        var noContent = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//        var result = new DeferredResult<ResponseEntity<Tag>>(1000L, noContent);
-//        assertTrue(result.equals(controller.getUpdatesTag()));
-//    }
+    @Test
+    public void getUpdates()
+    {
+        assertNull(controller.getUpdatesTag().getResult());
+    }
+
+
 
 }
