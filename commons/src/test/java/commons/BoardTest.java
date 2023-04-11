@@ -18,6 +18,12 @@ class BoardTest {
     }
 
     @Test
+    void testDefaultConstructor() {
+        board = new Board();
+        assertNotNull(board);
+    }
+
+    @Test
     void getBoardId() { // the id is auto generated
     }
     @Test

@@ -29,7 +29,7 @@ public class ColorScheme {
     }
 
     public ColorScheme() {
-
+        // for object mapper
     }
 
     public long getSchemeId() {
