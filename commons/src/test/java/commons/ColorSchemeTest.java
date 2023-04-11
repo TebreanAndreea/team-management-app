@@ -15,6 +15,12 @@ class ColorSchemeTest {
     }
 
     @Test
+    void testDefaultConstructor() {
+        colorScheme = new ColorScheme();
+        assertNotNull(colorScheme);
+    }
+
+    @Test
     void getSchemeId() { // the id is auto generated
     }
 
