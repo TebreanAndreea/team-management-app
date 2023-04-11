@@ -27,6 +27,30 @@ Worked for me too I think - Andrei
 
 ## How to run it
 
-## How to contribute to it
+> 1. Clone the git repository on your device; 
+> 2. Open the project in your preferred IDE; 
+> 3. Run the main method in the Main class of the server package OR use this command in the terminal:
+> ```./gradlew bootRun```
+> 4. Run the main method in the Main class of the client package using the following VM options: ```--module-path <path to JavaFX SDK> --add-modules javafx.controls,javafx.fxml```
+> OR use this command in the terminal:
+> ```./gradlew run``` 
+> 5. The Talio application should now be running on your device.
 
+#### Some useful things to know:
+- You can double-click on a color scheme (in the customization menu) to rename it.
+- You can join other people's servers by entering their address using the following pattern: ```<ip>:<port>``` (e.g. ```192.168.1.1:8080```)
+## How to contribute to it
+> 1. Clone the git repository on your device;
+> 2. Open the project in your preferred IDE;
+> 3. Create a new branch using the following naming convention: ```<your name>/<feature name>```
+> 4. Make your changes;
+> 5. Commit your changes;
+> 6. Push your changes to the remote repository;
+> 7. Create a merge request to the main branch;
+> 8. Wait for the merge request to be approved;
+> 9. Merge the changes into the main branch.
+> 10. Delete the branch you created.
+> 11. Pull the changes from the main branch.
+> 12. Repeat steps 3-11.
 ## Copyright / License (opt.)
+Alexandra Nicola, Andreea Tebrean, Andrei Stefan, Cristian Toadere, Marin Perković, Vasko V. Guenov

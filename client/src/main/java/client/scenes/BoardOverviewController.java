@@ -255,7 +255,7 @@ public class BoardOverviewController {
                 VBox vBox = (VBox) addCardButton.getParent().getParent();
                 Listing curList = map.get(vBox);
                 Card curCard = new Card("", name, null, new ArrayList<>(), new ArrayList<>(), curList, board.getCardFontColor(), board.getCardBackgroundColor(), scheme.getName());
-                Card updatedCard = saveCardDB(curCard, curList, true);
+                saveCardDB(curCard, curList, true);
                 refresh();
             } else {
 
@@ -1212,6 +1212,9 @@ public class BoardOverviewController {
                 break;
             case "C":
                 addColorPresetPopup(card, listing);
+                break;
+            case "?":
+                helpButton.fire();
                 break;
             default:
                 break;
