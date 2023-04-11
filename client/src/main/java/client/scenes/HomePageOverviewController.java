@@ -112,7 +112,7 @@ public class HomePageOverviewController {
         String http  = "http://";
 
         if (userUrl.contains(http))
-            userUrl = userUrl.substring(6);
+            userUrl = userUrl.substring(7);
 
         if (checkConnection(userUrl) && username.getText().trim().length() > 0) {
 
