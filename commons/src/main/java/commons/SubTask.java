@@ -33,7 +33,7 @@ public class SubTask {
      */
     @SuppressWarnings("unused")
     public SubTask(){
-
+        // for object mapper
     }
 
     /**

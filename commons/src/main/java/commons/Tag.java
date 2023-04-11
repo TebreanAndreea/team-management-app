@@ -39,7 +39,7 @@ public class Tag {
      */
     @SuppressWarnings("unused")
     public Tag() {
-
+        // for object mapper
     }
 
     /**
