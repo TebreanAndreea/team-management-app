@@ -112,7 +112,6 @@ public class BoardOverviewController {
 
     public void setHasAccess(boolean check) {
         this.hasAccess = check;
-        System.out.println("Initially " + hasAccess);
     }
 
     public void setIsAdmin(boolean b) {
@@ -655,7 +654,6 @@ public class BoardOverviewController {
     public void refresh() {
         //board = server.getBoardByID(board.getBoardId());
         refreshedSecurity();
-        //System.out.println(hasAccess);
         if (hasAccess)
             readOnly.setVisible(false);
         else readOnly.setVisible(true);

@@ -37,7 +37,6 @@ public class ColorService {
 
         ColorScheme save = repo.save(color);
         msgs.convertAndSend("/topic/colors", save);
-        System.out.println("Sent");
 
         return ResponseEntity.ok(save);
     }

@@ -495,7 +495,6 @@ public class ServerUtils {
         EXEC.submit(() -> {
             while (!Thread.interrupted())
             {
-                //System.out.println("Long Polling");
                 var response = ClientBuilder.newClient(new ClientConfig()) //
                     .target(SERVER).path("api/subtask/updates") //
                     .request(APPLICATION_JSON) //
@@ -517,7 +516,6 @@ public class ServerUtils {
         EXEC1.submit(() -> {
             while (!Thread.interrupted())
             {
-                //System.out.println("Long Polling");
                 var response = ClientBuilder.newClient(new ClientConfig()) //
                         .target(SERVER).path("api/tag/updates") //
                         .request(APPLICATION_JSON) //
@@ -539,7 +537,6 @@ public class ServerUtils {
         EXECII.submit(() -> {
             while (!Thread.interrupted() && !EXECII.isShutdown())
             {
-//                System.out.println("Long Polling");
                 var response = ClientBuilder.newClient(new ClientConfig()) //
                     .target(SERVER).path("api/card/updates") //
                     .request(APPLICATION_JSON) //

@@ -83,7 +83,6 @@ public class TagService {
         var key = new Object();
 
         listenings.put(key, s ->{
-            System.out.println("Reached");
             result.setResult(ResponseEntity.ok(s));
         });
 

@@ -46,14 +46,13 @@ public class Main {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            System.out.println("No admin password file found, generating it now. Please restart the server.");
             File file = new File("server/src/adminPass.txt");
             try {
                 file.delete();
                 file.createNewFile();
 
             } catch (IOException ex) {
-                System.out.println("Failed to create temp file. Please create a file named temp.txt in the project folder.");
+                //Failed to create temp file.
             }
         }
     }

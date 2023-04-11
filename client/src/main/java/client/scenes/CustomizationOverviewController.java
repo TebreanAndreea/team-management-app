@@ -97,7 +97,6 @@ public class CustomizationOverviewController {
      * refreshes the overview.
      */
     public void refresh() {
-        System.out.println("refreshed customization");
         board = server.getBoardByID(board.getBoardId());
         boardBackground.setValue(Color.valueOf(board.getBackgroundColor()));
         boardFont.setValue(Color.valueOf(board.getTextColor()));

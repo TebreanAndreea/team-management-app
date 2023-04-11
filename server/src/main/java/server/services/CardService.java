@@ -74,7 +74,6 @@ public class CardService {
      * @return tag corresponding to the operation
      */
     public ResponseEntity<Listing> delete(long id, boolean permanentDeletion) {
-        System.out.println("delete");
         Card card = repo.findById(id).orElse(null);
         if (card == null)
             return ResponseEntity.notFound().build();

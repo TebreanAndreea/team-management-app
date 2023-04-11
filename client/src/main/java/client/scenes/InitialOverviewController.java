@@ -226,7 +226,6 @@ public class InitialOverviewController {
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("No such file");
         }
 
         HBox hbox = new HBox();
@@ -306,9 +305,7 @@ public class InitialOverviewController {
                     return;
                 }
             }
-        } catch (Exception e) {
-            System.out.println("No such file");
-        }
+        } catch (Exception ignored){}
         try (FileWriter writer = new FileWriter(fileName, true)) {
             writer.write(board.getBoardId() + " " + hasAccess+" " +  board.getTitle()  +"\n");
         } catch (IOException e) {

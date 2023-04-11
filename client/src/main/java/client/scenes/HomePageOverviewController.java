@@ -93,7 +93,6 @@ public class HomePageOverviewController {
             scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            System.out.println("Error with scanner or with file.");
         }
     }
 
@@ -211,17 +210,11 @@ public class HomePageOverviewController {
             if (server.contains(http))
                 server = server.substring(7);
             if (password.equals(adminPassword) && checkConnection(server)) {
-                System.out.println("Admin login successful");
                 var adminOverview = FXML.load(AdminOverviewController.class, "client", "scenes", "AdminOverview.fxml");
                 primaryStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                 overview = new Scene(adminOverview.getValue());
                 primaryStage.setScene(overview);
                 primaryStage.show();
-            } else {
-                if (!password.equals(adminPassword))
-                    System.out.println("Wrong password: " + adminPassword + " " + password);
-                else
-                    System.out.println("Invalid server address");
             }
         }
 

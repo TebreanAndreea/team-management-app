@@ -85,7 +85,6 @@ public class CardOverviewController {
         isRunning = true;
         server.registerForMessages("/topic/colors", ColorScheme.class, q -> Platform.runLater(() -> {
             if (isRunning) {
-                System.out.println("I am here");
                 refresh();
             }
         }));
@@ -255,7 +254,6 @@ public class CardOverviewController {
 
             if (!name.isEmpty()) {
                 SubTask newSubTask = new SubTask(name, card);
-                System.out.println("Subtask added: " + newSubTask.getTitle());
                 saveSubtaskDB(newSubTask, card);
             } else {
                 Alert emptyField = new Alert(Alert.AlertType.ERROR);
@@ -393,7 +391,6 @@ public class CardOverviewController {
         List<SubTask> sbtask = new ArrayList<>();
         Card card = server.getCardsById(cardId);
         int idx = card.getSubTasks().indexOf(subTask);
-        System.out.println(idx);
         if (idx < card.getSubTasks().size() - 1) {
             for (int i = 0; i < card.getSubTasks().size(); i++) {
                 sbtask.add(card.getSubTasks().get(i));
@@ -438,7 +435,6 @@ public class CardOverviewController {
         List<SubTask> sbtask = new ArrayList<>();
         Card card = server.getCardsById(cardId);
         int idx = card.getSubTasks().indexOf(subTask);
-        System.out.println(idx);
         if (idx > 0) {
             for (int i = 0; i < card.getSubTasks().size(); i++) {
                 sbtask.add(card.getSubTasks().get(i));
@@ -510,7 +506,6 @@ public class CardOverviewController {
         colorSchemesLabel.setTextFill(fontColor);
 
 
-        System.out.println("Refreshed refresh: " + 0);
         curCard = server.getCardsById(cardId);
         if (curCard == null) {
             isRunning = false;
