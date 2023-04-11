@@ -195,16 +195,17 @@ public class Card {
     /**
      * Equals method for the Card class.
      * @param o - the object with which we check for equality
-     * @param listss - checks wether the method has been called from a list and doesn't check if the lists are equal as this makes the code go in a loop
+     * @param lists - checks whether the method has been called from a list and doesn't check if the lists are equal as this makes the code go in a loop
      * @return - a boolean based on the outcome
      */
-    public boolean equals(Object o, boolean listss) {
+    public boolean equals(Object o, boolean lists) {
         if (this == o) return true;
         if (!(o instanceof Card)) return false;
         Card card = (Card) o;
-        if (listss)
+        if (lists)
             return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor)) && schemeName.equals(card.schemeName);
-        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor))&& schemeName.equals(card.schemeName);
+//        return cardId == card.cardId && complete == card.complete && description.equals(card.description) && name.equals(card.name) && tags.equals(card.tags) && subTasks.equals(card.subTasks) && list.equals(card.list) && fontColor.equals(card.fontColor) && backgroundColor.equals((card.backgroundColor))&& schemeName.equals(card.schemeName);
+        return this.equals(o);
     }
     /**
      * Equals method for the Card class. (FOR TESTING PURPOSES ONLY)
